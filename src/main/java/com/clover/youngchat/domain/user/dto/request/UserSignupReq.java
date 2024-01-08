@@ -28,7 +28,7 @@ public class UserSignupReq {
     private String username;
 
     @Pattern(
-        regexp = "^[a-zA-Z0-9]{4,15}$",
+        regexp = PASSWORD_REGEX,
         message = "비밀번호는 영소문자, 대문자, 특수문자, 숫자를 포함한 8글자 이상 15글자 이하입니다."
     )
     private String password;
