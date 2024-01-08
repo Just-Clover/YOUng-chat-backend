@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class YoungChatApplication {
 
     public static void main(String[] args) {
+        long a = "test";
         SpringApplication.run(YoungChatApplication.class, args);
     }
 
