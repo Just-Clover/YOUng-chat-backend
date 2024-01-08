@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "sample")
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -26,9 +26,10 @@ public class User {
     private String profileImage;
 
     @Builder
-    private User(String email, String username, String password) {
+    private User(String email, String username, String password, String profileImage) {
         this.email = email;
         this.username = username;
         this.password = password;
+        this.profileImage = profileImage;
     }
 }
