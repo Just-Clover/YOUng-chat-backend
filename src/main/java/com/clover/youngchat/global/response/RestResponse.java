@@ -2,11 +2,17 @@ package com.clover.youngchat.global.response;
 
 import com.clover.youngchat.global.exception.ResultCode;
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 
+@Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RestResponse<T> implements Serializable {
 
     private HttpStatus status;
