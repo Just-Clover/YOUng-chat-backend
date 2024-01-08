@@ -1,10 +1,12 @@
 package com.clover.youngchat.domain.user.service;
 
+import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
+import com.clover.youngchat.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class UserService {
 
     private void validateSignup(UserSignupReq userSignupReq) {
         if (userRepository.existsByEmail(userSignupReq.getEmail())) {
-            throw new NullPointerException("중복된 email이 존재합니다.");
+            throw new GlobalException(DUPLICATED_EMAIL);
         }
     }
 }
