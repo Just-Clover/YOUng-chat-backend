@@ -16,7 +16,8 @@ public enum ResultCode {
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 1002, "입력값이 올바르지 않습니다."),
 
     // 유저 2000번대
-    DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, 2000, "중복된 email이 존재합니다");
+    DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, 2000, "중복된 email이 존재합니다"),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, 2001, "존재하지 않는 사용자 입니다.");
 
     // 채팅방 3000번대
 
