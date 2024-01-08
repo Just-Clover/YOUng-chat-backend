@@ -1,5 +1,9 @@
 package com.clover.youngchat.domain.user.dto.request;
 
+import static com.clover.youngchat.domain.user.constant.UserConstant.EMAIL_REGEX;
+import static com.clover.youngchat.domain.user.constant.UserConstant.PASSWORD_REGEX;
+import static com.clover.youngchat.domain.user.constant.UserConstant.USERNAME_REGEX;
+
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,11 +13,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSignupReq {
-
-    private static final String EMAIL_REGEX = "\\w+@\\w+\\.\\w+(\\.\\w+)?";
-    private static final String USERNAME_REGEX = "^[a-z가-힣]{4,10}$";
-    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,15}$";
-
 
     @Pattern(
         regexp = EMAIL_REGEX,
