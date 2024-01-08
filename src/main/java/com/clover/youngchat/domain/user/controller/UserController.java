@@ -1,11 +1,14 @@
 package com.clover.youngchat.domain.user.controller;
 
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
+import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.service.UserService;
 import com.clover.youngchat.global.response.RestResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,5 +24,10 @@ public class UserController {
     @PostMapping("/signup")
     public RestResponse<UserSignupRes> signup(@Valid @RequestBody UserSignupReq userSignupReq) {
         return RestResponse.success(userService.signup(userSignupReq));
+    }
+
+    @GetMapping("/profile/{userId}")
+    public RestResponse<UserProfileGetRes> getProfile(@PathVariable Long userId) {
+        return RestResponse.success(userService.getProfile(userId));
     }
 }

@@ -1,8 +1,10 @@
 package com.clover.youngchat.domain.user.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
+import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
@@ -32,6 +34,16 @@ public class UserService {
         userRepository.save(user);
 
         return new UserSignupRes();
+    }
+
+    public UserProfileGetRes getProfile(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+
+        return UserProfileGetRes.builder()
+            .username(user.getUsername())
+            .profileImage(user.getProfileImage())
+            .build();
     }
 
     private void validateSignup(UserSignupReq userSignupReq) {
