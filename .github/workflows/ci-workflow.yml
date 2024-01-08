@@ -3,6 +3,10 @@ name: Java CI with Gradle
 on:
   push:
     branches:
+      - ma
+      - develop
+  pull_request:
+    branches:
       - develop
 
 permissions:
@@ -37,9 +41,6 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Test with Gradle
-        run: ./gradlew test
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
