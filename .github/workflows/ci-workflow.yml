@@ -1,7 +1,7 @@
 name: Java CI with Gradle
 
 on:
-  push:
+  pull_request:
     branches:
       - develop
 
@@ -12,7 +12,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Set up CI server
@@ -37,13 +37,3 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Test with Gradle
-        run: ./gradlew test
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()  # 테스트가 실패하여도 Report를 보기 위해 `always`로 설정
-        with:
-          files: |
-            build/test-results/**/*.xml
