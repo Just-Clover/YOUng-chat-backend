@@ -17,11 +17,14 @@ public enum ResultCode {
 
     // 유저 2000번대
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, 2000, "중복된 email이 존재합니다"),
-    NOT_FOUND_USER(HttpStatus.NOT_FOUND, 2001, "존재하지 않는 사용자 입니다.");
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, 2001, "존재하지 않는 사용자 입니다."),
 
     // 채팅방 3000번대
 
     // 채팅 4000번대
+
+    // 친구 5000번대
+    NOT_FOUND_FRIEND(HttpStatus.NOT_FOUND, 5000, "친구를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final Integer code;
