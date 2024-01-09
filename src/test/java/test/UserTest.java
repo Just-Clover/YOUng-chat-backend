@@ -13,7 +13,7 @@ public interface UserTest {
 
     String TEST_ANOTHER_USER_EMAIL = "another@email.com";
     String TEST_ANOTHER_USER_NAME = "another1";
-    String TEST_ANOTHER_USER_PASSWORD = "12345aA!";
+    String TEST_ANOTHER_USER_PASSWORD = "12345aA!!";
 
     User TEST_USER = User.builder()
         .id(TEST_USER_ID)

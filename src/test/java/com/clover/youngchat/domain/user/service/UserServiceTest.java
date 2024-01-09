@@ -81,7 +81,7 @@ class UserServiceTest implements UserTest {
     }
 
     @Test
-    @DisplayName("비밀번호 변경테스트")
+    @DisplayName("비밀번호 변경테스트 : 성공")
     void updatePasswordSuccessTest() {
         // given
         UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
