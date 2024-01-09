@@ -2,9 +2,11 @@ package com.clover.youngchat.domain.user.controller;
 
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
+import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
+import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.service.UserService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +45,13 @@ public class UserController {
     UserDetailsImpl userDetails) {
         return RestResponse.success(
             userService.editProfile(userId, req, userDetails.getUser().getId()));
+    }
+  
+  @PatchMapping("/password")
+    public RestResponse<UserUpdatePasswordRes> updatePassword(
+        @Valid @RequestBody UserUpdatePasswordReq userUpdatePasswordReq,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return RestResponse.success(
+            userService.updatePassword(userDetails.getUser().getId(), userUpdatePasswordReq));
     }
 }
