@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 import test.UserTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,8 +91,9 @@ class UserServiceTest implements UserTest {
             .newPassword(TEST_ANOTHER_USER_PASSWORD)
             .checkNewPassword(TEST_ANOTHER_USER_PASSWORD)
             .build();
+        ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
-        given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.ofNullable(TEST_USER));
+        given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
         given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any()))
             .willReturn(true);
 
@@ -111,9 +113,9 @@ class UserServiceTest implements UserTest {
             .newPassword(TEST_ANOTHER_USER_PASSWORD)
             .checkNewPassword(TEST_ANOTHER_USER_PASSWORD)
             .build();
+        ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
-        given(userRepository.findById(TEST_USER_ID)).willReturn(
-            Optional.ofNullable(TEST_USER));
+        given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
         given(passwordEncoder.matches(any(), any()))
             .willReturn(false);
 
@@ -136,9 +138,9 @@ class UserServiceTest implements UserTest {
             .newPassword(TEST_ANOTHER_USER_PASSWORD)
             .checkNewPassword("NotMatches")
             .build();
+        ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
-        given(userRepository.findById(TEST_USER_ID)).willReturn(
-            Optional.ofNullable(TEST_USER));
+        given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
 
         // when
         GlobalException exception =
@@ -159,9 +161,9 @@ class UserServiceTest implements UserTest {
             .newPassword(TEST_USER_PASSWORD)
             .checkNewPassword(TEST_USER_PASSWORD)
             .build();
+        ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
-        given(userRepository.findById(TEST_USER_ID)).willReturn(
-            Optional.ofNullable(TEST_USER));
+        given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
         given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any()))
             .willReturn(true);
 

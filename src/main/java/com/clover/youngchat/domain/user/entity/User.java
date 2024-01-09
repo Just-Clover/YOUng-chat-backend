@@ -27,8 +27,7 @@ public class User {
     private String profileImage;
 
     @Builder
-    private User(Long id, String email, String username, String password, String profileImage) {
-        this.id = id;
+    private User(String email, String username, String password, String profileImage) {
         this.email = email;
         this.username = username;
         this.password = password;
@@ -39,8 +38,8 @@ public class User {
         this.username = req.getUsername();
         this.profileImage = req.getProfileImage();
     }
-  
-   public void updatePassword(String password) {
+
+    public void updatePassword(String password) {
         this.password = password;
-   }
+    }
 }

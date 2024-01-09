@@ -16,13 +16,11 @@ public interface UserTest {
     String TEST_ANOTHER_USER_PASSWORD = "12345aA!!";
 
     User TEST_USER = User.builder()
-        .id(TEST_USER_ID)
         .email(TEST_USER_EMAIL)
         .username(TEST_USER_NAME)
         .password(TEST_USER_PASSWORD)
         .build();
     User TEST_ANOTHER_USER = User.builder()
-        .id(TEST_ANOTHER_USER_ID)
         .email(TEST_ANOTHER_USER_EMAIL)
         .username(TEST_ANOTHER_USER_NAME)
         .password(TEST_ANOTHER_USER_PASSWORD)
