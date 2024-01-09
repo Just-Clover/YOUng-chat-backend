@@ -1,6 +1,5 @@
 package com.clover.youngchat.global.jwt;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -25,7 +24,7 @@ public class JwtUtil {
     public static final String REFRESH_TOKEN_HEADER = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
     public static final String BEARER_PREFIX = "Bearer ";
-    public static final String AUTHORITY =  "ROLE_USER";
+    public static final String AUTHORITY = "ROLE_USER";
     public static final long ACCESS_TOKEN_TIME = 60 * 30 * 1000 * 24L;
     public static final long REFRESH_TOKEN_TIME = 60 * 60 * 1000L * 24 * 14;
 
@@ -88,8 +87,9 @@ public class JwtUtil {
         return false;
     }
 
-    public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    public String getUserInfoFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
+            .getSubject();
     }
 
 }
