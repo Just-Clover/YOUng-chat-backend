@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +31,8 @@ public class UserController {
         return RestResponse.success(userService.signup(userSignupReq));
     }
 
-    @GetMapping("/profile/{userId}")
-    public RestResponse<UserProfileGetRes> getProfile(@PathVariable Long userId) {
+    @GetMapping("/profile")
+    public RestResponse<UserProfileGetRes> getProfile(@RequestParam Long userId) {
         return RestResponse.success(userService.getProfile(userId));
     }
 
