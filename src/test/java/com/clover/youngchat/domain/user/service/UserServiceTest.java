@@ -7,6 +7,7 @@ import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -91,8 +92,8 @@ class UserServiceTest implements UserTest {
             .build();
 
         given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.ofNullable(TEST_USER));
-        given(passwordEncoder.matches(req.getPrePassword(), TEST_USER_PASSWORD))
-            .willReturn(req.getPrePassword().equals(TEST_USER_PASSWORD));
+        given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any()))
+            .willReturn(true);
 
         // when
         userService.updatePassword(TEST_USER_ID, req);
@@ -113,8 +114,8 @@ class UserServiceTest implements UserTest {
 
         given(userRepository.findById(TEST_USER_ID)).willReturn(
             Optional.ofNullable(TEST_USER));
-        given(passwordEncoder.matches(req.getPrePassword(), TEST_USER_PASSWORD))
-            .willReturn(req.getPrePassword().equals(TEST_USER_PASSWORD));
+        given(passwordEncoder.matches(any(), any()))
+            .willReturn(false);
 
         // when
         GlobalException exception =
@@ -161,8 +162,8 @@ class UserServiceTest implements UserTest {
 
         given(userRepository.findById(TEST_USER_ID)).willReturn(
             Optional.ofNullable(TEST_USER));
-        given(passwordEncoder.matches(req.getPrePassword(), TEST_USER_PASSWORD))
-            .willReturn(req.getPrePassword().equals(TEST_USER_PASSWORD));
+        given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any()))
+            .willReturn(true);
 
         // when
         GlobalException exception =
