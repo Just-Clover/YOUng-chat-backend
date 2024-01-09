@@ -26,7 +26,8 @@ public class User {
     private String profileImage;
 
     @Builder
-    private User(String email, String username, String password, String profileImage) {
+    private User(Long id, String email, String username, String password, String profileImage) {
+        this.id = id;
         this.email = email;
         this.username = username;
         this.password = password;
