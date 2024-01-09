@@ -38,4 +38,8 @@ public class User {
         this.username = req.getUsername();
         this.profileImage = req.getProfileImage();
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }
