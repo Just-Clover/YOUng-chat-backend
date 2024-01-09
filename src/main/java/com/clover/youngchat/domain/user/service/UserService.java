@@ -84,7 +84,7 @@ public class UserService {
             throw new GlobalException(MISMATCH_PASSWORD);
         }
 
-        if (!req.getPrePassword().equals(req.getNewPassword())) {
+        if (req.getPrePassword().equals(req.getNewPassword())) {
             throw new GlobalException(SAME_OLD_PASSWORD);
         }
     }
