@@ -48,6 +48,7 @@ public class UserService {
             .email(userSignupReq.getEmail())
             .username(userSignupReq.getUsername())
             .password(encryptionPassword)
+            .profileImage(defaultProfileImageUrl)
             .build();
 
         userRepository.save(user);
