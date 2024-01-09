@@ -32,4 +32,8 @@ public class User {
         this.password = password;
         this.profileImage = profileImage;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }
