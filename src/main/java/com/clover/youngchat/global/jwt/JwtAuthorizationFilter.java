@@ -6,7 +6,6 @@ import static com.clover.youngchat.global.jwt.JwtUtil.REFRESH_TOKEN_HEADER;
 
 import com.clover.youngchat.global.redis.RedisUtil;
 import com.clover.youngchat.global.security.UserDetailsServiceImpl;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +35,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String accessToken = jwtUtil.getTokenFromHeader(request, ACCESS_TOKEN_HEADER);
 
-        if (StringUtils.hasText(accessToken)) {
-            accessToken = null;
-        }
         if (StringUtils.hasText(accessToken) && !jwtUtil.validateToken(accessToken)) {
             String refreshToken = jwtUtil.getTokenFromHeader(request, REFRESH_TOKEN_HEADER);
             if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)
@@ -54,9 +50,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         if (StringUtils.hasText(accessToken)) {
-            Claims info = jwtUtil.getUserInfoFromToken(accessToken);
             try {
-                setAuthentication(info.getSubject());
+                setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
             } catch (Exception e) {
                 log.error(e.getMessage());
                 return;
