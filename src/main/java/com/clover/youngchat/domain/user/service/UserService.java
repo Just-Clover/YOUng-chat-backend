@@ -3,7 +3,6 @@ package com.clover.youngchat.domain.user.service;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
-import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_FILE;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
@@ -24,6 +23,7 @@ import com.clover.youngchat.global.s3.S3Util.FilePath;
 import jakarta.transaction.Transactional;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +35,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final S3Util s3Util;
+
+    @Value("${default.image.url}")
+    private String defaultProfileImageUrl;
 
     public UserSignupRes signup(UserSignupReq userSignupReq) {
 
@@ -69,8 +72,6 @@ public class UserService {
         // 수정하고자 하는 프로필이 본인의 프로필이 아닌 경우
         if (!userId.equals(authUserId)) {
             throw new GlobalException(ACCESS_DENY);
-        } else if (multipartFile == null) {
-            throw new GlobalException(NOT_FOUND_FILE);
         }
 
         User user = userRepository.findById(userId)
@@ -78,10 +79,19 @@ public class UserService {
 
         String profileImageUrl = user.getProfileImage();
 
-        if (Objects.equals(multipartFile.getContentType(), "image/png")) {
-            profileImageUrl = s3Util.uploadFile(multipartFile, FilePath.PROFILE);
+        // user가 파일을 올리지 않았을 경우 프로필 변경하지 않는 것으로 간주해서 기존 프로필 그대로 유지
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            profileImageUrl = user.getProfileImage();
         } else {
-            throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
+            // user가 업로드 할 파일의 확장자가 png 인지 확인, png가 아니라면 exception 발생
+            if (!Objects.equals(multipartFile.getContentType(), "image/png")) {
+                throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
+            }
+            // user의 프로필 url이 기본 프로필과 같지 않을 경우 s3에서 삭제
+            if (!profileImageUrl.equals(defaultProfileImageUrl)) {
+                s3Util.deleteFile(profileImageUrl, FilePath.PROFILE);
+            }
+            profileImageUrl = s3Util.uploadFile(multipartFile, FilePath.PROFILE);
         }
 
         user.updateProfile(req, profileImageUrl);

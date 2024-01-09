@@ -68,7 +68,8 @@ public class S3Util {
     }
 
     private String createFileName(String fileName) {
-        return UUID.randomUUID().toString().concat(fileName);
+        String substringFile = fileName.substring(fileName.lastIndexOf('.'));
+        return UUID.randomUUID().toString().concat(substringFile);
     }
 
     @Getter
