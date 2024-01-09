@@ -1,8 +1,10 @@
 package com.clover.youngchat.domain.user.controller;
 
+import static com.clover.youngchat.global.exception.ResultCode.SUCCESS;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
@@ -20,8 +22,8 @@ class UserControllerTest extends BaseMvcTest {
     private UserService userService;
 
     @Test
-    @DisplayName("회원가입 테스트")
-    void signupTest() throws Exception {
+    @DisplayName("회원가입 테스트 : 성공")
+    void signupTestSuccess() throws Exception {
         // given
         UserSignupReq userSignupReq = UserSignupReq.builder()
             .email(TEST_USER_EMAIL)
@@ -33,7 +35,7 @@ class UserControllerTest extends BaseMvcTest {
         mockMvc.perform(post("/api/v1/users/signup")
                 .content(objectMapper.writeValueAsString(userSignupReq))
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
     }
 }
