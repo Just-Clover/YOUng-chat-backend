@@ -1,5 +1,6 @@
 package com.clover.youngchat.domain.user.entity;
 
+import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,5 +32,10 @@ public class User {
         this.username = username;
         this.password = password;
         this.profileImage = profileImage;
+    }
+
+    public void updateProfile(UserProfileEditReq req) {
+        this.username = req.getUsername();
+        this.profileImage = req.getProfileImage();
     }
 }
