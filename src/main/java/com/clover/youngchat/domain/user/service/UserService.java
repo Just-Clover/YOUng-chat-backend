@@ -4,6 +4,7 @@ import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
+import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
 
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
@@ -81,6 +82,10 @@ public class UserService {
 
         if (!passwordEncoder.matches(req.getPrePassword(), foundUser.getPassword())) {
             throw new GlobalException(MISMATCH_PASSWORD);
+        }
+
+        if (!req.getPrePassword().equals(req.getNewPassword())) {
+            throw new GlobalException(SAME_OLD_PASSWORD);
         }
     }
 }
