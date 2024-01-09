@@ -15,6 +15,7 @@ public enum ResultCode {
     ACCESS_DENY(HttpStatus.FORBIDDEN, 1001, "접근 권한이 없습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 1002, "입력값이 올바르지 않습니다."),
     NOT_FOUND_FILE(HttpStatus.NOT_FOUND, 1003, "해당 파일을 찾을 수 없습니다."),
+    INVALID_PROFILE_IMAGE_TYPE(HttpStatus.BAD_REQUEST, 1004, "지원하지 않는 파일 형식 입니다."),
 
     // 유저 2000번대
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, 2000, "중복된 email이 존재합니다"),

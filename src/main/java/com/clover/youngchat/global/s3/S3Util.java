@@ -10,8 +10,10 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Component
 @RequiredArgsConstructor
 public class S3Util {
 

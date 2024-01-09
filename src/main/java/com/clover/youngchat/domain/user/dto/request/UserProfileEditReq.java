@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 public class UserProfileEditReq {
 
     private String username;
-    private String profileImage;
 
     @Builder
-    private UserProfileEditReq(String username, String profileImage) {
+    private UserProfileEditReq(String username) {
         this.username = username;
-        this.profileImage = profileImage;
     }
 }

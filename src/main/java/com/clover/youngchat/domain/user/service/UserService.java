@@ -2,6 +2,8 @@ package com.clover.youngchat.domain.user.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
+import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_FILE;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
@@ -17,10 +19,14 @@ import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
+import com.clover.youngchat.global.s3.S3Util;
+import com.clover.youngchat.global.s3.S3Util.FilePath;
+import jakarta.transaction.Transactional;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3Util s3Util;
 
     public UserSignupRes signup(UserSignupReq userSignupReq) {
 
@@ -56,16 +63,28 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileEditRes editProfile(Long userId, UserProfileEditReq req, Long authUserId) {
+    public UserProfileEditRes editProfile(Long userId, UserProfileEditReq req,
+        MultipartFile multipartFile,
+        Long authUserId) {
         // 수정하고자 하는 프로필이 본인의 프로필이 아닌 경우
         if (!userId.equals(authUserId)) {
             throw new GlobalException(ACCESS_DENY);
+        } else if (multipartFile == null) {
+            throw new GlobalException(NOT_FOUND_FILE);
         }
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
 
-        user.updateProfile(req);
+        String profileImageUrl = user.getProfileImage();
+
+        if (Objects.equals(multipartFile.getContentType(), "image/png")) {
+            profileImageUrl = s3Util.uploadFile(multipartFile, FilePath.PROFILE);
+        } else {
+            throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
+        }
+
+        user.updateProfile(req, profileImageUrl);
 
         return new UserProfileEditRes();
 
