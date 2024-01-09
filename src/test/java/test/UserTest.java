@@ -4,9 +4,6 @@ import com.clover.youngchat.domain.user.entity.User;
 
 public interface UserTest {
 
-    Long TEST_USER_ID = 1L;
-    Long ANOTHER_TEST_USER_ID = 2L;
-
     String TEST_USER_EMAIL = "username@email.com";
     String TEST_USER_NAME = "username";
     String TEST_USER_PASSWORD = "12345678";
@@ -20,6 +17,7 @@ public interface UserTest {
         .username(TEST_USER_NAME)
         .password(TEST_USER_PASSWORD)
         .build();
+
     User TEST_ANOTHER_USER = User.builder()
         .email(TEST_ANOTHER_USER_EMAIL)
         .username(TEST_ANOTHER_USER_NAME)
