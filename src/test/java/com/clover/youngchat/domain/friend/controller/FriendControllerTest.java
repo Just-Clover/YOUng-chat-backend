@@ -1,5 +1,6 @@
 package com.clover.youngchat.domain.friend.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,6 +18,17 @@ public class FriendControllerTest extends BaseMvcTest {
 
     @MockBean
     private FriendService friendService;
+
+    @Test
+    @DisplayName("친구목록 조회 테스트")
+    void getFriendListTest() throws Exception {
+        // when - then
+        mockMvc.perform(get("/api/v1/friends")
+                .principal(mockPrincipal)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print());
+    }
 
     @Test
     @DisplayName("친구추가 테스트")

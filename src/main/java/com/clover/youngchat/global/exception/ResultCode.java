@@ -20,11 +20,14 @@ public enum ResultCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, 2001, "존재하지 않는 사용자 입니다."),
     MISMATCH_PASSWORD(HttpStatus.BAD_REQUEST, 2002, "기존 비밀번호가 일치하지 않습니다."),
     MISMATCH_CONFIRM_PASSWORD(HttpStatus.BAD_REQUEST, 2003, "변경된 비밀번호와 확인 비밀번호가 일치하지 않습니다."),
-    SAME_OLD_PASSWORD(HttpStatus.BAD_REQUEST, 2004, "이전 비밀번호와 같습니다.");
+    SAME_OLD_PASSWORD(HttpStatus.BAD_REQUEST, 2004, "이전 비밀번호와 같습니다."),
 
     // 채팅방 3000번대
 
     // 채팅 4000번대
+
+    // 친구 5000번대
+    NOT_FOUND_FRIEND(HttpStatus.NOT_FOUND, 5000, "친구를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final Integer code;
