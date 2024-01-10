@@ -65,6 +65,9 @@ dependencies {
     // h2
     testImplementation("com.h2database:h2:2.1.214")
     compileOnly("com.h2database:h2:2.1.214")
+
+    // aws
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
 }
 
 tasks.withType<Test> {
