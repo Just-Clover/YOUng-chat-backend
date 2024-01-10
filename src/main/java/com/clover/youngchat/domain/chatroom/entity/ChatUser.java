@@ -2,6 +2,7 @@ package com.clover.youngchat.domain.chatroom.entity;
 
 import com.clover.youngchat.domain.user.entity.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
@@ -20,13 +21,13 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ChatUser {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ChatRoom chatRoom;
