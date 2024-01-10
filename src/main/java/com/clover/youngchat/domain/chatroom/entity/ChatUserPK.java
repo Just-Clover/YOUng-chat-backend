@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatUserPK implements Serializable {
 
-    private Long userId;
-    private Long chatRoomId;
+    private Long user;
+    private Long chatRoom;
 }
