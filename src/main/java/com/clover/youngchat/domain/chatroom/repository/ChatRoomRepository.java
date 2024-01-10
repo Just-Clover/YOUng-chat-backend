@@ -6,4 +6,5 @@ import org.springframework.data.repository.RepositoryDefinition;
 @RepositoryDefinition(domainClass = ChatRoom.class, idClass = Long.class)
 public interface ChatRoomRepository {
 
+    ChatRoom save(ChatRoom chatRoom);
 }
