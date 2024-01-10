@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>YOUngChat! 이메일 인증 코드입니다.</title>
+</head>
+<body style="width: 100%; margin: 0 auto; padding: 10px;">
+<div style="text-align: center;">
+  <h1 class="text-center">
+    YOUngChat!
+  </h1>
+</div>
+<div style="text-align: center;">
+  <div style="border: 1px solid black; width: 300px; margin: 0 auto;">
+    <h4>YOUngChat 인증 코드입니다.</h4>
+    <div style="font-size: 130%;margin: 20px;">
+      CODE : <strong th:text="${code}"></strong>
+      <br>
+    </div>
+  </div>
+</div>
+</body>
+</html>
