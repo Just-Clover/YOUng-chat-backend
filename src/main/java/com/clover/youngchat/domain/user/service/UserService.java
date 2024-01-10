@@ -7,6 +7,7 @@ import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
+import static com.clover.youngchat.global.exception.ResultCode.UNAUTHORIZED_EMAIL;
 
 import com.clover.youngchat.domain.user.dto.request.UserEmailAuthCheckReq;
 import com.clover.youngchat.domain.user.dto.request.UserEmailAuthReq;
@@ -19,6 +20,7 @@ import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
+import com.clover.youngchat.domain.user.entity.EmailAuth;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.email.EmailUtil;
@@ -126,9 +128,13 @@ public class UserService {
             .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
     }
 
-    private void validateSignup(UserSignupReq userSignupReq) {
-        if (userRepository.existsByEmail(userSignupReq.getEmail())) {
+    private void validateSignup(UserSignupReq req) {
+        EmailAuth emailAuth = emailUtil.findEmailAuth(req.getEmail());
+        if (userRepository.existsByEmail(req.getEmail())) {
             throw new GlobalException(DUPLICATED_EMAIL);
+        }
+        if (!emailAuth.isAuthenticated()) {
+            throw new GlobalException(UNAUTHORIZED_EMAIL);
         }
     }
 

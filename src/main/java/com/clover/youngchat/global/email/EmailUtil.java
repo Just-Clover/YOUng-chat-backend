@@ -81,4 +81,8 @@ public class EmailUtil {
         return templateEngine.process("email", context);
     }
 
+    public EmailAuth findEmailAuth(String email) {
+        return emailAuthService.findById(email);
+    }
+
 }

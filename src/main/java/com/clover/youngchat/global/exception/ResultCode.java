@@ -26,6 +26,7 @@ public enum ResultCode {
     NOT_FOUND_EMAIL(HttpStatus.NOT_FOUND, 2005, "해당 이메일을 찾을 수 없습니다."),
     EMAIL_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, 2006, "이메일 전송에 실패했습니다."),
     INVALID_CODE(HttpStatus.BAD_REQUEST, 2007, "인증번호 코드가 일치하지 않습니다"),
+    UNAUTHORIZED_EMAIL(HttpStatus.BAD_REQUEST, 2008, "인증되지 않은 이메일입니다."),
 
     // 채팅방 3000번대
 
