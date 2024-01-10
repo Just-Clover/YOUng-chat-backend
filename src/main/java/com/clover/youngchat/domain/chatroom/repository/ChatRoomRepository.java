@@ -10,4 +10,6 @@ public interface ChatRoomRepository {
     ChatRoom save(ChatRoom chatRoom);
 
     Optional<ChatRoom> findById(Long id);
+
+    Boolean existsById(Long id);
 }
