@@ -7,16 +7,23 @@ import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
+import static com.clover.youngchat.global.exception.ResultCode.UNAUTHORIZED_EMAIL;
 
+import com.clover.youngchat.domain.user.dto.request.UserEmailAuthCheckReq;
+import com.clover.youngchat.domain.user.dto.request.UserEmailAuthReq;
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
+import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
+import com.clover.youngchat.domain.user.entity.EmailAuth;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
+import com.clover.youngchat.global.email.EmailUtil;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.s3.S3Util;
 import com.clover.youngchat.global.s3.S3Util.FilePath;
@@ -32,9 +39,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final String EMAIL_AUTHENTICATION = "YOUngChat! [이메일 인증]";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final S3Util s3Util;
+    private final EmailUtil emailUtil;
 
     @Value("${default.image.url}")
     private String defaultProfileImageUrl;
@@ -118,9 +128,14 @@ public class UserService {
             .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
     }
 
-    private void validateSignup(UserSignupReq userSignupReq) {
-        if (userRepository.existsByEmail(userSignupReq.getEmail())) {
+    private void validateSignup(UserSignupReq req) {
+        if (userRepository.existsByEmail(req.getEmail())) {
             throw new GlobalException(DUPLICATED_EMAIL);
+        }
+
+        EmailAuth emailAuth = emailUtil.findEmailAuth(req.getEmail());
+        if (!emailAuth.isAuthenticated()) {
+            throw new GlobalException(UNAUTHORIZED_EMAIL);
         }
     }
 
@@ -136,5 +151,15 @@ public class UserService {
         if (req.getPrePassword().equals(req.getNewPassword())) {
             throw new GlobalException(SAME_OLD_PASSWORD);
         }
+    }
+
+    public UserEmailAuthRes sendAuthEmail(final UserEmailAuthReq req) {
+        emailUtil.sendMessage(req.getEmail(), EMAIL_AUTHENTICATION);
+        return new UserEmailAuthRes();
+    }
+
+    public UserEmailAuthCheckRes checkAuthEmail(final UserEmailAuthCheckReq req) {
+        emailUtil.checkCode(req.getEmail(), req.getCode());
+        return new UserEmailAuthCheckRes();
     }
 }

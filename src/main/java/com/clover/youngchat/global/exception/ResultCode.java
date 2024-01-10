@@ -23,6 +23,10 @@ public enum ResultCode {
     MISMATCH_PASSWORD(HttpStatus.BAD_REQUEST, 2002, "기존 비밀번호가 일치하지 않습니다."),
     MISMATCH_CONFIRM_PASSWORD(HttpStatus.BAD_REQUEST, 2003, "변경된 비밀번호와 확인 비밀번호가 일치하지 않습니다."),
     SAME_OLD_PASSWORD(HttpStatus.BAD_REQUEST, 2004, "이전 비밀번호와 같습니다."),
+    NOT_FOUND_EMAIL(HttpStatus.NOT_FOUND, 2005, "해당 이메일을 찾을 수 없습니다."),
+    EMAIL_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, 2006, "이메일 전송에 실패했습니다."),
+    INVALID_CODE(HttpStatus.BAD_REQUEST, 2007, "인증번호 코드가 일치하지 않습니다"),
+    UNAUTHORIZED_EMAIL(HttpStatus.BAD_REQUEST, 2008, "인증되지 않은 이메일입니다."),
 
     // 채팅방 3000번대
 
