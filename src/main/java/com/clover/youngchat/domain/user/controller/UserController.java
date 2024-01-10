@@ -1,8 +1,12 @@
 package com.clover.youngchat.domain.user.controller;
 
+import com.clover.youngchat.domain.user.dto.request.UserEmailAuthCheckReq;
+import com.clover.youngchat.domain.user.dto.request.UserEmailAuthReq;
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
+import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
@@ -15,12 +19,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -41,17 +46,30 @@ public class UserController {
 
     @PatchMapping("/profile")
     public RestResponse<UserProfileEditRes> editProfile(@RequestParam Long userId,
-        @Valid @RequestBody UserProfileEditReq req, @AuthenticationPrincipal
-    UserDetailsImpl userDetails) {
+        @Valid @RequestPart UserProfileEditReq req,
+        @RequestPart(name = "image", required = false) MultipartFile multipartFile,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            userService.editProfile(userId, req, userDetails.getUser().getId()));
+            userService.editProfile(userId, req, multipartFile, userDetails.getUser().getId()));
     }
-  
-  @PatchMapping("/password")
+
+    @PatchMapping("/password")
     public RestResponse<UserUpdatePasswordRes> updatePassword(
         @Valid @RequestBody UserUpdatePasswordReq userUpdatePasswordReq,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
             userService.updatePassword(userDetails.getUser().getId(), userUpdatePasswordReq));
+    }
+
+    @PostMapping("/signup/email")
+    public RestResponse<UserEmailAuthRes> sendAuthEmail(
+        @Valid @RequestBody UserEmailAuthReq req) {
+        return RestResponse.success(userService.sendAuthEmail(req));
+    }
+
+    @PatchMapping("/signup/email")
+    public RestResponse<UserEmailAuthCheckRes> checkAuthEmail(
+        @RequestBody UserEmailAuthCheckReq req) {
+        return RestResponse.success(userService.checkAuthEmail(req));
     }
 }

@@ -54,8 +54,7 @@ class UserRepositoryTest implements UserTest {
                 tuple(TEST_ANOTHER_USER_NAME, TEST_ANOTHER_USER_EMAIL));
     }
 
-    @Test
-    @DisplayName("username 중복 확인")
+    @DisplayName("email 중복 확인")
     void existsByEmailTest() {
         // given
         User saveUser = userRepository.save(TEST_USER);

@@ -49,17 +49,18 @@ dependencies {
     // lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-
-    // jwt
-    compileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-
+    
     // query-dsl
     implementation("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
     annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+    // jwt
+    compileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    
     // jwt test
     testCompileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
     testRuntimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
@@ -72,6 +73,13 @@ dependencies {
     // h2
     compileOnly("com.h2database:h2:2.2.220")
     testImplementation("com.h2database:h2:2.2.220")
+
+    // aws
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+
+    // email
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
 }
 
 tasks.withType<Test> {

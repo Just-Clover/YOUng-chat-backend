@@ -34,9 +34,9 @@ public class User {
         this.profileImage = profileImage;
     }
 
-    public void updateProfile(UserProfileEditReq req) {
+    public void updateProfile(UserProfileEditReq req, String profileImageUrl) {
         this.username = req.getUsername();
-        this.profileImage = req.getProfileImage();
+        this.profileImage = profileImageUrl;
     }
 
     public void updatePassword(String password) {
