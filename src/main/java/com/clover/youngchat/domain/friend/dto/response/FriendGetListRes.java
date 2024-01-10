@@ -1,6 +1,5 @@
 package com.clover.youngchat.domain.friend.dto.response;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,16 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FriendGetListRes {
 
-    List<String> usernameList;
+    private String username;
+    private String profileImage;
 
     @Builder
-    private FriendGetListRes(List<String> usernameList) {
-        this.usernameList = usernameList;
+    private FriendGetListRes(String username, String profileImage) {
+        this.username = username;
+        this.profileImage = profileImage;
     }
 
-    public static FriendGetListRes to(List<String> usernameList) {
+    public static FriendGetListRes to(String username, String profileImage) {
         return FriendGetListRes.builder()
-            .usernameList(usernameList)
+            .username(username)
+            .profileImage(profileImage)
             .build();
     }
 }
