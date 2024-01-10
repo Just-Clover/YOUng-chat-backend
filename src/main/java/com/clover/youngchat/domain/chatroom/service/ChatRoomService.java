@@ -17,7 +17,6 @@ import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -62,13 +61,9 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
             new GlobalException(NOT_FOUND_CHATROOM));
 
-        List<ChatUser> chatUser = chatUserRepository.findByChatRoom_Id(chatRoomId).orElseThrow(() ->
-            new GlobalException(NOT_FOUND_CHATROOM));
-
-        chatUser.stream()
-            .filter(u -> u.getUser().getId().equals(user.getId()))
-            .findAny()
-            .orElseThrow(() -> new GlobalException(ACCESS_DENY));
+        if (!chatUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, user.getId())) {
+            throw new GlobalException(ACCESS_DENY);
+        }
 
         chatRoom.updateChatRoom(req);
 
