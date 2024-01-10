@@ -4,7 +4,7 @@ import com.clover.youngchat.domain.user.entity.EmailAuth;
 import java.util.Optional;
 import org.springframework.data.repository.RepositoryDefinition;
 
-@RepositoryDefinition(domainClass = EmailAuth.class, idClass = Long.class)
+@RepositoryDefinition(domainClass = EmailAuth.class, idClass = String.class)
 public interface EmailAuthRepository {
 
     boolean existsById(String email);
