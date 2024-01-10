@@ -21,8 +21,7 @@ public class ChatRoom extends BaseEntity {
     private String title;
 
     @Builder
-    private ChatRoom(Long id, String title) {
-        this.id = id;
+    private ChatRoom(String title) {
         this.title = title;
     }
 }
