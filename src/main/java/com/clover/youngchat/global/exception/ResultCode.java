@@ -29,6 +29,7 @@ public enum ResultCode {
     UNAUTHORIZED_EMAIL(HttpStatus.BAD_REQUEST, 2008, "인증되지 않은 이메일입니다."),
 
     // 채팅방 3000번대
+    NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 채팅방 입니다."),
 
     // 채팅 4000번대
 
