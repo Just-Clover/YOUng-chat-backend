@@ -56,8 +56,11 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
         @BeforeEach
         void setup() {
-            req = UserSignupReq.builder().email(TEST_USER_EMAIL).username(TEST_USER_NAME)
-                .password(TEST_USER_PASSWORD).build();
+            req = UserSignupReq.builder()
+                .email(TEST_USER_EMAIL)
+                .username(TEST_USER_NAME)
+                .password(TEST_USER_PASSWORD)
+                .build();
         }
 
         @Test
@@ -120,8 +123,10 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         void updatePasswordSuccessTest() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
-                .prePassword(TEST_USER_PASSWORD).newPassword(TEST_ANOTHER_USER_PASSWORD)
-                .checkNewPassword(TEST_ANOTHER_USER_PASSWORD).build();
+                .prePassword(TEST_USER_PASSWORD)
+                .newPassword(TEST_ANOTHER_USER_PASSWORD)
+                .checkNewPassword(TEST_ANOTHER_USER_PASSWORD)
+                .build();
             ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
             given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
@@ -138,9 +143,11 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         @DisplayName("실패 : 기존비밀번호틀림")
         void updatePasswordFailTest() {
             // given
-            UserUpdatePasswordReq req = UserUpdatePasswordReq.builder().prePassword("WrongPassword")
+            UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
+                .prePassword("WrongPassword")
                 .newPassword(TEST_ANOTHER_USER_PASSWORD)
-                .checkNewPassword(TEST_ANOTHER_USER_PASSWORD).build();
+                .checkNewPassword(TEST_ANOTHER_USER_PASSWORD)
+                .build();
             ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
             given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
@@ -160,8 +167,10 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         void updatePasswordFailTest2() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
-                .prePassword(TEST_USER_PASSWORD).newPassword(TEST_ANOTHER_USER_PASSWORD)
-                .checkNewPassword("NotMatches").build();
+                .prePassword(TEST_USER_PASSWORD)
+                .newPassword(TEST_ANOTHER_USER_PASSWORD)
+                .checkNewPassword("NotMatches")
+                .build();
             ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
             given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
@@ -180,8 +189,10 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         void updatePasswordFailTest3() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
-                .prePassword(TEST_USER_PASSWORD).newPassword(TEST_USER_PASSWORD)
-                .checkNewPassword(TEST_USER_PASSWORD).build();
+                .prePassword(TEST_USER_PASSWORD)
+                .newPassword(TEST_USER_PASSWORD)
+                .checkNewPassword(TEST_USER_PASSWORD)
+                .build();
             ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
             given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
