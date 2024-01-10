@@ -14,4 +14,18 @@ public interface EmailAuthTest extends UserTest {
             .code(TEST_CODE)
             .isAuthenticated(false)
             .build();
+
+    EmailAuth TEST_EMAIL_AUTH_OK =
+        EmailAuth.builder()
+            .email(TEST_EMAIL)
+            .code(TEST_CODE)
+            .isAuthenticated(true)
+            .build();
+
+    EmailAuth TEST_EMAIL_AUTH_FAIL =
+        EmailAuth.builder()
+            .email(TEST_EMAIL)
+            .code(TEST_CODE)
+            .isAuthenticated(false)
+            .build();
 }

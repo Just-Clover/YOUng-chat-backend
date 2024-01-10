@@ -129,10 +129,11 @@ public class UserService {
     }
 
     private void validateSignup(UserSignupReq req) {
-        EmailAuth emailAuth = emailUtil.findEmailAuth(req.getEmail());
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new GlobalException(DUPLICATED_EMAIL);
         }
+
+        EmailAuth emailAuth = emailUtil.findEmailAuth(req.getEmail());
         if (!emailAuth.isAuthenticated()) {
             throw new GlobalException(UNAUTHORIZED_EMAIL);
         }
