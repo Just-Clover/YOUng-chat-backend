@@ -31,7 +31,7 @@ class UserRepositoryTest implements UserTest {
     }
 
     @Test
-    @DisplayName("username 중복 확인")
+    @DisplayName("email 중복 확인")
     void existsByEmailTest() {
         // given
         User saveUser = userRepository.save(TEST_USER);
