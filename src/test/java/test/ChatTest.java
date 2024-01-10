@@ -4,6 +4,9 @@ import com.clover.youngchat.domain.chat.entity.Chat;
 
 public interface ChatTest extends UserTest, ChatRoomTest {
 
+    Long TEST_CHAT_ID = 1L;
+    Long TEST_ANOTHER_CHAT_ID = 2L;
+
     String TEST_CHAT_MESSAGE = "test message";
     String TEST_ANOTHER_CHAT_MESSAGE = "test message2";
 
