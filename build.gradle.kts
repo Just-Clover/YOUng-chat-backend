@@ -70,8 +70,8 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     // h2
-    compileOnly("com.h2database:h2:2.1.214")
-    testImplementation("com.h2database:h2:2.1.214")
+    compileOnly("com.h2database:h2:2.2.220")
+    testImplementation("com.h2database:h2:2.2.220")
 }
 
 tasks.withType<Test> {
