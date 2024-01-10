@@ -23,4 +23,8 @@ public class EmailAuth {
         this.code = code;
         this.isAuthenticated = isAuthenticated;
     }
+
+    public void updateAuthenticated(boolean isAuthenticated) {
+        this.isAuthenticated = isAuthenticated;
+    }
 }

@@ -53,11 +53,14 @@ public class EmailUtil {
         }
     }
 
-    public boolean checkCode(String to, String code) {
+    public void checkCode(String to, String code) {
 
         EmailAuth emailAuth = emailAuthService.findById(to);
-
-        return emailAuth.getCode().equals(code);
+        if (emailAuth.getCode().equals(code)) {
+            emailAuthService.updateAuthenticated(emailAuth);
+        } else {
+            throw new GlobalException(ResultCode.INVALID_CODE);
+        }
     }
 
     private MimeMessage createMessage(String to, String subject, String code)

@@ -1,9 +1,11 @@
 package com.clover.youngchat.domain.user.controller;
 
+import com.clover.youngchat.domain.user.dto.request.UserEmailAuthCheckReq;
 import com.clover.youngchat.domain.user.dto.request.UserEmailAuthReq;
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
@@ -63,5 +65,11 @@ public class UserController {
     public RestResponse<UserEmailAuthRes> sendAuthEmail(
         @Valid @RequestBody UserEmailAuthReq req) {
         return RestResponse.success(userService.sendAuthEmail(req));
+    }
+
+    @PatchMapping("/signup/email")
+    public RestResponse<UserEmailAuthCheckRes> checkAuthEmail(
+        @RequestBody UserEmailAuthCheckReq req) {
+        return RestResponse.success(userService.checkAuthEmail(req));
     }
 }

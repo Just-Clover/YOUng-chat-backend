@@ -8,10 +8,12 @@ import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
 
+import com.clover.youngchat.domain.user.dto.request.UserEmailAuthCheckReq;
 import com.clover.youngchat.domain.user.dto.request.UserEmailAuthReq;
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
@@ -147,5 +149,10 @@ public class UserService {
     public UserEmailAuthRes sendAuthEmail(final UserEmailAuthReq req) {
         emailUtil.sendMessage(req.getEmail(), EMAIL_AUTHENTICATION);
         return new UserEmailAuthRes();
+    }
+
+    public UserEmailAuthCheckRes checkAuthEmail(final UserEmailAuthCheckReq req) {
+        emailUtil.checkCode(req.getEmail(), req.getCode());
+        return new UserEmailAuthCheckRes();
     }
 }

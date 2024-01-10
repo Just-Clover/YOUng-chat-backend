@@ -21,6 +21,11 @@ public class EmailAuthService {
         emailAuthRepository.deleteById(email);
     }
 
+    public void updateAuthenticated(final EmailAuth emailAuth) {
+        emailAuth.updateAuthenticated(true);
+        save(emailAuth);
+    }
+
     public EmailAuth save(final EmailAuth emailAuth) {
         return emailAuthRepository.save(emailAuth);
     }
