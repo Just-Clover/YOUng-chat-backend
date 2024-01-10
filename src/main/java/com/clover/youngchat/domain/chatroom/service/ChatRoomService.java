@@ -1,8 +1,13 @@
 package com.clover.youngchat.domain.chatroom.service;
 
 
+import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
+
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -49,5 +54,19 @@ public class ChatRoomService {
         chatUserRepository.save(friendChat);
 
         return new ChatRoomCreateRes();
+    }
+
+    @Transactional
+    public ChatRoomEditRes editChatRoom(Long chatRoomId, ChatRoomEditReq req, User user) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
+            new GlobalException(NOT_FOUND_CHATROOM));
+
+        if (!chatUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, user.getId())) {
+            throw new GlobalException(ACCESS_DENY);
+        }
+
+        chatRoom.updateChatRoom(req);
+
+        return new ChatRoomEditRes();
     }
 }

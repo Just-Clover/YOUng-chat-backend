@@ -7,4 +7,6 @@ import org.springframework.data.repository.RepositoryDefinition;
 public interface ChatUserRepository {
 
     ChatUser save(ChatUser chatUser);
+
+    boolean existsByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
 }

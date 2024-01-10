@@ -1,5 +1,6 @@
 package com.clover.youngchat.domain.chatroom.entity;
 
+import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.model.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,5 +24,9 @@ public class ChatRoom extends BaseEntity {
     @Builder
     private ChatRoom(String title) {
         this.title = title;
+    }
+
+    public void updateChatRoom(ChatRoomEditReq req) {
+        this.title = req.getTitle();
     }
 }
