@@ -11,6 +11,7 @@ import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class ChatRoomService {
     private final ChatUserRepository chatUserRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public ChatRoomCreateRes createChatRoom(ChatRoomCreateReq req, User user) {
         User friend = userRepository.findById(req.getFriendId()).orElseThrow(() ->
             new GlobalException(ResultCode.NOT_FOUND_USER));
@@ -45,7 +47,7 @@ public class ChatRoomService {
             .build();
 
         chatUserRepository.save(friendChat);
-        
+
         return new ChatRoomCreateRes();
     }
 }
