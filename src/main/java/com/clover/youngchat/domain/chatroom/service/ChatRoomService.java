@@ -58,8 +58,7 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomEditRes editChatRoom(Long chatRoomId, ChatRoomEditReq req, User user) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
-            new GlobalException(NOT_FOUND_CHATROOM));
+        ChatRoom chatRoom = findById(chatRoomId);
 
         if (!chatUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, user.getId())) {
             throw new GlobalException(ACCESS_DENY);
@@ -68,5 +67,10 @@ public class ChatRoomService {
         chatRoom.updateChatRoom(req);
 
         return new ChatRoomEditRes();
+    }
+
+    private ChatRoom findById(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
+            new GlobalException(NOT_FOUND_CHATROOM));
     }
 }
