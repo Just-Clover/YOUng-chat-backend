@@ -1,9 +1,11 @@
 package com.clover.youngchat.domain.friend.controller;
 
+import static com.clover.youngchat.global.exception.ResultCode.SUCCESS;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.friend.service.FriendService;
@@ -26,7 +28,21 @@ public class FriendControllerTest extends BaseMvcTest {
         mockMvc.perform(get("/api/v1/friends")
                 .principal(mockPrincipal)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("친구목록 검색 조회 테스트")
+    void getFriendSearchListTest() throws Exception {
+        // given
+        String keyword = "test";
+
+        // when - then
+        mockMvc.perform(get("/api/v1/friends/search/" + keyword)
+                .principal(mockPrincipal)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
     }
 
@@ -40,7 +56,7 @@ public class FriendControllerTest extends BaseMvcTest {
         mockMvc.perform(post("/api/v1/friends/" + friendId)
                 .principal(mockPrincipal)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
     }
 }
