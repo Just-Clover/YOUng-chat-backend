@@ -11,6 +11,8 @@ import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes.ChatRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
@@ -117,5 +119,27 @@ public class ChatRoomService {
         }
 
         return getResList;
+    }
+
+    @Transactional
+    public ChatRoomDetailGetRes getDetailChatRoom(Long chatRoomId, User user) {
+        // 채팅방에 속한 사람만 조회 가능
+        isChatRoomMember(chatRoomId, user.getId());
+
+        List<Chat> chatList = chatRepository.findAllByChatRoom_Id(chatRoomId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+
+        ChatRoom chatRoom = findById(chatRoomId);
+
+        ChatRoomDetailGetRes res = ChatRoomDetailGetRes.builder()
+            .title(chatRoom.getTitle())
+            .build();
+
+        for (Chat c : chatList) {
+            ChatRes chatRes = ChatRoomDetailGetRes.ChatRes.to(c);
+            res.addChatRes(chatRes);
+        }
+
+        return res;
     }
 }
