@@ -108,7 +108,6 @@ public class UserService {
         user.updateProfile(req, profileImageUrl);
 
         return new UserProfileEditRes();
-
     }
 
     @Transactional
