@@ -23,11 +23,11 @@ import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +92,7 @@ public class ChatRoomService {
         return new ChatRoomLeaveRes();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
         List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
             .orElseThrow(() ->
@@ -110,7 +110,7 @@ public class ChatRoomService {
         return getResList;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ChatRoomDetailGetRes getDetailChatRoom(Long chatRoomId, User user) {
         // 채팅방에 속한 사람만 조회 가능
         isChatRoomMember(chatRoomId, user.getId());
