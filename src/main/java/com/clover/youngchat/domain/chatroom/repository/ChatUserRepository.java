@@ -9,9 +9,9 @@ public interface ChatUserRepository {
 
     ChatUser save(ChatUser chatUser);
 
-    Boolean existsByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
+    boolean existsByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
 
-    Optional<ChatUser> findByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
+    Optional<ChatUser> findByChatRoom_IdAndUser_Id(Long chatbRoomId, Long userId);
 
     void delete(ChatUser chatUser);
 }

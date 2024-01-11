@@ -11,5 +11,5 @@ public interface ChatRoomRepository {
 
     Optional<ChatRoom> findById(Long id);
 
-    Boolean existsById(Long id);
+    boolean existsById(Long id);
 }
