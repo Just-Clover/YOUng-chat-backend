@@ -33,6 +33,7 @@ public enum ResultCode {
     NOT_MEMBER_CHATROOM(HttpStatus.NOT_FOUND, 3001, "채팅방의 멤버만 접근할 수 있습니다"),
 
     // 채팅 4000번대
+    NOT_FOUND_CHAT(HttpStatus.NOT_FOUND, 4000, "채팅을 찾을 수 없습니다."),
 
     // 친구 5000번대
     NOT_FOUND_FRIEND(HttpStatus.NOT_FOUND, 5000, "친구를 찾을 수 없습니다.");

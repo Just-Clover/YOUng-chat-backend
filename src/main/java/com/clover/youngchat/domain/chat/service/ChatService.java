@@ -8,9 +8,9 @@ import com.clover.youngchat.domain.chat.dto.response.ChatCreateRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
-import com.clover.youngchat.domain.chatroom.entity.ChatUser;
+import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
-import com.clover.youngchat.domain.chatroom.repository.ChatUserRepository;
+import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatUserRepository chatUserRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
 
     public ChatCreateRes createChat(
         final Long chatRoomId, final ChatCreateReq req, final Long userId) {
@@ -29,12 +29,13 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
 
-        ChatUser chatUser = chatUserRepository.findByChatRoom_IdAndUser_Id(chatRoomId, userId)
+        ChatRoomUser chatRoomUser = chatRoomUserRepository.findByChatRoom_IdAndUser_Id(chatRoomId,
+                userId)
             .orElseThrow(() -> new GlobalException(ACCESS_DENY));
 
         Chat chat = Chat.builder()
             .message(req.getMessage())
-            .sender(chatUser.getUser())
+            .sender(chatRoomUser.getUser())
             .chatRoom(chatRoom)
             .build();
 

@@ -13,7 +13,7 @@ import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
-import com.clover.youngchat.domain.chatroom.repository.ChatUserRepository;
+import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,7 @@ class ChatServiceTest implements ChatTest {
     private ChatRoomRepository chatRoomRepository;
 
     @Mock
-    private ChatUserRepository chatUserRepository;
+    private ChatRoomUserRepository chatRoomUserRepository;
 
     @InjectMocks
     private ChatService chatService;
@@ -60,7 +60,8 @@ class ChatServiceTest implements ChatTest {
             // given
             given(chatRoomRepository.findById(TEST_CHAT_ROOM_ID)).willReturn(
                 Optional.of(TEST_CHAT_ROOM));
-            given(chatUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
+            given(
+                chatRoomUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
                 .willReturn(Optional.of(TEST_CHAT_USER));
 
             // when

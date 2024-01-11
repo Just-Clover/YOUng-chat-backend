@@ -5,12 +5,15 @@ import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomListGetRes;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +33,12 @@ public class ChatRoomController {
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
             chatRoomService.createChatRoom(req, userDetails.getUser()));
+    }
+
+    @GetMapping
+    public RestResponse<List<ChatRoomListGetRes>> getChatRoomList(
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return RestResponse.success(chatRoomService.getChatRoomList(userDetails.getUser()));
     }
 
     @PatchMapping("/{chatRoomId}")

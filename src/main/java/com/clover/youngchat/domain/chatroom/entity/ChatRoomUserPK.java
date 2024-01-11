@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatUserPK implements Serializable {
+public class ChatRoomUserPK implements Serializable {
 
     private Long user;
     private Long chatRoom;
