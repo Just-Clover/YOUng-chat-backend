@@ -32,7 +32,7 @@ class FriendRepositoryTest implements FriendTest {
 
     @Test
     @DisplayName("본인의 친구 목록을 조회한다.")
-    void getFriendList() {
+    void getFriendList_Test() {
         // given
         User user = userRepository.save(TEST_USER);
         userRepository.save(TEST_ANOTHER_USER);
@@ -50,7 +50,7 @@ class FriendRepositoryTest implements FriendTest {
 
     @Test
     @DisplayName("키워드로 친구 목록을 검색한다.")
-    void test() {
+    void getSearch_Test() {
         // given
         User user = userRepository.save(TEST_USER);
         User anotherUser = userRepository.save(TEST_ANOTHER_USER);
@@ -81,7 +81,7 @@ class FriendRepositoryTest implements FriendTest {
 
     @Test
     @DisplayName("친구를 추가하였을 때 DB에 저장되는지 확인한다.")
-    void saveTest() {
+    void save_Test() {
         // given
         User user = userRepository.save(TEST_USER);
         User anotherUser = userRepository.save(TEST_ANOTHER_USER);
@@ -100,5 +100,50 @@ class FriendRepositoryTest implements FriendTest {
 
         assertThat(actual.getFriend()).extracting("email", "username")
             .contains(TEST_ANOTHER_USER_EMAIL, TEST_ANOTHER_USER_NAME);
+    }
+
+    @Test
+    @DisplayName("유저의 Id와 친구의 Id가 존재하는지 체크한다.")
+    void existsByUser_IdAndFriend_Id_Test() {
+        // given
+        User user = userRepository.save(TEST_USER);
+        User anotherUser = userRepository.save(TEST_ANOTHER_USER);
+
+        Friend friend = Friend.builder()
+            .user(user)
+            .friend(anotherUser)
+            .build();
+
+        friendRepository.save(friend);
+        // when
+        boolean actual = friendRepository.existsByUser_IdAndFriend_Id(user.getId(),
+            anotherUser.getId());
+
+        // then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    @DisplayName("친구가 삭제되었는지 테스트한다.")
+    void deleteByFriend_Id_Test() {
+        // given
+        User user = userRepository.save(TEST_USER);
+        User anotherUser = userRepository.save(TEST_ANOTHER_USER);
+
+        Friend friend = Friend.builder()
+            .user(user)
+            .friend(anotherUser)
+            .build();
+
+        friendRepository.save(friend);
+        // when
+
+        friendRepository.deleteByFriend_Id(anotherUser.getId());
+
+        boolean actual = friendRepository.existsByUser_IdAndFriend_Id(user.getId(),
+            anotherUser.getId());
+
+        // then
+        assertThat(actual).isFalse();
     }
 }
