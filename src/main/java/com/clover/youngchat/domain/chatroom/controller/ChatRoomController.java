@@ -2,10 +2,11 @@ package com.clover.youngchat.domain.chatroom.controller;
 
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomListGetRes;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
@@ -36,9 +37,17 @@ public class ChatRoomController {
     }
 
     @GetMapping
-    public RestResponse<List<ChatRoomListGetRes>> getChatRoomList(
+    public RestResponse<List<ChatRoomAndLastChatGetRes>> getChatRoomList(
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(chatRoomService.getChatRoomList(userDetails.getUser()));
+    }
+
+    @GetMapping("/{chatRoomId}")
+    public RestResponse<ChatRoomDetailGetRes> getDetailChatRoom(@PathVariable Long chatRoomId,
+        @AuthenticationPrincipal UserDetailsImpl
+            userDetails) {
+        return RestResponse.success(
+            chatRoomService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
     }
 
     @PatchMapping("/{chatRoomId}")

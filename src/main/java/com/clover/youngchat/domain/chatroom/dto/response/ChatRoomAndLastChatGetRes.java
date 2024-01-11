@@ -10,21 +10,21 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatRoomListGetRes {
+public class ChatRoomAndLastChatGetRes {
 
     private String title;
     private String lastChat;
     private LocalDateTime lastChatTime;
 
     @Builder
-    private ChatRoomListGetRes(String title, String lastChat, LocalDateTime lastChatTime) {
+    private ChatRoomAndLastChatGetRes(String title, String lastChat, LocalDateTime lastChatTime) {
         this.title = title;
         this.lastChat = lastChat;
         this.lastChatTime = lastChatTime;
     }
 
-    public ChatRoomListGetRes to(ChatRoom chatRoom, Chat chat) {
-        return ChatRoomListGetRes.builder()
+    public static ChatRoomAndLastChatGetRes to(ChatRoom chatRoom, Chat chat) {
+        return ChatRoomAndLastChatGetRes.builder()
             .title(chatRoom.getTitle())
             .lastChat(chat.getMessage())
             .lastChatTime(chat.getCreatedAt())

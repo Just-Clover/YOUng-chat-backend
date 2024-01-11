@@ -9,10 +9,12 @@ import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes.ChatRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomListGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -21,11 +23,11 @@ import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +92,44 @@ public class ChatRoomService {
         return new ChatRoomLeaveRes();
     }
 
+    @Transactional(readOnly = true)
+    public List<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
+        List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
+            .orElseThrow(() ->
+                new GlobalException(NOT_FOUND_CHATROOM));
+
+        List<ChatRoomAndLastChatGetRes> getResList = new ArrayList<>();
+
+        for (ChatRoomUser c : chatRoomUserList) {
+            Chat chat = chatRepository.findLastChatByChatRoom_Id(c.getChatRoom().getId())
+                .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+
+            ChatRoomAndLastChatGetRes res = ChatRoomAndLastChatGetRes.to(c.getChatRoom(), chat);
+            getResList.add(res);
+        }
+
+        return getResList;
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoomDetailGetRes getDetailChatRoom(Long chatRoomId, User user) {
+        // 채팅방에 속한 사람만 조회 가능
+        isChatRoomMember(chatRoomId, user.getId());
+
+        List<ChatRes> chatList = chatRepository.findAllByChatRoom_Id(chatRoomId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT))
+            .stream()
+            .map(ChatRes::to)
+            .toList();
+
+        ChatRoom chatRoom = findById(chatRoomId);
+
+        return ChatRoomDetailGetRes.builder()
+            .title(chatRoom.getTitle())
+            .chatResList(chatList)
+            .build();
+    }
+
     private ChatRoom findById(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
             new GlobalException(NOT_FOUND_CHATROOM));
@@ -99,23 +139,5 @@ public class ChatRoomService {
         if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
             throw new GlobalException(ACCESS_DENY);
         }
-    }
-
-    @Transactional
-    public List<ChatRoomListGetRes> getChatRoomList(User user) {
-        List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
-            .orElseThrow(() ->
-                new GlobalException(NOT_FOUND_CHATROOM));
-
-        List<ChatRoomListGetRes> getResList = new ArrayList<>();
-
-        for (ChatRoomUser c : chatRoomUserList) {
-            Chat chat = chatRepository.findByChatRoom_Id(c.getChatRoom().getId())
-                .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
-            ChatRoomListGetRes crs = ChatRoomListGetRes.builder().build();
-            getResList.add(crs.to(c.getChatRoom(), chat));
-        }
-
-        return getResList;
     }
 }
