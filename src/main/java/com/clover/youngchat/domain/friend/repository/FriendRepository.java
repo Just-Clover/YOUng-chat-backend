@@ -13,4 +13,8 @@ public interface FriendRepository extends FriendRepositoryCustom {
     Optional<List<Friend>> findByUser(User user);
 
     Friend save(Friend friend);
+
+    boolean existsByUser_IdAndFriend_Id(Long userId, Long friendId);
+
+    void deleteByFriend_Id(Long friendId);
 }
