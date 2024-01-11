@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import com.clover.youngchat.domain.friend.dto.response.FriendGetListRes;
 import com.clover.youngchat.domain.friend.entity.Friend;
@@ -43,10 +44,10 @@ public class FriendServiceTest implements FriendTest {
             Optional.of(List.of(TEST_FRIEND, TEST_ANOTHER_FRIEND)));
 
         // when
-        FriendGetListRes actual = friendService.getFriendList(TEST_USER);
+        List<FriendGetListRes> actual = friendService.getFriendList(TEST_USER);
 
         // then
-        Assertions.assertThat(actual.getUsernameList()).hasSize(2);
+        Assertions.assertThat(actual).hasSize(2);
         verify(friendRepository, times(1)).findByUser(any(User.class));
     }
 
@@ -64,13 +65,12 @@ public class FriendServiceTest implements FriendTest {
         verify(friendRepository, times(1)).findByUser(any());
     }
 
-
     @DisplayName("친구 추가 테스트")
     @Test
     void addFriendTest() {
         // given
         Long friendId = 2L;
-
+        setField(TEST_USER, "id", 1L);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
 
         // when
@@ -86,6 +86,7 @@ public class FriendServiceTest implements FriendTest {
     void addMeFriendTest() {
         // given
         Long friendId = 1L;
+        setField(TEST_USER, "id", 1L);
 
         // when, then
         Assertions.assertThatThrownBy(() -> friendService.addFriend(friendId, TEST_USER))

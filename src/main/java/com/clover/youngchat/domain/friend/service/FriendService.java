@@ -4,6 +4,7 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.friend.dto.response.FriendAddRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetListRes;
+import com.clover.youngchat.domain.friend.dto.response.FriendGetSearchListRes;
 import com.clover.youngchat.domain.friend.entity.Friend;
 import com.clover.youngchat.domain.friend.repository.FriendRepository;
 import com.clover.youngchat.domain.user.entity.User;
@@ -24,15 +25,18 @@ public class FriendService {
     private final FriendRepository friendRepository;
 
     @Transactional(readOnly = true)
-    public FriendGetListRes getFriendList(User user) {
-        List<Friend> friends = friendRepository.findByUser(user)
-            .orElseThrow(() -> new GlobalException(ResultCode.NOT_FOUND_FRIEND));
+    public List<FriendGetListRes> getFriendList(User user) {
+        List<Friend> friends = findByUser(user);
 
-        List<String> usernameList = friends.stream()
-            .map(friend -> friend.getFriend().getUsername())
+        return friends.stream()
+            .map(friend -> FriendGetListRes.to(friend.getFriend().getUsername(),
+                friend.getFriend().getProfileImage()))
             .collect(Collectors.toList());
+    }
 
-        return FriendGetListRes.to(usernameList);
+    @Transactional(readOnly = true)
+    public List<FriendGetSearchListRes> getFriendSearchList(String keyword, User user) {
+        return friendRepository.findFriendByKeyword(user.getId(), keyword);
     }
 
     public FriendAddRes addFriend(Long friendId, User user) {
@@ -51,4 +55,10 @@ public class FriendService {
 
         return new FriendAddRes();
     }
+
+    private List<Friend> findByUser(User user) {
+        return friendRepository.findByUser(user)
+            .orElseThrow(() -> new GlobalException(ResultCode.NOT_FOUND_FRIEND));
+    }
+
 }
