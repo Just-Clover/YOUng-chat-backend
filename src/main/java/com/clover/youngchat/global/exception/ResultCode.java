@@ -30,6 +30,7 @@ public enum ResultCode {
 
     // 채팅방 3000번대
     NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, 3000, "존재하지 않는 채팅방 입니다."),
+    NOT_MEMBER_CHATROOM(HttpStatus.NOT_FOUND, 3001, "채팅방의 멤버만 접근할 수 있습니다"),
 
     // 채팅 4000번대
 

@@ -8,6 +8,7 @@ import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -58,15 +59,37 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomEditRes editChatRoom(Long chatRoomId, ChatRoomEditReq req, User user) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
-            new GlobalException(NOT_FOUND_CHATROOM));
+        ChatRoom chatRoom = findById(chatRoomId);
 
-        if (!chatUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, user.getId())) {
-            throw new GlobalException(ACCESS_DENY);
-        }
+        isChatRoomMember(chatRoomId, user.getId());
 
         chatRoom.updateChatRoom(req);
 
         return new ChatRoomEditRes();
+    }
+
+    @Transactional
+    public ChatRoomLeaveRes leaveChatRoom(Long chatRoomId, User user) {
+        if (!chatRoomRepository.existsById(chatRoomId)) {
+            throw new GlobalException(NOT_FOUND_CHATROOM);
+        }
+
+        ChatUser chatUser = chatUserRepository.findByChatRoom_IdAndUser_Id(chatRoomId, user.getId())
+            .orElseThrow(() -> new GlobalException(ACCESS_DENY));
+
+        chatUserRepository.delete(chatUser);
+
+        return new ChatRoomLeaveRes();
+    }
+
+    private ChatRoom findById(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
+            new GlobalException(NOT_FOUND_CHATROOM));
+    }
+
+    private void isChatRoomMember(Long chatRoomId, Long userId) {
+        if (!chatUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
+            throw new GlobalException(ACCESS_DENY);
+        }
     }
 }
