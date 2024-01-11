@@ -4,6 +4,8 @@ import com.clover.youngchat.global.jwt.JwtAuthenticationFilter;
 import com.clover.youngchat.global.jwt.JwtAuthorizationFilter;
 import com.clover.youngchat.global.jwt.JwtUtil;
 import com.clover.youngchat.global.redis.RedisUtil;
+import com.clover.youngchat.global.security.LogoutHandlerImpl;
+import com.clover.youngchat.global.security.LogoutSuccessHandlerImpl;
 import com.clover.youngchat.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -19,9 +21,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -33,8 +32,8 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final LogoutHandler logoutHandler;
-    private final LogoutSuccessHandler logoutSuccessHandler;
+    private final LogoutHandlerImpl logoutHandler;
+    private final LogoutSuccessHandlerImpl logoutSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -81,7 +80,7 @@ public class SecurityConfig {
 
         http.logout(
             logout -> {
-                logout.logoutRequestMatcher(new AntPathRequestMatcher("api/v1/users/logout"));
+                logout.logoutUrl("/api/v1/users/logout");
                 logout.addLogoutHandler(logoutHandler); // 로그아웃 핸들러
                 logout.logoutSuccessHandler(logoutSuccessHandler); // 로그아웃 성공 후 핸들러
             });
