@@ -23,7 +23,7 @@ public class ChatRoomAndLastChatGetRes {
         this.lastChatTime = lastChatTime;
     }
 
-    public ChatRoomAndLastChatGetRes to(ChatRoom chatRoom, Chat chat) {
+    public static ChatRoomAndLastChatGetRes to(ChatRoom chatRoom, Chat chat) {
         return ChatRoomAndLastChatGetRes.builder()
             .title(chatRoom.getTitle())
             .lastChat(chat.getMessage())
