@@ -9,10 +9,10 @@ import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomListGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -102,17 +102,17 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public List<ChatRoomListGetRes> getChatRoomList(User user) {
+    public List<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
         List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
             .orElseThrow(() ->
                 new GlobalException(NOT_FOUND_CHATROOM));
 
-        List<ChatRoomListGetRes> getResList = new ArrayList<>();
+        List<ChatRoomAndLastChatGetRes> getResList = new ArrayList<>();
 
         for (ChatRoomUser c : chatRoomUserList) {
             Chat chat = chatRepository.findByChatRoom_Id(c.getChatRoom().getId())
                 .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
-            ChatRoomListGetRes crs = ChatRoomListGetRes.builder().build();
+            ChatRoomAndLastChatGetRes crs = ChatRoomAndLastChatGetRes.builder().build();
             getResList.add(crs.to(c.getChatRoom(), chat));
         }
 
