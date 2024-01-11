@@ -8,12 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RedisHash(value = "blacklist", timeToLive = ACCESS_TOKEN_TIME)
-@EnableRedisRepositories
 public class Blacklist {
 
     @Id

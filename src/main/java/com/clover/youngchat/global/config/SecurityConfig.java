@@ -1,5 +1,6 @@
 package com.clover.youngchat.global.config;
 
+import com.clover.youngchat.domain.auth.service.BlacklistService;
 import com.clover.youngchat.global.jwt.JwtAuthenticationFilter;
 import com.clover.youngchat.global.jwt.JwtAuthorizationFilter;
 import com.clover.youngchat.global.jwt.JwtUtil;
@@ -32,6 +33,7 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
+    private final BlacklistService blacklistService;
     private final LogoutHandlerImpl logoutHandler;
     private final LogoutSuccessHandlerImpl logoutSuccessHandler;
 
@@ -55,8 +57,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, redisUtil,
-            userDetailsService);
+        return new JwtAuthorizationFilter(jwtUtil, redisUtil, userDetailsService, blacklistService);
     }
 
     @Bean

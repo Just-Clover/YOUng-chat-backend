@@ -19,7 +19,7 @@ public class BlacklistService {
     }
 
     public boolean isTokenBlackListed(String accessToken) {
-        return blacklistRepository.existById(accessToken);
+        return blacklistRepository.existsById(accessToken);
     }
 
 } 

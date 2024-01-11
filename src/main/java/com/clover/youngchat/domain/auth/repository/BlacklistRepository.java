@@ -8,5 +8,5 @@ public interface BlacklistRepository {
 
     Blacklist save(Blacklist blacklist);
 
-    boolean existById(String accessToken);
+    boolean existsById(String accessToken);
 }
