@@ -92,17 +92,6 @@ public class ChatRoomService {
         return new ChatRoomLeaveRes();
     }
 
-    private ChatRoom findById(Long chatRoomId) {
-        return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
-            new GlobalException(NOT_FOUND_CHATROOM));
-    }
-
-    private void isChatRoomMember(Long chatRoomId, Long userId) {
-        if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
-            throw new GlobalException(ACCESS_DENY);
-        }
-    }
-
     @Transactional
     public List<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
         List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
@@ -141,5 +130,16 @@ public class ChatRoomService {
         }
 
         return res;
+    }
+
+    private ChatRoom findById(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
+            new GlobalException(NOT_FOUND_CHATROOM));
+    }
+
+    private void isChatRoomMember(Long chatRoomId, Long userId) {
+        if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
+            throw new GlobalException(ACCESS_DENY);
+        }
     }
 }
