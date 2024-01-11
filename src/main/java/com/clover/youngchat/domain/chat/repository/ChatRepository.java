@@ -11,6 +11,10 @@ public interface ChatRepository {
 
     Chat save(Chat chat);
 
+    Optional<Chat> findById(Long chatId);
+
+    void delete(Chat chat);
+
     @Query("select c from Chat c where c.chatRoom.id = :chatRoomId order by c.createdAt desc limit 1")
     Optional<Chat> findByChatRoom_Id(@Param("chatRoomId") Long chatRoomId);
 }

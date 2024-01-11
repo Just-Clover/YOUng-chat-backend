@@ -2,6 +2,7 @@ package com.clover.youngchat.domain.chat.controller;
 
 import static com.clover.youngchat.global.exception.ResultCode.SUCCESS;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,10 +31,25 @@ class ChatControllerTest extends BaseMvcTest {
             .message("test")
             .build();
 
-        // when & then
+        // when - then
         mockMvc.perform(post("/api/v1/chat-rooms/" + chatRoomId + "/chats")
                 .principal(mockPrincipal)
                 .content(objectMapper.writeValueAsString(req))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("채팅삭제 테스트 : 성공")
+    void deleteChatTestSuccess() throws Exception {
+        // given
+        long chatRoomId = 1L;
+        long chatId = 1L;
+
+        // when - then
+        mockMvc.perform(delete("/api/v1/chat-rooms/" + chatRoomId + "/chats/" + chatId)
+                .principal(mockPrincipal)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());

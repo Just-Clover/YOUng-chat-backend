@@ -1,11 +1,13 @@
 package com.clover.youngchat.domain.chat.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.ChatUserTest.TEST_CHAT_USER;
 
@@ -99,6 +101,61 @@ class ChatServiceTest implements ChatTest {
             // then
             assertThat(exception.getResultCode().getMessage())
                 .isEqualTo(ACCESS_DENY.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅 삭제 테스트")
+    class deleteChatTest {
+
+
+        @Test
+        @DisplayName("성공")
+        void deleteChatSuccessTest() {
+            // given
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(any(), any()))
+                .willReturn(true);
+            given(chatRepository.findById(any())).willReturn(Optional.of(TEST_CHAT));
+
+            // when
+            chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
+
+            // then
+            verify(chatRepository, times(1)).delete(any(Chat.class));
+        }
+
+        @Test
+        @DisplayName("실패 : 방id와 유저id와 일치한 chatuser가 없을 때")
+        void deleteChatFailTest_AccessDeny() {
+            // given
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(any(), any()))
+                .willReturn(false);
+
+            // when
+            GlobalException exception = assertThrows(GlobalException.class,
+                () -> chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
+
+            // then
+            assertThat(exception.getResultCode().getMessage())
+                .isEqualTo(ACCESS_DENY.getMessage());
+
+        }
+
+        @Test
+        @DisplayName("실패 : 존재하지 않는 chat id로 삭제를 시도할 때")
+        void deleteChatFailTest_NotFoundChat() {
+            // given
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(any(), any()))
+                .willReturn(true);
+
+            // when
+            GlobalException exception = assertThrows(GlobalException.class,
+                () -> chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
+
+            // then
+            assertThat(exception.getResultCode().getMessage())
+                .isEqualTo(NOT_FOUND_CHAT.getMessage());
+
         }
     }
 }

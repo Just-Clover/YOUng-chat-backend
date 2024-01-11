@@ -1,10 +1,12 @@
 package com.clover.youngchat.domain.chat.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.dto.response.ChatCreateRes;
+import com.clover.youngchat.domain.chat.dto.response.ChatDeleteRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
@@ -41,5 +43,19 @@ public class ChatService {
 
         chatRepository.save(chat);
         return new ChatCreateRes();
+    }
+
+    public ChatDeleteRes deleteChat(
+        final Long chatRoomId, final Long chatId, final Long userId) {
+
+        if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
+            throw new GlobalException(ACCESS_DENY);
+        }
+        Chat chat = chatRepository.findById(chatId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+
+        chatRepository.delete(chat);
+
+        return new ChatDeleteRes();
     }
 }
