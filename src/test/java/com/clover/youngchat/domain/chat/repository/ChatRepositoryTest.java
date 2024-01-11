@@ -7,16 +7,19 @@ import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
+import com.clover.youngchat.global.config.QueryDslConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import test.ChatTest;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(QueryDslConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ChatRepositoryTest implements ChatTest {
 
@@ -35,6 +38,7 @@ class ChatRepositoryTest implements ChatTest {
         // given
         User user = userRepository.save(TEST_USER);
         ChatRoom chatRoom = chatRoomRepository.save(TEST_CHAT_ROOM);
+
         Chat chat = Chat.builder()
             .message(TEST_CHAT_MESSAGE)
             .sender(user)
