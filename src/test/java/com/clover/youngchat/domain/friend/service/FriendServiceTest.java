@@ -38,7 +38,7 @@ public class FriendServiceTest implements FriendTest {
 
     @Test
     @DisplayName("친구목록에서 두명의 친구를 조회한다.")
-    void getFriendList() {
+    void getFriendList_Test() {
         // given
         given(friendRepository.findByUser(any(User.class))).willReturn(
             Optional.of(List.of(TEST_FRIEND, TEST_ANOTHER_FRIEND)));
@@ -53,7 +53,7 @@ public class FriendServiceTest implements FriendTest {
 
     @Test
     @DisplayName("친구목록에서 친구를 조회하는데 결과가 없다.")
-    void getNotFoundFriendList() {
+    void getNotFoundFriendList_Test() {
         // given
         given(friendRepository.findByUser(any())).willReturn(
             Optional.empty());
@@ -67,7 +67,7 @@ public class FriendServiceTest implements FriendTest {
 
     @DisplayName("친구 추가 테스트")
     @Test
-    void addFriendTest() {
+    void addFriend_Test() {
         // given
         Long friendId = 2L;
         setField(TEST_USER, "id", 1L);
@@ -83,13 +83,44 @@ public class FriendServiceTest implements FriendTest {
 
     @DisplayName("본인 스스로를 친구 추가할 수 없다.")
     @Test
-    void addMeFriendTest() {
+    void addMeFriend_Test() {
         // given
         Long friendId = 1L;
         setField(TEST_USER, "id", 1L);
 
         // when, then
         Assertions.assertThatThrownBy(() -> friendService.addFriend(friendId, TEST_USER))
+            .isInstanceOf(GlobalException.class);
+    }
+
+    @Test
+    @DisplayName("친구 삭제 테스트")
+    void deleteFriend_Test() {
+        // given
+        Long friendId = 2L;
+        setField(TEST_USER, "id", 1L);
+
+        given(friendRepository.existsByUser_IdAndFriend_Id(anyLong(), anyLong())).willReturn(true);
+
+        // when
+        friendService.deleteFriend(friendId, TEST_USER);
+
+        // then
+        verify(friendRepository, times(1)).existsByUser_IdAndFriend_Id(anyLong(), anyLong());
+        verify(friendRepository, times(1)).deleteByFriend_Id(anyLong());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 친구 삭제 테스트")
+    void deleteFriendNotExists_Test() {
+        // given
+        Long friendId = 2L;
+        setField(TEST_USER, "id", 1L);
+
+        given(friendRepository.existsByUser_IdAndFriend_Id(anyLong(), anyLong())).willReturn(false);
+
+        // when, then
+        Assertions.assertThatThrownBy(() -> friendService.deleteFriend(friendId, TEST_USER))
             .isInstanceOf(GlobalException.class);
     }
 }
