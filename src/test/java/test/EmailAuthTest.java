@@ -1,6 +1,6 @@
 package test;
 
-import com.clover.youngchat.domain.user.entity.EmailAuth;
+import com.clover.youngchat.domain.auth.entity.EmailAuth;
 
 public interface EmailAuthTest extends UserTest {
 

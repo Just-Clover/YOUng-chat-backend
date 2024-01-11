@@ -1,7 +1,7 @@
 package com.clover.youngchat.global.email;
 
-import com.clover.youngchat.domain.user.entity.EmailAuth;
-import com.clover.youngchat.domain.user.service.EmailAuthService;
+import com.clover.youngchat.domain.auth.entity.EmailAuth;
+import com.clover.youngchat.domain.auth.service.EmailAuthService;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
 import jakarta.mail.MessagingException;

@@ -1,4 +1,4 @@
-package com.clover.youngchat.domain.user.service;
+package com.clover.youngchat.domain.auth.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.clover.youngchat.domain.user.repository.EmailAuthRepository;
+import com.clover.youngchat.domain.auth.repository.EmailAuthRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
