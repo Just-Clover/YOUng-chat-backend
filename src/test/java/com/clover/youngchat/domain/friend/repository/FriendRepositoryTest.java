@@ -2,21 +2,25 @@ package com.clover.youngchat.domain.friend.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.clover.youngchat.domain.friend.dto.response.FriendGetSearchListRes;
 import com.clover.youngchat.domain.friend.entity.Friend;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
+import com.clover.youngchat.global.config.QueryDslConfig;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import test.FriendTest;
 
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(QueryDslConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FriendRepositoryTest implements FriendTest {
 
@@ -42,6 +46,37 @@ class FriendRepositoryTest implements FriendTest {
         // then
         assertThat(actual).hasSize(2);
         assertThat(actual.get(0).getFriend().getUsername()).isEqualTo(TEST_ANOTHER_USER_NAME);
+    }
+
+    @Test
+    @DisplayName("키워드로 친구 목록을 검색한다.")
+    void test() {
+        // given
+        User user = userRepository.save(TEST_USER);
+        User anotherUser = userRepository.save(TEST_ANOTHER_USER);
+        User friendUser = userRepository.save(TEST_FRIEND_USER);
+
+        Friend friend = Friend.builder()
+            .user(user)
+            .friend(anotherUser)
+            .build();
+
+        Friend friend2 = Friend.builder()
+            .user(user)
+            .friend(friendUser)
+            .build();
+
+        friendRepository.save(friend);
+        friendRepository.save(friend2);
+
+        String keyword = "a";
+
+        // when
+        List<FriendGetSearchListRes> actual = friendRepository.findFriendByKeyword(
+            user.getId(), keyword);
+
+        // then
+        assertThat(actual).hasSize(2);
     }
 
     @Test

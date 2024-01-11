@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.data.repository.RepositoryDefinition;
 
 @RepositoryDefinition(domainClass = Friend.class, idClass = FriendPK.class)
-public interface FriendRepository {
+public interface FriendRepository extends FriendRepositoryCustom {
 
     Optional<List<Friend>> findByUser(User user);
 

@@ -1,18 +1,24 @@
 package com.clover.youngchat.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.clover.youngchat.domain.user.entity.User;
+import com.clover.youngchat.global.config.QueryDslConfig;
+import java.util.List;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import test.UserTest;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(QueryDslConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest implements UserTest {
 
@@ -31,6 +37,23 @@ class UserRepositoryTest implements UserTest {
     }
 
     @Test
+    @DisplayName("Id 리스트로 유저를 조회한다.")
+    void findUsersByIdContains() {
+        // given
+        User user = userRepository.save(TEST_USER);
+        User anotherUser = userRepository.save(TEST_ANOTHER_USER);
+
+        // when
+        List<User> actual = userRepository.findUsersByIdIn(
+            List.of(user.getId(), anotherUser.getId())).get();
+
+        // then
+        assertThat(actual).hasSize(2);
+        assertThat(actual).extracting("username", "email")
+            .contains(Tuple.tuple(TEST_USER_NAME, TEST_USER_EMAIL),
+                tuple(TEST_ANOTHER_USER_NAME, TEST_ANOTHER_USER_EMAIL));
+    }
+
     @DisplayName("email 중복 확인")
     void existsByEmailTest() {
         // given
