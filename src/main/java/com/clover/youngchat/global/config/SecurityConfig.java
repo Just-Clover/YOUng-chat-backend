@@ -19,6 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +32,9 @@ public class SecurityConfig {
     private final RedisUtil redisUtil;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
+
+    private final LogoutHandler logoutHandler;
+    private final LogoutSuccessHandler logoutSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -72,6 +78,13 @@ public class SecurityConfig {
 
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http.logout(
+            logout -> {
+                logout.logoutRequestMatcher(new AntPathRequestMatcher("api/v1/users/logout"));
+                logout.addLogoutHandler(logoutHandler); // 로그아웃 핸들러
+                logout.logoutSuccessHandler(logoutSuccessHandler); // 로그아웃 성공 후 핸들러
+            });
 
         return http.build();
     }
