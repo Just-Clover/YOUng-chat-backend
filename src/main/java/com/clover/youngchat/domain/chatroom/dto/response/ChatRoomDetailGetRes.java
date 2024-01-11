@@ -14,16 +14,12 @@ import lombok.NoArgsConstructor;
 public class ChatRoomDetailGetRes {
 
     private String title;
-    private List<ChatRes> chatResList;
+    private List<ChatRes> chatResList = new ArrayList<>();
 
     @Builder
-    private ChatRoomDetailGetRes(String title) {
+    private ChatRoomDetailGetRes(String title, List<ChatRes> chatResList) {
         this.title = title;
-        this.chatResList = new ArrayList<>();
-    }
-
-    public void addChatRes(ChatRes chatRes) {
-        this.chatResList.add(chatRes);
+        this.chatResList = chatResList;
     }
 
     @Getter
