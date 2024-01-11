@@ -4,6 +4,7 @@ import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
@@ -39,6 +40,14 @@ public class ChatRoomController {
     public RestResponse<List<ChatRoomAndLastChatGetRes>> getChatRoomList(
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(chatRoomService.getChatRoomList(userDetails.getUser()));
+    }
+
+    @GetMapping("/{chatRoomId}")
+    public RestResponse<ChatRoomDetailGetRes> getDetailChatRoom(@PathVariable Long chatRoomId,
+        @AuthenticationPrincipal UserDetailsImpl
+            userDetails) {
+        return RestResponse.success(
+            chatRoomService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
     }
 
     @PatchMapping("/{chatRoomId}")
