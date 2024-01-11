@@ -31,9 +31,9 @@ public class FriendController {
         return RestResponse.success(friendService.getFriendList(userDetails.getUser()));
     }
 
-    @GetMapping("/search/{keyword}")
+    @GetMapping("/search")
     public RestResponse<List<FriendGetSearchListRes>> getFriendSearchList(
-        @PathVariable String keyword,
+        String keyword,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
             friendService.getFriendSearchList(keyword, userDetails.getUser()));

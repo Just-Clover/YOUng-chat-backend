@@ -39,9 +39,9 @@ public class FriendControllerTest extends BaseMvcTest {
         String keyword = "test";
 
         // when - then
-        mockMvc.perform(get("/api/v1/friends/search/" + keyword)
+        mockMvc.perform(get("/api/v1/friends/search")
                 .principal(mockPrincipal)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON).param("keyword", keyword))
             .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
     }
