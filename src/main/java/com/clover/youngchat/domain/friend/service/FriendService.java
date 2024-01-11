@@ -3,6 +3,7 @@ package com.clover.youngchat.domain.friend.service;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.friend.dto.response.FriendAddRes;
+import com.clover.youngchat.domain.friend.dto.response.FriendDeleteRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetListRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetSearchListRes;
 import com.clover.youngchat.domain.friend.entity.Friend;
@@ -56,9 +57,18 @@ public class FriendService {
         return new FriendAddRes();
     }
 
+    @Transactional
+    public FriendDeleteRes deleteFriend(Long friendId, User user) {
+        if (!friendRepository.existsByUser_IdAndFriend_Id(user.getId(), friendId)) {
+            throw new GlobalException(ResultCode.NOT_FOUND_FRIEND);
+        }
+        friendRepository.deleteByFriend_Id(friendId);
+
+        return new FriendDeleteRes();
+    }
+
     private List<Friend> findByUser(User user) {
         return friendRepository.findByUser(user)
             .orElseThrow(() -> new GlobalException(ResultCode.NOT_FOUND_FRIEND));
     }
-
 }
