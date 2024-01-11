@@ -11,7 +11,8 @@ public interface ChatUserRepository {
 
     boolean existsByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
 
-    Optional<ChatUser> findByChatRoom_IdAndUser_Id(Long chatbRoomId, Long userId);
+    Optional<ChatUser> findByChatRoom_IdAndUser_Id(Long chatRoomId, Long userId);
 
     void delete(ChatUser chatUser);
+  
 }
