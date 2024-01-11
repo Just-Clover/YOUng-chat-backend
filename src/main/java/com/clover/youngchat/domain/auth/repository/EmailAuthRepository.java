@@ -1,6 +1,6 @@
-package com.clover.youngchat.domain.user.repository;
+package com.clover.youngchat.domain.auth.repository;
 
-import com.clover.youngchat.domain.user.entity.EmailAuth;
+import com.clover.youngchat.domain.auth.entity.EmailAuth;
 import java.util.Optional;
 import org.springframework.data.repository.RepositoryDefinition;
 
