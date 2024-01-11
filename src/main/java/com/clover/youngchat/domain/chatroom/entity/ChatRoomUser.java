@@ -17,10 +17,10 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
-@Table(name = "chat_user")
-@IdClass(ChatUserPK.class)
+@Table(name = "chatroom_user")
+@IdClass(ChatRoomUserPK.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatUser {
+public class ChatRoomUser {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,7 +35,7 @@ public class ChatUser {
     private ChatRoom chatRoom;
 
     @Builder
-    private ChatUser(User user, ChatRoom chatRoom) {
+    private ChatRoomUser(User user, ChatRoom chatRoom) {
         this.user = user;
         this.chatRoom = chatRoom;
     }
