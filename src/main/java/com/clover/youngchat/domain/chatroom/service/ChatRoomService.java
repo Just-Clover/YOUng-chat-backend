@@ -2,22 +2,28 @@ package com.clover.youngchat.domain.chatroom.service;
 
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 
+import com.clover.youngchat.domain.chat.entity.Chat;
+import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomListGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
-import com.clover.youngchat.domain.chatroom.entity.ChatUser;
+import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
-import com.clover.youngchat.domain.chatroom.repository.ChatUserRepository;
+import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +32,8 @@ import org.springframework.stereotype.Service;
 public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatUserRepository chatUserRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
+    private final ChatRepository chatRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -40,19 +47,19 @@ public class ChatRoomService {
 
         chatRoomRepository.save(chatRoom);
 
-        ChatUser myChat = ChatUser.builder()
+        ChatRoomUser myChat = ChatRoomUser.builder()
             .user(user)
             .chatRoom(chatRoom)
             .build();
 
-        chatUserRepository.save(myChat);
+        chatRoomUserRepository.save(myChat);
 
-        ChatUser friendChat = ChatUser.builder()
+        ChatRoomUser friendChat = ChatRoomUser.builder()
             .user(friend)
             .chatRoom(chatRoom)
             .build();
 
-        chatUserRepository.save(friendChat);
+        chatRoomUserRepository.save(friendChat);
 
         return new ChatRoomCreateRes();
     }
@@ -74,10 +81,11 @@ public class ChatRoomService {
             throw new GlobalException(NOT_FOUND_CHATROOM);
         }
 
-        ChatUser chatUser = chatUserRepository.findByChatRoom_IdAndUser_Id(chatRoomId, user.getId())
+        ChatRoomUser chatRoomUser = chatRoomUserRepository.findByChatRoom_IdAndUser_Id(chatRoomId,
+                user.getId())
             .orElseThrow(() -> new GlobalException(ACCESS_DENY));
 
-        chatUserRepository.delete(chatUser);
+        chatRoomUserRepository.delete(chatRoomUser);
 
         return new ChatRoomLeaveRes();
     }
@@ -88,8 +96,26 @@ public class ChatRoomService {
     }
 
     private void isChatRoomMember(Long chatRoomId, Long userId) {
-        if (!chatUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
+        if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
             throw new GlobalException(ACCESS_DENY);
         }
+    }
+
+    @Transactional
+    public List<ChatRoomListGetRes> getChatRoomList(User user) {
+        List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
+            .orElseThrow(() ->
+                new GlobalException(NOT_FOUND_CHATROOM));
+
+        List<ChatRoomListGetRes> getResList = new ArrayList<>();
+
+        for (ChatRoomUser c : chatRoomUserList) {
+            Chat chat = chatRepository.findByChatRoom_Id(c.getChatRoom().getId())
+                .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+            ChatRoomListGetRes crs = ChatRoomListGetRes.builder().build();
+            getResList.add(crs.to(c.getChatRoom(), chat));
+        }
+
+        return getResList;
     }
 }
