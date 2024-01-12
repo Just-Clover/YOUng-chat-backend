@@ -73,7 +73,7 @@ class UserControllerTest extends BaseMvcTest {
     @DisplayName("프로필 조회 : 성공")
     void getUserProfileSuccess() throws Exception {
         Long userId = 1L;
-        ;
+
         given(userService.getProfile(anyLong())).willReturn(UserProfileGetRes.builder()
             .username(TEST_USER_NAME)
             .profileImage(TEST_USER_PROFILE_IMAGE)
