@@ -64,6 +64,20 @@ class UserServiceTest implements UserTest, EmailAuthTest {
     @InjectMocks
     private UserService userService;
 
+    private User testUser;
+
+    @BeforeEach
+    void setUp() {
+        testUser = User.builder()
+            .email(TEST_USER_EMAIL)
+            .username(TEST_USER_NAME)
+            .password(TEST_USER_PASSWORD)
+            .profileImage(TEST_USER_PROFILE_IMAGE)
+            .build();
+
+        ReflectionTestUtils.setField(testUser, "id", 1L);
+    }
+
     @Nested
     @DisplayName("회원가입 테스트")
     class signupTest {
@@ -85,7 +99,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             // given
             given(userRepository.existsByEmail(req.getEmail())).willReturn(false);
             given(emailUtil.findEmailAuth(req.getEmail())).willReturn(TEST_EMAIL_AUTH_OK);
-            given(userRepository.save(any(User.class))).willReturn(TEST_USER);
+            given(userRepository.save(any(User.class))).willReturn(testUser);
 
             // when
             userService.signup(req);
@@ -145,7 +159,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 .build();
             ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
 
-            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(testUser));
             given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any())).willReturn(true);
 
             // when
@@ -164,9 +178,9 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 .newPassword(TEST_ANOTHER_USER_PASSWORD)
                 .checkNewPassword(TEST_ANOTHER_USER_PASSWORD)
                 .build();
-            ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
+            ReflectionTestUtils.setField(testUser, "id", TEST_USER_ID);
 
-            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(testUser));
             given(passwordEncoder.matches(any(), any())).willReturn(false);
 
             // when
@@ -187,9 +201,9 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 .newPassword(TEST_ANOTHER_USER_PASSWORD)
                 .checkNewPassword("NotMatches")
                 .build();
-            ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
+            ReflectionTestUtils.setField(testUser, "id", TEST_USER_ID);
 
-            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(testUser));
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
@@ -209,9 +223,9 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 .newPassword(TEST_USER_PASSWORD)
                 .checkNewPassword(TEST_USER_PASSWORD)
                 .build();
-            ReflectionTestUtils.setField(TEST_USER, "id", TEST_USER_ID);
+            ReflectionTestUtils.setField(testUser, "id", TEST_USER_ID);
 
-            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(TEST_USER_ID)).willReturn(Optional.of(testUser));
             given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any())).willReturn(true);
 
             // when
@@ -231,7 +245,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         @Test
         @DisplayName("성공")
         void getUserProfileSuccess() {
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
             userService.getProfile(TEST_USER_ID);
 
@@ -271,38 +285,36 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 IMAGE_PNG_VALUE, // 컨텐츠 타입
                 fileResource.getInputStream()); // 컨텐츠 내용
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
             given(s3Util.uploadFile(any(), any())).willReturn(TEST_ANOTHER_USER_PROFILE_IMAGE);
 
-            userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
+            userService.editProfile(testUser.getId(), req, multipartFile, testUser.getId());
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(s3Util, times(1)).uploadFile(any(), any());
             verify(s3Util, times(1)).deleteFile(any(), any());
 
-            assertThat(TEST_USER.getUsername()).isEqualTo(req.getUsername());
-            assertThat(TEST_USER.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
+            assertThat(testUser.getUsername()).isEqualTo(req.getUsername());
+            assertThat(testUser.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
         }
 
         @Test
         @DisplayName("성공 : 같은 프로필 이미지")
-        void editUserProfileSuccess_SameProfileImage() throws IOException {
+        void editUserProfileSuccess_SameProfileImage() {
             UserProfileEditReq req = UserProfileEditReq.builder()
                 .username("프로필 수정")
                 .build();
 
-            MultipartFile multipartFile = null;
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
-
-            userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
+            userService.editProfile(testUser.getId(), req, null, testUser.getId());
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(s3Util, times(0)).uploadFile(null, null);
             verify(s3Util, times(0)).deleteFile(null, null);
 
-            assertThat(TEST_USER.getUsername()).isEqualTo(req.getUsername());
-            assertThat(TEST_USER.getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
+            assertThat(testUser.getUsername()).isEqualTo(req.getUsername());
+            assertThat(testUser.getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
         }
 
         @Test
@@ -340,7 +352,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 IMAGE_GIF_VALUE, // 컨텐츠 타입
                 fileResource.getInputStream()); // 컨텐츠 내용
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
             GlobalException exception = assertThrows(GlobalException.class,
                 () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
