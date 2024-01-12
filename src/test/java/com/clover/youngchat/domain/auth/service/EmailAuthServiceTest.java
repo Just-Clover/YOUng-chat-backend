@@ -3,11 +3,14 @@ package com.clover.youngchat.domain.auth.service;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.clover.youngchat.domain.auth.repository.EmailAuthRepository;
 import com.clover.youngchat.global.exception.GlobalException;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +42,8 @@ class EmailAuthServiceTest implements EmailAuthTest {
     @Test
     @DisplayName("이메일 찾기 실패 테스트")
     public void findByIdTest() {
+        // given
+        given(emailAuthRepository.findById(anyString())).willReturn(Optional.empty());
 
         // when
         GlobalException exception =

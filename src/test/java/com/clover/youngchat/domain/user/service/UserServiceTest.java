@@ -121,8 +121,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 () -> userService.signup(req));
 
             // then
-            assertThat(DUPLICATED_EMAIL.getMessage()).isEqualTo(
-                exception.getResultCode().getMessage());
+            assertThat(exception.getResultCode().getMessage())
+                .isEqualTo(DUPLICATED_EMAIL.getMessage());
         }
 
         @Test
@@ -188,8 +188,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 () -> userService.updatePassword(TEST_USER_ID, req));
 
             // then
-            assertThat(MISMATCH_PASSWORD.getMessage()).isEqualTo(
-                exception.getResultCode().getMessage());
+            assertThat(exception.getResultCode().getMessage())
+                .isEqualTo(MISMATCH_PASSWORD.getMessage());
         }
 
         @Test
@@ -210,8 +210,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 () -> userService.updatePassword(TEST_USER_ID, req));
 
             // then
-            assertThat(MISMATCH_CONFIRM_PASSWORD.getMessage()).isEqualTo(
-                exception.getResultCode().getMessage());
+            assertThat(exception.getResultCode().getMessage())
+                .isEqualTo(MISMATCH_CONFIRM_PASSWORD.getMessage());
         }
 
         @Test
@@ -233,8 +233,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 () -> userService.updatePassword(TEST_USER_ID, req));
 
             // then
-            assertThat(SAME_OLD_PASSWORD.getMessage()).isEqualTo(
-                exception.getResultCode().getMessage());
+            assertThat(exception.getResultCode().getMessage())
+                .isEqualTo(SAME_OLD_PASSWORD.getMessage());
         }
     }
 
