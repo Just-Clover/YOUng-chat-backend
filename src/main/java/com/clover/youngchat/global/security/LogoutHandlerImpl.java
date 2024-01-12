@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 public class LogoutHandlerImpl implements LogoutHandler {
 
     private final RedisUtil redisUtil;
+    private final JwtUtil jwtUtil;
     private final BlacklistService blacklistService;
 
     @Override
@@ -27,6 +28,8 @@ public class LogoutHandlerImpl implements LogoutHandler {
         if (StringUtils.hasText(refreshToken)) {
             redisUtil.delete(refreshToken);
         }
-        blacklistService.addTokenToBlacklist(accessToken);
+
+        long expiration = jwtUtil.getExpirationSecondsFromToken(accessToken);
+        blacklistService.addTokenToBlacklist(accessToken, expiration);
     }
 }

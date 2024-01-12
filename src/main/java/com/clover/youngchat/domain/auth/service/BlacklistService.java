@@ -11,9 +11,10 @@ public class BlacklistService {
 
     private final BlacklistRepository blacklistRepository;
 
-    public void addTokenToBlacklist(String accessToken) {
+    public void addTokenToBlacklist(String accessToken, long expiration) {
         Blacklist blacklist = Blacklist.builder()
             .accessToken(accessToken)
+            .expiration(expiration)
             .build();
         blacklistRepository.save(blacklist);
     }
