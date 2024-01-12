@@ -1,9 +1,12 @@
 package com.clover.youngchat.global.config;
 
+import com.clover.youngchat.domain.auth.service.BlacklistService;
 import com.clover.youngchat.global.jwt.JwtAuthenticationFilter;
 import com.clover.youngchat.global.jwt.JwtAuthorizationFilter;
 import com.clover.youngchat.global.jwt.JwtUtil;
 import com.clover.youngchat.global.redis.RedisUtil;
+import com.clover.youngchat.global.security.LogoutHandlerImpl;
+import com.clover.youngchat.global.security.LogoutSuccessHandlerImpl;
 import com.clover.youngchat.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -30,6 +33,10 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
+    private final BlacklistService blacklistService;
+    private final LogoutHandlerImpl logoutHandler;
+    private final LogoutSuccessHandlerImpl logoutSuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -50,8 +57,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, redisUtil,
-            userDetailsService);
+        return new JwtAuthorizationFilter(jwtUtil, redisUtil, userDetailsService, blacklistService);
     }
 
     @Bean
@@ -72,6 +78,13 @@ public class SecurityConfig {
 
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http.logout(
+            logout -> {
+                logout.logoutUrl("/api/v1/users/logout");
+                logout.addLogoutHandler(logoutHandler); // 로그아웃 핸들러
+                logout.logoutSuccessHandler(logoutSuccessHandler); // 로그아웃 성공 후 핸들러
+            });
 
         return http.build();
     }

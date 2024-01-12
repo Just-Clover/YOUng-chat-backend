@@ -1,7 +1,7 @@
-package com.clover.youngchat.domain.user.service;
+package com.clover.youngchat.domain.auth.service;
 
-import com.clover.youngchat.domain.user.entity.EmailAuth;
-import com.clover.youngchat.domain.user.repository.EmailAuthRepository;
+import com.clover.youngchat.domain.auth.entity.EmailAuth;
+import com.clover.youngchat.domain.auth.repository.EmailAuthRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.exception.ResultCode;
 import lombok.RequiredArgsConstructor;

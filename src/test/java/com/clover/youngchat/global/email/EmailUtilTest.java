@@ -7,8 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.clover.youngchat.domain.user.entity.EmailAuth;
-import com.clover.youngchat.domain.user.service.EmailAuthService;
+import com.clover.youngchat.domain.auth.entity.EmailAuth;
+import com.clover.youngchat.domain.auth.service.EmailAuthService;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

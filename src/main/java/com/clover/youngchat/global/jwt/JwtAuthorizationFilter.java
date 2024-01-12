@@ -1,9 +1,12 @@
 package com.clover.youngchat.global.jwt;
 
+import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.jwt.JwtUtil.ACCESS_TOKEN_HEADER;
 import static com.clover.youngchat.global.jwt.JwtUtil.BEARER_PREFIX;
 import static com.clover.youngchat.global.jwt.JwtUtil.REFRESH_TOKEN_HEADER;
 
+import com.clover.youngchat.domain.auth.service.BlacklistService;
+import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.redis.RedisUtil;
 import com.clover.youngchat.global.security.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -28,12 +31,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final UserDetailsServiceImpl userDetailsService;
+    private final BlacklistService blacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = jwtUtil.getTokenFromHeader(request, ACCESS_TOKEN_HEADER);
+
+        if (StringUtils.hasText(accessToken)
+            && blacklistService.isTokenBlackListed(accessToken)) {
+            throw new GlobalException(ACCESS_DENY);
+        }
 
         if (StringUtils.hasText(accessToken) && !jwtUtil.validateToken(accessToken)) {
             String refreshToken = jwtUtil.getTokenFromHeader(request, REFRESH_TOKEN_HEADER);

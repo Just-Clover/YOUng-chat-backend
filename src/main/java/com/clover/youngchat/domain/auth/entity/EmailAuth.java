@@ -1,4 +1,4 @@
-package com.clover.youngchat.domain.user.entity;
+package com.clover.youngchat.domain.auth.entity;
 
 import lombok.AccessLevel;
 import lombok.Builder;
