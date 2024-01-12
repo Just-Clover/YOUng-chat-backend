@@ -14,13 +14,17 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
+import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.email.EmailUtil;
 import com.clover.youngchat.global.exception.GlobalException;
+import com.clover.youngchat.global.s3.S3Util;
+import java.io.IOException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +34,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 import test.EmailAuthTest;
 import test.UserTest;
 
@@ -46,6 +54,9 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private S3Util s3Util;
 
     @InjectMocks
     private UserService userService;
@@ -208,34 +219,64 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             assertThat(SAME_OLD_PASSWORD.getMessage()).isEqualTo(
                 exception.getResultCode().getMessage());
         }
+    }
 
-        @Nested
-        @DisplayName("프로필 조회")
-        class getUserProfile {
+    @Nested
+    @DisplayName("프로필 조회")
+    class getUserProfile {
 
-            @Test
-            @DisplayName("성공")
-            void getUserProfileSuccess() {
-                given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+        @Test
+        @DisplayName("성공")
+        void getUserProfileSuccess() {
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
 
-                userService.getProfile(TEST_USER_ID);
+            userService.getProfile(TEST_USER_ID);
 
-                verify(userRepository, times(1)).findById(anyLong());
-            }
+            verify(userRepository, times(1)).findById(anyLong());
+        }
 
-            @Test
-            @DisplayName("실패 : 존재하지 않는 유저")
-            void getUserProfileFail_NotFoundUser() {
-                given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+        @Test
+        @DisplayName("실패 : 존재하지 않는 유저")
+        void getUserProfileFail_NotFoundUser() {
+            given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
-                GlobalException exception = assertThrows(GlobalException.class, () ->
-                    userService.getProfile(TEST_USER_ID));
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                userService.getProfile(TEST_USER_ID));
 
-                verify(userRepository, times(1)).findById(anyLong());
+            verify(userRepository, times(1)).findById(anyLong());
 
-                assertThat(NOT_FOUND_USER.getMessage()).isEqualTo(
-                    exception.getResultCode().getMessage());
-            }
+            assertThat(NOT_FOUND_USER.getMessage()).isEqualTo(
+                exception.getResultCode().getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("프로필 수정")
+    class editUserProfile {
+
+        @Test
+        @DisplayName("성공")
+        void editUserProfileSuccess() throws IOException {
+            UserProfileEditReq req = UserProfileEditReq.builder()
+                .username("프로필 수정")
+                .build();
+
+            Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
+            MultipartFile multipartFile = new MockMultipartFile(
+                "image", // 파라미터 이름
+                fileResource.getFilename(), // 파일 이름
+                IMAGE_PNG_VALUE, // 컨텐츠 타입
+                fileResource.getInputStream()); // 컨텐츠 내용
+
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(s3Util.uploadFile(any(), any())).willReturn(TEST_ANOTHER_USER_PROFILE_IMAGE);
+
+            userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
+
+            verify(userRepository, times(1)).findById(anyLong());
+
+            assertThat(TEST_USER.getUsername()).isEqualTo(req.getUsername());
+            assertThat(TEST_USER.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
         }
     }
 }
