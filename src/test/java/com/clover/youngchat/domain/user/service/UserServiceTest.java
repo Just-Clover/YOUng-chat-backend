@@ -2,6 +2,7 @@ package com.clover.youngchat.domain.user.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
+import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
@@ -15,6 +16,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.http.MediaType.IMAGE_GIF_VALUE;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
@@ -299,6 +301,30 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                     ANOTHER_TEST_USER_ID));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
+        }
+
+        @Test
+        @DisplayName("실패 : 파일이 png가 아닐 경우")
+        void editUserProfileFail_NOT_PNG() throws IOException {
+            UserProfileEditReq req = UserProfileEditReq.builder()
+                .username("프로필 수정")
+                .build();
+
+            Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
+            MultipartFile multipartFile = new MockMultipartFile(
+                "image", // 파라미터 이름
+                fileResource.getFilename(), // 파일 이름
+                IMAGE_GIF_VALUE, // 컨텐츠 타입
+                fileResource.getInputStream()); // 컨텐츠 내용
+
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+
+            GlobalException exception = assertThrows(GlobalException.class,
+                () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
+                    TEST_USER_ID));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                INVALID_PROFILE_IMAGE_TYPE.getMessage());
         }
     }
 }
