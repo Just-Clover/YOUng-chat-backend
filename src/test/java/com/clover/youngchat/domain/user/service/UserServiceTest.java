@@ -246,8 +246,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             verify(userRepository, times(1)).findById(anyLong());
 
-            assertThat(NOT_FOUND_USER.getMessage()).isEqualTo(
-                exception.getResultCode().getMessage());
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_USER.getMessage());
         }
     }
 
