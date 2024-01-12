@@ -258,8 +258,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
     class editUserProfile {
 
         @Test
-        @DisplayName("성공")
-        void editUserProfileSuccess() throws IOException {
+        @DisplayName("성공 : 다른 프로필 이미지")
+        void editUserProfileSuccess_AnotherProfileImage() throws IOException {
             UserProfileEditReq req = UserProfileEditReq.builder()
                 .username("프로필 수정")
                 .build();
@@ -277,6 +277,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
 
             verify(userRepository, times(1)).findById(anyLong());
+            verify(s3Util, times(1)).uploadFile(any(), any());
+            verify(s3Util, times(1)).deleteFile(any(), any());
 
             assertThat(TEST_USER.getUsername()).isEqualTo(req.getUsername());
             assertThat(TEST_USER.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
