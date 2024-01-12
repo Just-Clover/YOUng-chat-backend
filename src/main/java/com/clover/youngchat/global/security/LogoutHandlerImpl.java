@@ -1,5 +1,8 @@
 package com.clover.youngchat.global.security;
 
+import static com.clover.youngchat.global.jwt.JwtUtil.ACCESS_TOKEN_HEADER;
+import static com.clover.youngchat.global.jwt.JwtUtil.REFRESH_TOKEN_HEADER;
+
 import com.clover.youngchat.domain.auth.service.BlacklistService;
 import com.clover.youngchat.global.jwt.JwtUtil;
 import com.clover.youngchat.global.redis.RedisUtil;
@@ -22,8 +25,8 @@ public class LogoutHandlerImpl implements LogoutHandler {
     @Override
     public void logout(final HttpServletRequest request, final HttpServletResponse response,
         final Authentication authentication) {
-        String refreshToken = request.getHeader(JwtUtil.REFRESH_TOKEN_HEADER);
-        String accessToken = request.getHeader(JwtUtil.ACCESS_TOKEN_HEADER);
+        String refreshToken = jwtUtil.getTokenFromHeader(request, REFRESH_TOKEN_HEADER);
+        String accessToken = jwtUtil.getTokenFromHeader(request, ACCESS_TOKEN_HEADER);
 
         if (StringUtils.hasText(refreshToken)) {
             redisUtil.delete(refreshToken);

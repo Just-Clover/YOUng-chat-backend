@@ -40,7 +40,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String accessToken = jwtUtil.getTokenFromHeader(request, ACCESS_TOKEN_HEADER);
 
         if (StringUtils.hasText(accessToken)
-            && blacklistService.isTokenBlackListed(BEARER_PREFIX + accessToken)) {
+            && blacklistService.isTokenBlackListed(accessToken)) {
             throw new GlobalException(ACCESS_DENY);
         }
 

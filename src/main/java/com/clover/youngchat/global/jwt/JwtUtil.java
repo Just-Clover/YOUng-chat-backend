@@ -1,5 +1,6 @@
 package com.clover.youngchat.global.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -27,11 +28,11 @@ public class JwtUtil {
     public static final String AUTHORITY = "ROLE_USER";
     public static final long ACCESS_TOKEN_TIME = 60 * 30 * 1000 * 24L;
     public static final long REFRESH_TOKEN_TIME = 60 * 60 * 1000L * 24 * 14;
-
+    public static final long MILLISECONDS_TO_SECONDS = 10;
+    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     @PostConstruct
     public void init() {
@@ -90,6 +91,19 @@ public class JwtUtil {
     public String getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody()
             .getSubject();
+    }
+
+    public long getExpirationSecondsFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build().
+            parseClaimsJws(token)
+            .getBody();
+
+        long expirationMillis = claims.getExpiration().getTime();
+        long currentMillis = System.currentTimeMillis();
+
+        return (expirationMillis - currentMillis) / MILLISECONDS_TO_SECONDS;
     }
 
 }
