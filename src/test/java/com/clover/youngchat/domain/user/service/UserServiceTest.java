@@ -285,6 +285,27 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         }
 
         @Test
+        @DisplayName("성공 : 같은 프로필 이미지")
+        void editUserProfileSuccess_SameProfileImage() throws IOException {
+            UserProfileEditReq req = UserProfileEditReq.builder()
+                .username("프로필 수정")
+                .build();
+
+            MultipartFile multipartFile = null;
+
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+
+            userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
+
+            verify(userRepository, times(1)).findById(anyLong());
+            verify(s3Util, times(0)).uploadFile(null, null);
+            verify(s3Util, times(0)).deleteFile(null, null);
+
+            assertThat(TEST_USER.getUsername()).isEqualTo(req.getUsername());
+            assertThat(TEST_USER.getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
+        }
+
+        @Test
         @DisplayName("실패 : 본인 프로필이 아닐 경우")
         void editUserProfileFail_Access_Deny() throws IOException {
             UserProfileEditReq req = UserProfileEditReq.builder()
