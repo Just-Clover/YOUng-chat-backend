@@ -56,6 +56,7 @@ class UserRepositoryTest implements UserTest {
                 tuple(TEST_ANOTHER_USER_NAME, TEST_ANOTHER_USER_EMAIL));
     }
 
+    @Test
     @DisplayName("email 중복 확인")
     void existsByEmailTest() {
         // given
