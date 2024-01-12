@@ -75,7 +75,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             .profileImage(TEST_USER_PROFILE_IMAGE)
             .build();
 
-        ReflectionTestUtils.setField(testUser, "id", 1L);
+        ReflectionTestUtils.setField(testUser, "id", TEST_USER_ID);
     }
 
     @Nested
@@ -288,7 +288,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
             given(s3Util.uploadFile(any(), any())).willReturn(TEST_ANOTHER_USER_PROFILE_IMAGE);
 
-            userService.editProfile(testUser.getId(), req, multipartFile, testUser.getId());
+            userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(s3Util, times(1)).uploadFile(any(), any());
@@ -307,7 +307,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
-            userService.editProfile(testUser.getId(), req, null, testUser.getId());
+            userService.editProfile(TEST_USER_ID, req, null, TEST_USER_ID);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(s3Util, times(0)).uploadFile(null, null);
