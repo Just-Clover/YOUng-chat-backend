@@ -3,6 +3,7 @@ package com.clover.youngchat.domain.user.service;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.UNAUTHORIZED_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -220,6 +221,21 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 userService.getProfile(TEST_USER_ID);
 
                 verify(userRepository, times(1)).findById(anyLong());
+            }
+
+            @Test
+            @DisplayName("실패 : 존재하지 않는 유저")
+            void getUserProfileFail_NotFoundUser() {
+                given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+                GlobalException exception = assertThrows(GlobalException.class, () ->
+                    userService.getProfile(TEST_USER_ID));
+
+                verify(userRepository, times(1)).findById(anyLong());
+
+                assertThat(NOT_FOUND_USER.getMessage()).isEqualTo(
+                    exception.getResultCode().getMessage());
+
             }
         }
     }
