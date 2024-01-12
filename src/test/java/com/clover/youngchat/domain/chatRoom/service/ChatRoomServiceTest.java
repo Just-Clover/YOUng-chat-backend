@@ -181,5 +181,23 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_CHATROOM.getMessage());
         }
+
+        @Test
+        @DisplayName("실패 : 채팅방의 멤버가 아닐 경우")
+        void editChatRoomFail_AccessDeny() {
+            ChatRoomEditReq req = ChatRoomEditReq.builder()
+                .title("채팅방 수정")
+                .build();
+
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(false);
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                ACCESS_DENY.getMessage());
+        }
     }
 }
