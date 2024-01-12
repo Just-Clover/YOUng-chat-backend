@@ -5,7 +5,9 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -13,16 +15,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.clover.youngchat.domain.BaseMvcTest;
+import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.service.UserService;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 @WebMvcTest(controllers = {UserController.class})
 class UserControllerTest extends BaseMvcTest {
@@ -85,5 +94,36 @@ class UserControllerTest extends BaseMvcTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 수정 : 성공")
+    void editUserProfileSuccess() throws Exception {
+        Long userId = 1L;
+
+        given(userService.editProfile(anyLong(), any(), any(), anyLong())).willReturn(
+            new UserProfileEditRes());
+        UserProfileEditReq req = UserProfileEditReq.builder()
+            .username(TEST_USER_NAME)
+            .build();
+        Resource fileResource = new ClassPathResource(TEST_USER_PROFILE_IMAGE);
+
+        MockMultipartFile multipartFile = new MockMultipartFile(
+            "image", // 파라미터 이름
+            fileResource.getFilename(), // 파일 이름
+            IMAGE_PNG_VALUE, // 컨텐츠 타입
+            fileResource.getInputStream()); // 컨텐츠 내용
+
+        String reqToJson = objectMapper.writeValueAsString(req);
+
+        MockMultipartFile reqFile = new MockMultipartFile(
+            "req", "json", "application/json", reqToJson.getBytes(StandardCharsets.UTF_8));
+        mockMvc
+            .perform(
+                multipart(HttpMethod.PATCH, "/api/v1/users/profile").file(multipartFile)
+                    .file(reqFile).principal(mockPrincipal)
+                    .param("userId", String.valueOf(userId)))
+            .andDo(print())
+            .andExpect(status().isOk());
     }
 }
