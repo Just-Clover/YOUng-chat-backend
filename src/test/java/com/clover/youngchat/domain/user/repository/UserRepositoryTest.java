@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.global.config.QueryDslConfig;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,5 +66,19 @@ class UserRepositoryTest implements UserTest {
 
         // then
         assertThat(isDuplicated).isTrue();
+    }
+
+    @Test
+    @DisplayName("findById 테스트")
+    void findByIdTest() {
+        userRepository.save(TEST_USER);
+
+        Optional<User> findUser = userRepository.findById(TEST_USER.getId());
+
+        assertThat(findUser.get().getId()).isEqualTo(TEST_USER.getId());
+        assertThat(findUser.get().getUsername()).isEqualTo(TEST_USER_NAME);
+        assertThat(findUser.get().getEmail()).isEqualTo(TEST_USER_EMAIL);
+        assertThat(findUser.get().getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
+        assertThat(findUser.get().getPassword()).matches(TEST_USER_PASSWORD);
     }
 }
