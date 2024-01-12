@@ -2,11 +2,13 @@ package com.clover.youngchat.domain.chatRoom.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static test.ChatRoomTest.TEST_CHAT_ROOM;
+import static test.ChatRoomTest.TEST_CHAT_ROOM_ID;
 import static test.ChatRoomTest.TEST_CHAT_ROOM_TITLE;
 
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.global.config.QueryDslConfig;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +32,16 @@ public class ChatRoomRepositoryTest {
         ChatRoom chatRoom = chatRoomRepository.save(TEST_CHAT_ROOM);
 
         assertThat(chatRoom.getTitle()).isEqualTo(TEST_CHAT_ROOM_TITLE);
+    }
+
+    @Test
+    @DisplayName("findById 테스트")
+    void findByIdTest() {
+        chatRoomRepository.save(TEST_CHAT_ROOM);
+
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(TEST_CHAT_ROOM_ID);
+
+        assertThat(chatRoom.get().getId()).isEqualTo(TEST_CHAT_ROOM_ID);
+        assertThat(chatRoom.get().getTitle()).isEqualTo(TEST_CHAT_ROOM_TITLE);
     }
 }
