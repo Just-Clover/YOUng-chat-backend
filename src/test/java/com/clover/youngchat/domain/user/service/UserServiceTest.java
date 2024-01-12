@@ -3,11 +3,13 @@ package com.clover.youngchat.domain.user.service;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.UNAUTHORIZED_EMAIL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -115,7 +117,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
     }
 
     @Nested
-    @DisplayName("비밀번호 변경테스트")
+    @DisplayName("비밀번호 변경 테스트")
     class updatePasswordTest {
 
         @Test
@@ -140,7 +142,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         }
 
         @Test
-        @DisplayName("실패 : 기존비밀번호틀림")
+        @DisplayName("실패 : 기존 비밀번호 틀림")
         void updatePasswordFailTest() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
@@ -163,7 +165,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         }
 
         @Test
-        @DisplayName("실패 : 새로운비밀번호와 확인 비밀번호틀림")
+        @DisplayName("실패 : 새로운비밀번호와 확인 비밀번호 틀림")
         void updatePasswordFailTest2() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
@@ -205,6 +207,35 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             // then
             assertThat(SAME_OLD_PASSWORD.getMessage()).isEqualTo(
                 exception.getResultCode().getMessage());
+        }
+
+        @Nested
+        @DisplayName("프로필 조회")
+        class getUserProfile {
+
+            @Test
+            @DisplayName("성공")
+            void getUserProfileSuccess() {
+                given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+
+                userService.getProfile(TEST_USER_ID);
+
+                verify(userRepository, times(1)).findById(anyLong());
+            }
+
+            @Test
+            @DisplayName("실패 : 존재하지 않는 유저")
+            void getUserProfileFail_NotFoundUser() {
+                given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+                GlobalException exception = assertThrows(GlobalException.class, () ->
+                    userService.getProfile(TEST_USER_ID));
+
+                verify(userRepository, times(1)).findById(anyLong());
+
+                assertThat(NOT_FOUND_USER.getMessage()).isEqualTo(
+                    exception.getResultCode().getMessage());
+            }
         }
     }
 }
