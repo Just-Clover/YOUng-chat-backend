@@ -8,6 +8,7 @@ import static com.clover.youngchat.global.exception.ResultCode.UNAUTHORIZED_EMAI
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -205,6 +206,21 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             // then
             assertThat(SAME_OLD_PASSWORD.getMessage()).isEqualTo(
                 exception.getResultCode().getMessage());
+        }
+
+        @Nested
+        @DisplayName("프로필 조회")
+        class getUserProfile {
+
+            @Test
+            @DisplayName("성공")
+            void getUserProfileSuccess() {
+                given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+
+                userService.getProfile(TEST_USER_ID);
+
+                verify(userRepository, times(1)).findById(anyLong());
+            }
         }
     }
 }
