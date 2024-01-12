@@ -33,6 +33,7 @@ class UserRepositoryTest implements UserTest {
 
         // then
         assertThat(saveUser.getUsername()).isEqualTo(TEST_USER_NAME);
+        assertThat(saveUser.getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
         assertThat(saveUser.getEmail()).isEqualTo(TEST_USER_EMAIL);
     }
 

@@ -117,7 +117,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
     }
 
     @Nested
-    @DisplayName("비밀번호 변경테스트")
+    @DisplayName("비밀번호 변경 테스트")
     class updatePasswordTest {
 
         @Test
@@ -142,7 +142,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         }
 
         @Test
-        @DisplayName("실패 : 기존비밀번호틀림")
+        @DisplayName("실패 : 기존 비밀번호 틀림")
         void updatePasswordFailTest() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
@@ -165,7 +165,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         }
 
         @Test
-        @DisplayName("실패 : 새로운비밀번호와 확인 비밀번호틀림")
+        @DisplayName("실패 : 새로운비밀번호와 확인 비밀번호 틀림")
         void updatePasswordFailTest2() {
             // given
             UserUpdatePasswordReq req = UserUpdatePasswordReq.builder()
@@ -235,7 +235,6 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
                 assertThat(NOT_FOUND_USER.getMessage()).isEqualTo(
                     exception.getResultCode().getMessage());
-
             }
         }
     }
