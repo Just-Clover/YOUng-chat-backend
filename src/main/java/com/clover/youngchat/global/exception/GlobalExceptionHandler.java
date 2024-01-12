@@ -4,6 +4,7 @@ import com.clover.youngchat.global.common.ErrorRes;
 import com.clover.youngchat.global.common.InvalidErrorRes;
 import com.clover.youngchat.global.response.RestResponse;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,12 +14,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(GlobalException.class)
-    public RestResponse<ErrorRes> handleGlobalException(GlobalException e) {
-        return RestResponse.error(e.getResultCode(), new ErrorRes());
+    public ResponseEntity<RestResponse<ErrorRes>> handleGlobalException(GlobalException e) {
+        return ResponseEntity.status(e.getResultCode().getStatus())
+            .body(RestResponse.error(e.getResultCode(), new ErrorRes()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public RestResponse<List<InvalidErrorRes>> handleInputInvalidException(
+    public ResponseEntity<RestResponse<List<InvalidErrorRes>>> handleInputInvalidException(
         MethodArgumentNotValidException ex) {
         List<FieldError> errors = ex.getBindingResult().getFieldErrors();
 
@@ -29,6 +31,7 @@ public class GlobalExceptionHandler {
                 .build()
             ).toList();
 
-        return RestResponse.error(ResultCode.INVALID_INPUT, errorResList);
+        return ResponseEntity.status(ex.getStatusCode())
+            .body(RestResponse.error(ResultCode.INVALID_INPUT, errorResList));
     }
 }
