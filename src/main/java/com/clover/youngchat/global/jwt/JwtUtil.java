@@ -26,9 +26,9 @@ public class JwtUtil {
     public static final String AUTHORIZATION_KEY = "auth";
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORITY = "ROLE_USER";
-    public static final long ACCESS_TOKEN_TIME = 60 * 30 * 1000 * 24L;
+    public static final long ACCESS_TOKEN_TIME = 60 * 30 * 1000;
     public static final long REFRESH_TOKEN_TIME = 60 * 60 * 1000L * 24 * 14;
-    public static final long MILLISECONDS_TO_SECONDS = 10;
+    public static final long MILLISECONDS_TO_SECONDS = 1000;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     @Value("${jwt.secret.key}")
     private String secretKey;
