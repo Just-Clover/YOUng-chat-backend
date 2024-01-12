@@ -1,5 +1,6 @@
 package com.clover.youngchat.domain.user.service;
 
+import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
@@ -277,6 +278,27 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             assertThat(TEST_USER.getUsername()).isEqualTo(req.getUsername());
             assertThat(TEST_USER.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
+        }
+
+        @Test
+        @DisplayName("실패 : 본인 프로필이 아닐 경우")
+        void editUserProfileFail_Access_Deny() throws IOException {
+            UserProfileEditReq req = UserProfileEditReq.builder()
+                .username("프로필 수정")
+                .build();
+
+            Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
+            MultipartFile multipartFile = new MockMultipartFile(
+                "image", // 파라미터 이름
+                fileResource.getFilename(), // 파일 이름
+                IMAGE_PNG_VALUE, // 컨텐츠 타입
+                fileResource.getInputStream()); // 컨텐츠 내용
+
+            GlobalException exception = assertThrows(GlobalException.class,
+                () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
+                    ANOTHER_TEST_USER_ID));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
         }
     }
 }
