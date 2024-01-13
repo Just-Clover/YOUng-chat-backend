@@ -38,33 +38,25 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = jwtUtil.getTokenFromHeader(request, ACCESS_TOKEN_HEADER);
+        String refreshToken = jwtUtil.getTokenFromHeader(request, REFRESH_TOKEN_HEADER);
 
-        if (StringUtils.hasText(accessToken)
-            && blacklistService.isTokenBlackListed(accessToken)) {
+        if (!StringUtils.hasText(accessToken)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if (blacklistService.isTokenBlackListed(accessToken)) {
             throw new GlobalException(ACCESS_DENY);
         }
 
-        if (StringUtils.hasText(accessToken) && !jwtUtil.validateToken(accessToken)) {
-            String refreshToken = jwtUtil.getTokenFromHeader(request, REFRESH_TOKEN_HEADER);
-            if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)
-                && redisUtil.hasKey(refreshToken)) {
-                String email = (String) redisUtil.get(refreshToken);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-                accessToken = jwtUtil.createAccessToken(userDetails.getUsername())
-                    .split(" ")[1].trim();
-
-                response.addHeader("AccessToken", BEARER_PREFIX + accessToken);
-            }
+        if (!jwtUtil.validateToken(accessToken)) {
+            accessToken = createNewAccessToken(refreshToken);
+            response.addHeader("AccessToken", BEARER_PREFIX + accessToken);
         }
-
-        if (StringUtils.hasText(accessToken)) {
-            try {
-                setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                return;
-            }
+        try {
+            setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return;
         }
 
         filterChain.doFilter(request, response);
@@ -76,6 +68,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
+    }
+
+    private String createNewAccessToken(String refreshToken) {
+        String newAccessToken = "";
+        if (!redisUtil.hasKey(refreshToken)) {
+            throw new GlobalException(ACCESS_DENY);
+        }
+        if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)) {
+            String email = (String) redisUtil.get(refreshToken);
+            newAccessToken = jwtUtil.createAccessToken(email)
+                .split(" ")[1].trim();
+        }
+
+        return newAccessToken;
     }
 
     private Authentication createAuthentication(String email) {
