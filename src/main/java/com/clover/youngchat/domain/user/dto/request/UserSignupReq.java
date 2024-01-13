@@ -7,6 +7,7 @@ import static com.clover.youngchat.domain.user.constant.UserConstant.PASSWORD_RE
 import static com.clover.youngchat.domain.user.constant.UserConstant.USERNAME_MESSAGE;
 import static com.clover.youngchat.domain.user.constant.UserConstant.USERNAME_REGEX;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,12 +18,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSignupReq {
 
+    @NotNull(message = EMAIL_MESSAGE)
     @Pattern(regexp = EMAIL_REGEX, message = EMAIL_MESSAGE)
     private String email;
 
+    @NotNull(message = USERNAME_MESSAGE)
     @Pattern(regexp = USERNAME_REGEX, message = USERNAME_MESSAGE)
     private String username;
 
+    @NotNull(message = PASSWORD_MESSAGE)
     @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_MESSAGE)
     private String password;
 

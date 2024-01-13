@@ -1,5 +1,6 @@
 package com.clover.youngchat.domain.user.dto.request;
 
+import static com.clover.youngchat.domain.user.constant.UserConstant.PASSWORD_MESSAGE;
 import static com.clover.youngchat.domain.user.constant.UserConstant.PASSWORD_REGEX;
 
 import jakarta.validation.constraints.Pattern;
@@ -14,7 +15,7 @@ public class UserUpdatePasswordReq {
 
     private String prePassword;
 
-    @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_REGEX)
+    @Pattern(regexp = PASSWORD_REGEX, message = PASSWORD_MESSAGE)
     private String newPassword;
 
     private String checkNewPassword;
