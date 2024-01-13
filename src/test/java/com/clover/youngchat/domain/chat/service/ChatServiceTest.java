@@ -77,6 +77,8 @@ class ChatServiceTest implements ChatTest {
         @DisplayName("실패 : 존재하지 않는 채팅방 id")
         void createChatFailTest_notFoundChatRoom() {
             // given
+            given(chatRoomRepository.findById(TEST_CHAT_ROOM_ID)).willReturn(
+                Optional.empty());
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
@@ -93,6 +95,9 @@ class ChatServiceTest implements ChatTest {
             // given
             given(chatRoomRepository.findById(TEST_CHAT_ROOM_ID)).willReturn(
                 Optional.of(TEST_CHAT_ROOM));
+            given(
+                chatRoomUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
+                .willReturn(Optional.empty());
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
@@ -107,7 +112,6 @@ class ChatServiceTest implements ChatTest {
     @Nested
     @DisplayName("채팅 삭제 테스트")
     class deleteChatTest {
-
 
         @Test
         @DisplayName("성공")
@@ -147,6 +151,7 @@ class ChatServiceTest implements ChatTest {
             // given
             given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(any(), any()))
                 .willReturn(true);
+            given(chatRepository.findById(any())).willReturn(Optional.empty());
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
