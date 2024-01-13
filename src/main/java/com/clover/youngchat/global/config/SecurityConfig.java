@@ -1,6 +1,7 @@
 package com.clover.youngchat.global.config;
 
 import com.clover.youngchat.domain.auth.service.BlacklistService;
+import com.clover.youngchat.global.exception.FilterExceptionHandler;
 import com.clover.youngchat.global.jwt.JwtAuthenticationFilter;
 import com.clover.youngchat.global.jwt.JwtAuthorizationFilter;
 import com.clover.youngchat.global.jwt.JwtUtil;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -65,6 +67,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public FilterExceptionHandler filterExceptionHandler() {
+        return new FilterExceptionHandler();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
 
@@ -82,6 +89,7 @@ public class SecurityConfig {
 
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(filterExceptionHandler(), LogoutFilter.class);
 
         http.logout(
             logout -> {
@@ -99,6 +107,7 @@ public class SecurityConfig {
             config.setAllowedOrigins(Collections.singletonList("*")); // 모든 오리진 허용
             config.setAllowedMethods(Collections.singletonList("*")); // 모든 메서드 허용
             config.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더 허용
+            config.setExposedHeaders(Collections.singletonList("*"));
             return config;
         });
     }
