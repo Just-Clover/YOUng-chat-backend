@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static test.ChatUserTest.TEST_CHAT_USER;
+import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 
 import com.clover.youngchat.domain.chat.constant.ChatConstant;
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
@@ -64,7 +64,7 @@ class ChatServiceTest implements ChatTest {
                 Optional.of(TEST_CHAT_ROOM));
             given(
                 chatRoomUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
-                .willReturn(Optional.of(TEST_CHAT_USER));
+                .willReturn(Optional.of(TEST_CHAT_ROOM_USER));
 
             // when
             chatService.createChat(TEST_CHAT_ROOM_ID, req, TEST_USER_ID);
