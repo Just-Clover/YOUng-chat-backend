@@ -10,17 +10,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static test.ChatRoomTest.TEST_CHAT_ROOM_ID;
-import static test.ChatRoomTest.TEST_CHAT_ROOM_TITLE;
-import static test.ChatRoomTest.TEST_USER_EMAIL;
-import static test.ChatRoomTest.TEST_USER_NAME;
-import static test.ChatRoomTest.TEST_USER_PASSWORD;
-import static test.ChatRoomTest.TEST_USER_PROFILE_IMAGE;
-import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
-import static test.UserTest.ANOTHER_TEST_USER_ID;
-import static test.UserTest.TEST_USER;
-
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -38,9 +29,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import test.ChatRoomTest;
 
 @ExtendWith(MockitoExtension.class)
-public class ChatRoomServiceTest {
+public class ChatRoomServiceTest implements ChatRoomTest {
 
     @InjectMocks
     private ChatRoomService chatRoomService;
@@ -63,7 +55,7 @@ public class ChatRoomServiceTest {
         chatRoom = ChatRoom.builder()
             .title(TEST_CHAT_ROOM_TITLE)
             .build();
-        ReflectionTestUtils.setField(chatRoom, "id", 1L);
+        ReflectionTestUtils.setField(chatRoom, "id", TEST_CHAT_ROOM_ID);
 
         user = User.builder()
             .username(TEST_USER_NAME)
@@ -72,7 +64,7 @@ public class ChatRoomServiceTest {
             .password(TEST_USER_PASSWORD)
             .build();
 
-        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", TEST_USER_ID);
     }
 
     @Nested
@@ -151,6 +143,27 @@ public class ChatRoomServiceTest {
                 ()-> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅방 수정")
+    class editChatRoom {
+
+        @Test
+        @DisplayName("채팅방 수정 성공")
+        void editChatRoomSuccess() {
+            ChatRoomEditReq req = ChatRoomEditReq.builder()
+                .title("채팅방 수정")
+                .build();
+
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+
+            chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user);
+
+            assertThat(chatRoom.getTitle()).isEqualTo(req.getTitle());
         }
     }
 }
