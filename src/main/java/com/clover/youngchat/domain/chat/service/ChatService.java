@@ -16,6 +16,7 @@ import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,16 +46,16 @@ public class ChatService {
         return new ChatCreateRes();
     }
 
+    @Transactional
     public ChatDeleteRes deleteChat(
         final Long chatRoomId, final Long chatId, final Long userId) {
-
         if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
             throw new GlobalException(ACCESS_DENY);
         }
         Chat chat = chatRepository.findById(chatId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
 
-        chatRepository.delete(chat);
+        chat.deleteChat();
 
         return new ChatDeleteRes();
     }

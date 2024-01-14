@@ -1,5 +1,7 @@
 package com.clover.youngchat.domain.chat.entity;
 
+import static com.clover.youngchat.domain.chat.constant.ChatConstant.DELETE_MESSAGE;
+
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.user.entity.User;
 import jakarta.persistence.Column;
@@ -52,5 +54,9 @@ public class Chat {
         this.message = message;
         this.sender = sender;
         this.chatRoom = chatRoom;
+    }
+
+    public void deleteChat() {
+        this.message = DELETE_MESSAGE;
     }
 }
