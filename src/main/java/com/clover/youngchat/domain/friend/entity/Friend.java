@@ -24,13 +24,13 @@ public class Friend {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "friend_id")
+    @JoinColumn(name = "friend_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User friend;
 

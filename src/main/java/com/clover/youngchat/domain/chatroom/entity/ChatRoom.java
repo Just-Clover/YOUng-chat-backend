@@ -2,6 +2,7 @@ package com.clover.youngchat.domain.chatroom.entity;
 
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.model.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,6 +20,8 @@ public class ChatRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String title;
 
     @Builder
