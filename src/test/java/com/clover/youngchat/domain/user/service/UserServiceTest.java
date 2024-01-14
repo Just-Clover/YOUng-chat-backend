@@ -247,7 +247,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         void getUserProfileSuccess() {
             given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
-            userService.getProfile(TEST_USER_ID);
+            userService.getProfile(TEST_USER_ID, TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
         }
@@ -258,7 +258,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                userService.getProfile(TEST_USER_ID));
+                userService.getProfile(TEST_USER_ID, TEST_USER));
 
             verify(userRepository, times(1)).findById(anyLong());
 

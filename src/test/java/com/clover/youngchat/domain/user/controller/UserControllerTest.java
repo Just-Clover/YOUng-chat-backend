@@ -21,6 +21,7 @@ import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
+import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.service.UserService;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
@@ -83,10 +84,11 @@ class UserControllerTest extends BaseMvcTest {
     void getUserProfileSuccess() throws Exception {
         Long userId = 1L;
 
-        given(userService.getProfile(anyLong())).willReturn(UserProfileGetRes.builder()
-            .username(TEST_USER_NAME)
-            .profileImage(TEST_USER_PROFILE_IMAGE)
-            .build());
+        given(userService.getProfile(anyLong(), any(User.class))).willReturn(
+            UserProfileGetRes.builder()
+                .username(TEST_USER_NAME)
+                .profileImage(TEST_USER_PROFILE_IMAGE)
+                .build());
 
         mockMvc.perform(get("/api/v1/users/profile")
                 .param("userId", String.valueOf(userId))

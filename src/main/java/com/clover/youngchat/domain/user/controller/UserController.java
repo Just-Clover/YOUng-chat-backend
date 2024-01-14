@@ -40,8 +40,9 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public RestResponse<UserProfileGetRes> getProfile(@RequestParam Long userId) {
-        return RestResponse.success(userService.getProfile(userId));
+    public RestResponse<UserProfileGetRes> getProfile(@RequestParam(required = false) Long userId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return RestResponse.success(userService.getProfile(userId, userDetails.getUser()));
     }
 
     @PatchMapping("/profile")

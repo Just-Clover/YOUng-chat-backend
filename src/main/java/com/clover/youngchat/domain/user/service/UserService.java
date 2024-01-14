@@ -66,9 +66,11 @@ public class UserService {
         return new UserSignupRes();
     }
 
-    public UserProfileGetRes getProfile(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+    public UserProfileGetRes getProfile(Long userId, User user) {
+        if (userId != null) {
+            user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+        }
 
         return UserProfileGetRes.builder()
             .username(user.getUsername())
