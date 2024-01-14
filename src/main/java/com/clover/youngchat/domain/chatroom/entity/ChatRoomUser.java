@@ -24,13 +24,13 @@ public class ChatRoomUser {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id")
+    @JoinColumn(name = "chatroom_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ChatRoom chatRoom;
 
