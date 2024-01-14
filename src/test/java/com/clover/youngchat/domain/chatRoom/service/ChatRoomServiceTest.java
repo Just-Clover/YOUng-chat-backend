@@ -1,5 +1,6 @@
 package com.clover.youngchat.domain.chatRoom.service;
 
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,6 +122,17 @@ public class ChatRoomServiceTest {
             verify(chatRoomRepository,times(1)).existsById(anyLong());
             verify(chatRoomUserRepository, times(1)).findByChatRoom_IdAndUser_Id(anyLong(),anyLong());
             verify(chatRoomUserRepository,times(1)).delete(any());
+        }
+
+        @Test
+        @DisplayName("실패 : 존재하지 않는 채팅방")
+        void leaveChatRoomFail_NotFoundChatRoom(){
+            given(chatRoomRepository.existsById(anyLong())).willReturn(false);
+
+            GlobalException exception = Assertions.assertThrows(GlobalException.class,
+                ()-> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(NOT_FOUND_CHATROOM.getMessage());
         }
     }
 }
