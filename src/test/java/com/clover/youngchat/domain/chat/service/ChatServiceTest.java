@@ -7,10 +7,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.ChatUserTest.TEST_CHAT_USER;
 
+import com.clover.youngchat.domain.chat.constant.ChatConstant;
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
@@ -125,7 +125,7 @@ class ChatServiceTest implements ChatTest {
             chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
 
             // then
-            verify(chatRepository, times(1)).delete(any(Chat.class));
+            assertThat(TEST_CHAT.getMessage()).isEqualTo(ChatConstant.DELETE_MESSAGE);
         }
 
         @Test
