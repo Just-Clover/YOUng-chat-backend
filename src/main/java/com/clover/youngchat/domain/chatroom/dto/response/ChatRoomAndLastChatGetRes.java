@@ -26,8 +26,8 @@ public class ChatRoomAndLastChatGetRes {
     public static ChatRoomAndLastChatGetRes to(ChatRoom chatRoom, Chat chat) {
         return ChatRoomAndLastChatGetRes.builder()
             .title(chatRoom.getTitle())
-            .lastChat((chat == null) ? null : chat.getMessage())
-            .lastChatTime((chat == null) ? null : chat.getCreatedAt())
+            .lastChat((chat == null) ? "" : chat.getMessage())
+            .lastChatTime((chat == null) ? chatRoom.getCreatedAt() : chat.getCreatedAt())
             .build();
     }
 }
