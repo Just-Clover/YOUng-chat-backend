@@ -102,7 +102,7 @@ public class ChatRoomService {
 
         for (ChatRoomUser c : chatRoomUserList) {
             Chat chat = chatRepository.findLastChatByChatRoom_Id(c.getChatRoom().getId())
-                .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+                .orElse(null);
 
             ChatRoomAndLastChatGetRes res = ChatRoomAndLastChatGetRes.to(c.getChatRoom(), chat);
             getResList.add(res);
