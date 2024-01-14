@@ -100,9 +100,10 @@ public class ChatRoomService {
 
         List<ChatRoomAndLastChatGetRes> getResList = new ArrayList<>();
 
+        // TODO: 차후 로직 수정요함.
         for (ChatRoomUser c : chatRoomUserList) {
             Chat chat = chatRepository.findLastChatByChatRoom_Id(c.getChatRoom().getId())
-                .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+                .orElse(null);
 
             ChatRoomAndLastChatGetRes res = ChatRoomAndLastChatGetRes.to(c.getChatRoom(), chat);
             getResList.add(res);
