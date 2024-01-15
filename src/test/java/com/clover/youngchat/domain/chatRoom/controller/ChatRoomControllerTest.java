@@ -81,4 +81,14 @@ public class ChatRoomControllerTest extends BaseMvcTest {
             .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
     }
+
+    @Test
+    @DisplayName("채팅방 상세 조회 테스트 : 성공")
+    void getDetailChatRoom() throws Exception {
+        mockMvc.perform(get("/api/v1/chat-rooms/" + TEST_CHAT_ROOM_ID)
+                .principal(mockPrincipal))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
+            .andDo(print());
+    }
 }
