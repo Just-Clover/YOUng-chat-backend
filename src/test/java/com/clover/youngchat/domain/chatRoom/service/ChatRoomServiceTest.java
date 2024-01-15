@@ -11,9 +11,15 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
+import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER_LIST;
+import static test.ChatTest.TEST_CHAT;
+import static test.ChatTest.TEST_CHAT_MESSAGE;
 
+import com.clover.youngchat.domain.chat.entity.Chat;
+import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -21,6 +27,7 @@ import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +50,9 @@ public class ChatRoomServiceTest implements ChatRoomTest {
     private ChatRoomRepository chatRoomRepository;
 
     @Mock
+    private ChatRepository chatRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     @Mock
@@ -50,6 +60,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
     private ChatRoom chatRoom;
     private User user;
+    private Chat chat;
 
     @BeforeEach
     void setup() {
@@ -67,6 +78,12 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             .build();
 
         ReflectionTestUtils.setField(user, "id", TEST_USER_ID);
+
+        chat = Chat.builder()
+            .chatRoom(chatRoom)
+            .sender(user)
+            .message(TEST_CHAT_MESSAGE)
+            .build();
     }
 
     @Nested
@@ -105,6 +122,30 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_USER.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅방 목록 조회")
+    class getChatRoomList {
+
+        @Test
+        @DisplayName("성공")
+        void getChatRoomListSuccess() {
+            given(chatRoomUserRepository.findByUser_Id(anyLong())).willReturn(
+                Optional.of(TEST_CHAT_ROOM_USER_LIST));
+
+            given(chatRepository.findLastChatByChatRoom_Id(any())).willReturn(
+                Optional.of(chat));
+
+            List<ChatRoomAndLastChatGetRes> resList = chatRoomService.getChatRoomList(user);
+
+            verify(chatRoomUserRepository, times(1)).findByUser_Id(anyLong());
+            verify(chatRepository, times(2)).findLastChatByChatRoom_Id(any());
+
+            assertThat(resList.get(0).getTitle()).isEqualTo(TEST_CHAT.getChatRoom().getTitle());
+            assertThat(resList.get(0).getLastChat()).isEqualTo(TEST_CHAT.getMessage());
+            assertThat(resList.get(0).getLastChatTime()).isEqualTo(TEST_CHAT.getCreatedAt());
         }
     }
 
