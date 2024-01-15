@@ -2,6 +2,7 @@ package com.clover.youngchat.domain.chatRoom.controller;
 
 import static com.clover.youngchat.global.exception.ResultCode.SUCCESS;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -13,6 +14,7 @@ import static test.ChatRoomTest.TEST_CHAT_ROOM_TITLE;
 import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.chatroom.controller.ChatRoomController;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,22 @@ public class ChatRoomControllerTest extends BaseMvcTest {
             .build();
 
         mockMvc.perform(post("/api/v1/chat-rooms")
+                .content(objectMapper.writeValueAsString(req))
+                .contentType(MediaType.APPLICATION_JSON)
+                .principal(mockPrincipal))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("채팅방 수정 테스트 : 성공")
+    void editChatRoom() throws Exception {
+        ChatRoomEditReq req = ChatRoomEditReq.builder()
+            .title(TEST_CHAT_ROOM_TITLE)
+            .build();
+
+        mockMvc.perform(patch("/api/v1/chat-rooms/" + TEST_CHAT_ROOM_ID)
                 .content(objectMapper.writeValueAsString(req))
                 .contentType(MediaType.APPLICATION_JSON)
                 .principal(mockPrincipal))

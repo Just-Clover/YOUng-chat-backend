@@ -10,17 +10,10 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static test.ChatRoomTest.TEST_CHAT_ROOM_ID;
-import static test.ChatRoomTest.TEST_CHAT_ROOM_TITLE;
-import static test.ChatRoomTest.TEST_USER_EMAIL;
-import static test.ChatRoomTest.TEST_USER_NAME;
-import static test.ChatRoomTest.TEST_USER_PASSWORD;
-import static test.ChatRoomTest.TEST_USER_PROFILE_IMAGE;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
-import static test.UserTest.ANOTHER_TEST_USER_ID;
-import static test.UserTest.TEST_USER;
 
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -38,9 +31,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import test.ChatRoomTest;
 
 @ExtendWith(MockitoExtension.class)
-public class ChatRoomServiceTest {
+public class ChatRoomServiceTest implements ChatRoomTest {
 
     @InjectMocks
     private ChatRoomService chatRoomService;
@@ -55,7 +49,6 @@ public class ChatRoomServiceTest {
     private ChatRoomUserRepository chatRoomUserRepository;
 
     private ChatRoom chatRoom;
-
     private User user;
 
     @BeforeEach
@@ -63,16 +56,17 @@ public class ChatRoomServiceTest {
         chatRoom = ChatRoom.builder()
             .title(TEST_CHAT_ROOM_TITLE)
             .build();
-        ReflectionTestUtils.setField(chatRoom, "id", 1L);
+
+        ReflectionTestUtils.setField(chatRoom, "id", TEST_CHAT_ROOM_ID);
 
         user = User.builder()
             .username(TEST_USER_NAME)
             .email(TEST_USER_EMAIL)
-            .profileImage(TEST_USER_PROFILE_IMAGE)
             .password(TEST_USER_PASSWORD)
+            .profileImage(TEST_USER_PROFILE_IMAGE)
             .build();
 
-        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "id", TEST_USER_ID);
     }
 
     @Nested
@@ -117,40 +111,100 @@ public class ChatRoomServiceTest {
     @Nested
     @DisplayName("채팅방 나가기")
     class leaveChatRoom {
+
         @Test
         @DisplayName("성공")
-        void leaveChatRoomSuccess(){
+        void leaveChatRoomSuccess() {
             given(chatRoomRepository.existsById(anyLong())).willReturn(true);
-            given(chatRoomUserRepository.findByChatRoom_IdAndUser_Id(anyLong(), anyLong())).willReturn(Optional.of(TEST_CHAT_ROOM_USER));
+            given(chatRoomUserRepository.findByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(Optional.of(TEST_CHAT_ROOM_USER));
 
             chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user);
 
-            verify(chatRoomRepository,times(1)).existsById(anyLong());
-            verify(chatRoomUserRepository, times(1)).findByChatRoom_IdAndUser_Id(anyLong(),anyLong());
-            verify(chatRoomUserRepository,times(1)).delete(any());
+            verify(chatRoomRepository, times(1)).existsById(anyLong());
+            verify(chatRoomUserRepository, times(1)).findByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            verify(chatRoomUserRepository, times(1)).delete(any());
         }
 
         @Test
         @DisplayName("실패 : 존재하지 않는 채팅방")
-        void leaveChatRoomFail_NotFoundChatRoom(){
+        void leaveChatRoomFail_NotFoundChatRoom() {
             given(chatRoomRepository.existsById(anyLong())).willReturn(false);
 
             GlobalException exception = assertThrows(GlobalException.class,
-                ()-> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
+                () -> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
 
-            assertThat(exception.getResultCode().getMessage()).isEqualTo(NOT_FOUND_CHATROOM.getMessage());
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHATROOM.getMessage());
         }
 
         @Test
         @DisplayName("실패 : 채팅방에 속한 유저가 아닐 경우")
-        void leaveChatRoomFail_AccessDeny(){
+        void leaveChatRoomFail_AccessDeny() {
             given(chatRoomRepository.existsById(anyLong())).willReturn(true);
-            given(chatRoomUserRepository.findByChatRoom_IdAndUser_Id(anyLong(), anyLong())).willReturn(Optional.empty());
+            given(chatRoomUserRepository.findByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class,
-                ()-> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
+                () -> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅방 수정")
+    class editChatRoom {
+
+        @Test
+        @DisplayName("성공")
+        void editChatRoomSuccess() {
+            ChatRoomEditReq req = ChatRoomEditReq.builder()
+                .title("채팅방 수정")
+                .build();
+
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+
+            chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user);
+
+            assertThat(chatRoom.getTitle()).isEqualTo(req.getTitle());
+        }
+
+        @Test
+        @DisplayName("실패 : 존재하지 않는 채팅방")
+        void editChatRoomFail_NotFoundChatRoom() {
+            ChatRoomEditReq req = ChatRoomEditReq.builder()
+                .title("채팅방 수정")
+                .build();
+
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHATROOM.getMessage());
+        }
+
+        @Test
+        @DisplayName("실패 : 채팅방의 멤버가 아닐 경우")
+        void editChatRoomFail_AccessDeny() {
+            ChatRoomEditReq req = ChatRoomEditReq.builder()
+                .title("채팅방 수정")
+                .build();
+
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(false);
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                ACCESS_DENY.getMessage());
         }
     }
 }
