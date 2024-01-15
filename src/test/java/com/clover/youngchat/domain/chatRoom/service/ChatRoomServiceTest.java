@@ -147,6 +147,18 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             assertThat(resList.get(0).getLastChat()).isEqualTo(TEST_CHAT.getMessage());
             assertThat(resList.get(0).getLastChatTime()).isEqualTo(TEST_CHAT.getCreatedAt());
         }
+
+        @Test
+        @DisplayName("실패 : 속한 채팅방이 없는 경우")
+        void getChatRoomListFail_NotFoundChatRoom() {
+            given(chatRoomUserRepository.findByUser_Id(anyLong())).willReturn(Optional.empty());
+
+            GlobalException exception = assertThrows(GlobalException.class,
+                () -> chatRoomService.getChatRoomList(user));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHATROOM.getMessage());
+        }
     }
 
     @Nested
