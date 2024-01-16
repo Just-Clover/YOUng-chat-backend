@@ -12,7 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER_LIST;
-import static test.ChatTest.TEST_CHAT;
 import static test.ChatTest.TEST_CHAT_MESSAGE;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
@@ -143,9 +142,9 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             verify(chatRoomUserRepository, times(1)).findByUser_Id(anyLong());
             verify(chatRepository, times(2)).findLastChatByChatRoom_Id(any());
 
-            assertThat(resList.get(0).getTitle()).isEqualTo(TEST_CHAT.getChatRoom().getTitle());
-            assertThat(resList.get(0).getLastChat()).isEqualTo(TEST_CHAT.getMessage());
-            assertThat(resList.get(0).getLastChatTime()).isEqualTo(TEST_CHAT.getCreatedAt());
+            assertThat(resList.get(0).getTitle()).isEqualTo(chat.getChatRoom().getTitle());
+            assertThat(resList.get(0).getLastChat()).isEqualTo(chat.getMessage());
+            assertThat(resList.get(0).getLastChatTime()).isEqualTo(chat.getCreatedAt());
         }
 
         @Test
