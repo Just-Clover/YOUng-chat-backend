@@ -1,6 +1,7 @@
 package com.clover.youngchat.domain.chatRoom.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -220,6 +221,25 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 NOT_FOUND_CHATROOM.getMessage());
         }
 
+        @Test
+        @DisplayName("실패 : 채팅이 없는 경우")
+        void getDetailChatRoomFail_NotFoundChat() {
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+            given(chatRepository.findAllByChatRoom_Id(anyLong())).willReturn(Optional.empty());
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+
+            verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            verify(chatRoomRepository, times(1)).findById(anyLong());
+            verify(chatRepository, times(1)).findAllByChatRoom_Id(anyLong());
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHAT.getMessage());
+        }
     }
 
     @Nested
