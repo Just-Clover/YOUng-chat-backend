@@ -116,14 +116,13 @@ public class ChatRoomService {
     public ChatRoomDetailGetRes getDetailChatRoom(Long chatRoomId, User user) {
         // 채팅방에 속한 사람만 조회 가능
         isChatRoomMember(chatRoomId, user.getId());
+        ChatRoom chatRoom = findById(chatRoomId);
 
         List<ChatRes> chatList = chatRepository.findAllByChatRoom_Id(chatRoomId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT))
             .stream()
             .map(ChatRes::to)
             .toList();
-
-        ChatRoom chatRoom = findById(chatRoomId);
 
         return ChatRoomDetailGetRes.builder()
             .title(chatRoom.getTitle())

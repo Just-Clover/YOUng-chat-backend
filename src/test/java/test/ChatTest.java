@@ -1,6 +1,8 @@
 package test;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
+import java.util.Arrays;
+import java.util.List;
 
 public interface ChatTest extends UserTest, ChatRoomTest {
 
@@ -21,4 +23,6 @@ public interface ChatTest extends UserTest, ChatRoomTest {
         .sender(TEST_ANOTHER_USER)
         .chatRoom(TEST_ANOTHER_CHAT_ROOM)
         .build();
+
+    List<Chat> TEST_CHAT_LIST = Arrays.asList(TEST_CHAT, TEST_ANOTHER_CHAT);
 }

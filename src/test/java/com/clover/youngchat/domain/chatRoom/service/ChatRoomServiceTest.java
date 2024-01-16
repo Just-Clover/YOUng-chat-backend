@@ -1,6 +1,7 @@
 package com.clover.youngchat.domain.chatRoom.service;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,9 +12,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
+import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER_LIST;
+import static test.ChatTest.TEST_CHAT;
+import static test.ChatTest.TEST_CHAT_LIST;
+import static test.ChatTest.TEST_CHAT_MESSAGE;
 
+import com.clover.youngchat.domain.chat.entity.Chat;
+import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -21,6 +30,7 @@ import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +53,9 @@ public class ChatRoomServiceTest implements ChatRoomTest {
     private ChatRoomRepository chatRoomRepository;
 
     @Mock
+    private ChatRepository chatRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     @Mock
@@ -50,6 +63,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
     private ChatRoom chatRoom;
     private User user;
+    private Chat chat;
 
     @BeforeEach
     void setup() {
@@ -67,6 +81,12 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             .build();
 
         ReflectionTestUtils.setField(user, "id", TEST_USER_ID);
+
+        chat = Chat.builder()
+            .chatRoom(chatRoom)
+            .sender(user)
+            .message(TEST_CHAT_MESSAGE)
+            .build();
     }
 
     @Nested
@@ -105,6 +125,120 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_USER.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅방 목록 조회")
+    class getChatRoomList {
+
+        @Test
+        @DisplayName("성공")
+        void getChatRoomListSuccess() {
+            given(chatRoomUserRepository.findByUser_Id(anyLong())).willReturn(
+                Optional.of(TEST_CHAT_ROOM_USER_LIST));
+
+            given(chatRepository.findLastChatByChatRoom_Id(any())).willReturn(
+                Optional.of(chat));
+
+            List<ChatRoomAndLastChatGetRes> resList = chatRoomService.getChatRoomList(user);
+
+            verify(chatRoomUserRepository, times(1)).findByUser_Id(anyLong());
+            verify(chatRepository, times(2)).findLastChatByChatRoom_Id(any());
+
+            assertThat(resList.get(0).getTitle()).isEqualTo(chat.getChatRoom().getTitle());
+            assertThat(resList.get(0).getLastChat()).isEqualTo(chat.getMessage());
+            assertThat(resList.get(0).getLastChatTime()).isEqualTo(chat.getCreatedAt());
+        }
+
+        @Test
+        @DisplayName("실패 : 속한 채팅방이 없는 경우")
+        void getChatRoomListFail_NotFoundChatRoom() {
+            given(chatRoomUserRepository.findByUser_Id(anyLong())).willReturn(Optional.empty());
+
+            GlobalException exception = assertThrows(GlobalException.class,
+                () -> chatRoomService.getChatRoomList(user));
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHATROOM.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅방 상세 조회")
+    class getDetailChatRoom {
+
+        @Test
+        @DisplayName("성공")
+        void getDetailChatRoomSuccess() {
+            // given
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+            given(chatRepository.findAllByChatRoom_Id(anyLong())).willReturn(
+                Optional.of(TEST_CHAT_LIST));
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+
+            // when
+            ChatRoomDetailGetRes res = chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user);
+
+            // then
+            verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            verify(chatRepository, times(1)).findAllByChatRoom_Id(anyLong());
+
+            assertThat(res.getChatResList().get(0).getMessage()).isEqualTo(TEST_CHAT.getMessage());
+            assertThat(res.getChatResList().get(0).getMessageTime()).isEqualTo(
+                TEST_CHAT.getCreatedAt());
+            assertThat(res.getChatResList().get(0).getUsername()).isEqualTo(user.getUsername());
+        }
+
+        @Test
+        @DisplayName("실패 : 채팅방 멤버가 아닐 경우")
+        void getDetailChatRoomFail_AccessDeny() {
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(false);
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+
+            verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
+        }
+
+        @Test
+        @DisplayName("실패 : 존재하지 않는 채팅방")
+        void getDetailChatRoomFail_NotFoundChatRoom() {
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+
+            verify(chatRoomRepository, times(1)).findById(anyLong());
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHATROOM.getMessage());
+        }
+
+        @Test
+        @DisplayName("실패 : 채팅이 없는 경우")
+        void getDetailChatRoomFail_NotFoundChat() {
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+            given(chatRepository.findAllByChatRoom_Id(anyLong())).willReturn(Optional.empty());
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+
+            verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            verify(chatRoomRepository, times(1)).findById(anyLong());
+            verify(chatRepository, times(1)).findAllByChatRoom_Id(anyLong());
+
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                NOT_FOUND_CHAT.getMessage());
         }
     }
 
