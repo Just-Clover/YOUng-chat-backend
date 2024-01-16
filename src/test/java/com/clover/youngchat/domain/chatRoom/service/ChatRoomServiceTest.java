@@ -12,6 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER_LIST;
+import static test.ChatTest.TEST_CHAT;
+import static test.ChatTest.TEST_CHAT_LIST;
 import static test.ChatTest.TEST_CHAT_MESSAGE;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
@@ -19,6 +21,7 @@ import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -157,6 +160,35 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_CHATROOM.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("채팅방 상세 조회")
+    class getDetailChatRoom {
+
+        @Test
+        @DisplayName("성공")
+        void getDetailChatRoomSuccess() {
+            // given
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(true);
+            given(chatRepository.findAllByChatRoom_Id(anyLong())).willReturn(
+                Optional.of(TEST_CHAT_LIST));
+            given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
+
+            // when
+            ChatRoomDetailGetRes res = chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user);
+
+            // then
+            verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            verify(chatRepository, times(1)).findAllByChatRoom_Id(anyLong());
+
+            assertThat(res.getChatResList().get(0).getMessage()).isEqualTo(TEST_CHAT.getMessage());
+            assertThat(res.getChatResList().get(0).getMessageTime()).isEqualTo(
+                TEST_CHAT.getCreatedAt());
+            assertThat(res.getChatResList().get(0).getUsername()).isEqualTo(user.getUsername());
         }
     }
 
