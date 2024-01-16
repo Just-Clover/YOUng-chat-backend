@@ -190,6 +190,20 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 TEST_CHAT.getCreatedAt());
             assertThat(res.getChatResList().get(0).getUsername()).isEqualTo(user.getUsername());
         }
+
+        @Test
+        @DisplayName("실패 : 채팅방 멤버가 아닐 경우")
+        void getDetailChatRoomFail_AccessDeny() {
+            given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong())).willReturn(false);
+
+            GlobalException exception = assertThrows(GlobalException.class, () ->
+                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+
+            verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
+                anyLong());
+            assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
+        }
     }
 
     @Nested
