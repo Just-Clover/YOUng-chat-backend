@@ -30,7 +30,8 @@ public class FriendService {
         List<Friend> friends = findByUser(user);
 
         return friends.stream()
-            .map(friend -> FriendGetListRes.to(friend.getFriend().getUsername(),
+            .map(friend -> FriendGetListRes.to(friend.getFriend().getId(),
+                friend.getFriend().getUsername(),
                 friend.getFriend().getProfileImage()))
             .collect(Collectors.toList());
     }
