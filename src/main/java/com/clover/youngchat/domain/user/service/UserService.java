@@ -76,11 +76,7 @@ public class UserService {
             email = user.getEmail();
         }
 
-        return UserProfileGetRes.builder()
-            .username(user.getUsername())
-            .profileImage(user.getProfileImage())
-            .email(email)
-            .build();
+        return UserProfileGetRes.to(user, email);
     }
 
     @Transactional
