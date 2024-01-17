@@ -77,6 +77,7 @@ public class UserService {
         }
 
         return UserProfileGetRes.builder()
+            .userId(user.getId())
             .username(user.getUsername())
             .profileImage(user.getProfileImage())
             .email(email)
