@@ -67,14 +67,19 @@ public class UserService {
     }
 
     public UserProfileGetRes getProfile(Long userId, User user) {
+        String email = null;
+
         if (userId != null) {
             user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+        } else {
+            email = user.getEmail();
         }
 
         return UserProfileGetRes.builder()
             .username(user.getUsername())
             .profileImage(user.getProfileImage())
+            .email(email)
             .build();
     }
 
