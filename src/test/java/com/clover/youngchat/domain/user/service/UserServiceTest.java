@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -22,6 +23,7 @@ import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.email.EmailUtil;
@@ -138,10 +140,8 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             // then
             assertThat(exception.getResultCode().getMessage())
-                .isEqualTo(UNAUTHORIZED_EMAIL.getMessage())
-            ;
+                .isEqualTo(UNAUTHORIZED_EMAIL.getMessage());
         }
-
     }
 
     @Nested
@@ -265,101 +265,118 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_USER.getMessage());
         }
-    }
-
-    @Nested
-    @DisplayName("프로필 수정")
-    class editUserProfile {
 
         @Test
-        @DisplayName("성공 : 다른 프로필 이미지")
-        void editUserProfileSuccess_AnotherProfileImage() throws IOException {
-            UserProfileEditReq req = UserProfileEditReq.builder()
-                .username("프로필 수정")
-                .build();
+        @DisplayName("이메일로 사용자를 검색한다.")
+        void searchProfile_Test() {
+            // given
+            given(userRepository.findByEmail(anyString())).willReturn(Optional.of(TEST_USER));
 
-            Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
-            MultipartFile multipartFile = new MockMultipartFile(
-                "image", // 파라미터 이름
-                fileResource.getFilename(), // 파일 이름
-                IMAGE_PNG_VALUE, // 컨텐츠 타입
-                fileResource.getInputStream()); // 컨텐츠 내용
+            // when
+            UserProfileSearchRes actual = userService.searchProfile(TEST_USER_EMAIL);
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
-            given(s3Util.uploadFile(any(), any())).willReturn(TEST_ANOTHER_USER_PROFILE_IMAGE);
-
-            userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
-
-            verify(userRepository, times(1)).findById(anyLong());
-            verify(s3Util, times(1)).uploadFile(any(), any());
-            verify(s3Util, times(1)).deleteFile(any(), any());
-
-            assertThat(testUser.getUsername()).isEqualTo(req.getUsername());
-            assertThat(testUser.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
+            // then
+            assertThat(actual).extracting("email", "profileImage")
+                .contains(TEST_USER_EMAIL, TEST_USER_PROFILE_IMAGE);
+            verify(userRepository, times(1)).findByEmail(anyString());
         }
 
-        @Test
-        @DisplayName("성공 : 같은 프로필 이미지")
-        void editUserProfileSuccess_SameProfileImage() {
-            UserProfileEditReq req = UserProfileEditReq.builder()
-                .username("프로필 수정")
-                .build();
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
+        @Nested
+        @DisplayName("프로필 수정")
+        class editUserProfile {
 
-            userService.editProfile(TEST_USER_ID, req, null, TEST_USER_ID);
+            @Test
+            @DisplayName("성공 : 다른 프로필 이미지")
+            void editUserProfileSuccess_AnotherProfileImage() throws IOException {
+                UserProfileEditReq req = UserProfileEditReq.builder()
+                    .username("프로필 수정")
+                    .build();
 
-            verify(userRepository, times(1)).findById(anyLong());
-            verify(s3Util, times(0)).uploadFile(null, null);
-            verify(s3Util, times(0)).deleteFile(null, null);
+                Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
+                MultipartFile multipartFile = new MockMultipartFile(
+                    "image", // 파라미터 이름
+                    fileResource.getFilename(), // 파일 이름
+                    IMAGE_PNG_VALUE, // 컨텐츠 타입
+                    fileResource.getInputStream()); // 컨텐츠 내용
 
-            assertThat(testUser.getUsername()).isEqualTo(req.getUsername());
-            assertThat(testUser.getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
-        }
+                given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
+                given(s3Util.uploadFile(any(), any())).willReturn(TEST_ANOTHER_USER_PROFILE_IMAGE);
 
-        @Test
-        @DisplayName("실패 : 본인 프로필이 아닐 경우")
-        void editUserProfileFail_Access_Deny() throws IOException {
-            UserProfileEditReq req = UserProfileEditReq.builder()
-                .username("프로필 수정")
-                .build();
+                userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
 
-            Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
-            MultipartFile multipartFile = new MockMultipartFile(
-                "image", // 파라미터 이름
-                fileResource.getFilename(), // 파일 이름
-                IMAGE_PNG_VALUE, // 컨텐츠 타입
-                fileResource.getInputStream()); // 컨텐츠 내용
+                verify(userRepository, times(1)).findById(anyLong());
+                verify(s3Util, times(1)).uploadFile(any(), any());
+                verify(s3Util, times(1)).deleteFile(any(), any());
 
-            GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
-                    ANOTHER_TEST_USER_ID));
+                assertThat(testUser.getUsername()).isEqualTo(req.getUsername());
+                assertThat(testUser.getProfileImage()).isEqualTo(TEST_ANOTHER_USER_PROFILE_IMAGE);
+            }
 
-            assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
-        }
+            @Test
+            @DisplayName("성공 : 같은 프로필 이미지")
+            void editUserProfileSuccess_SameProfileImage() {
+                UserProfileEditReq req = UserProfileEditReq.builder()
+                    .username("프로필 수정")
+                    .build();
 
-        @Test
-        @DisplayName("실패 : 파일이 png가 아닐 경우")
-        void editUserProfileFail_NOT_PNG() throws IOException {
-            UserProfileEditReq req = UserProfileEditReq.builder()
-                .username("프로필 수정")
-                .build();
+                given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
-            Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
-            MultipartFile multipartFile = new MockMultipartFile(
-                "image", // 파라미터 이름
-                fileResource.getFilename(), // 파일 이름
-                IMAGE_GIF_VALUE, // 컨텐츠 타입
-                fileResource.getInputStream()); // 컨텐츠 내용
+                userService.editProfile(TEST_USER_ID, req, null, TEST_USER_ID);
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
+                verify(userRepository, times(1)).findById(anyLong());
+                verify(s3Util, times(0)).uploadFile(null, null);
+                verify(s3Util, times(0)).deleteFile(null, null);
 
-            GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
-                    TEST_USER_ID));
+                assertThat(testUser.getUsername()).isEqualTo(req.getUsername());
+                assertThat(testUser.getProfileImage()).isEqualTo(TEST_USER_PROFILE_IMAGE);
+            }
 
-            assertThat(exception.getResultCode().getMessage()).isEqualTo(
-                INVALID_PROFILE_IMAGE_TYPE.getMessage());
+            @Test
+            @DisplayName("실패 : 본인 프로필이 아닐 경우")
+            void editUserProfileFail_Access_Deny() throws IOException {
+                UserProfileEditReq req = UserProfileEditReq.builder()
+                    .username("프로필 수정")
+                    .build();
+
+                Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
+                MultipartFile multipartFile = new MockMultipartFile(
+                    "image", // 파라미터 이름
+                    fileResource.getFilename(), // 파일 이름
+                    IMAGE_PNG_VALUE, // 컨텐츠 타입
+                    fileResource.getInputStream()); // 컨텐츠 내용
+
+                GlobalException exception = assertThrows(GlobalException.class,
+                    () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
+                        ANOTHER_TEST_USER_ID));
+
+                assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                    ACCESS_DENY.getMessage());
+            }
+
+            @Test
+            @DisplayName("실패 : 파일이 png가 아닐 경우")
+            void editUserProfileFail_NOT_PNG() throws IOException {
+                UserProfileEditReq req = UserProfileEditReq.builder()
+                    .username("프로필 수정")
+                    .build();
+
+                Resource fileResource = new ClassPathResource(TEST_ANOTHER_USER_PROFILE_IMAGE);
+                MultipartFile multipartFile = new MockMultipartFile(
+                    "image", // 파라미터 이름
+                    fileResource.getFilename(), // 파일 이름
+                    IMAGE_GIF_VALUE, // 컨텐츠 타입
+                    fileResource.getInputStream()); // 컨텐츠 내용
+
+                given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
+
+                GlobalException exception = assertThrows(GlobalException.class,
+                    () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
+                        TEST_USER_ID));
+
+                assertThat(exception.getResultCode().getMessage()).isEqualTo(
+                    INVALID_PROFILE_IMAGE_TYPE.getMessage());
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
+import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.service.UserService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -34,15 +36,27 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/profile")
+    public RestResponse<UserProfileGetRes> getProfile(@RequestParam(required = false) Long userId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return RestResponse.success(userService.getProfile(userId, userDetails.getUser()));
+    }
+
+    @GetMapping(value = "/search", headers = "Keyword")
+    public RestResponse<UserProfileSearchRes> searchProfile(
+        @RequestHeader("Keyword") String email) {
+        return RestResponse.success(userService.searchProfile(email));
+    }
+
     @PostMapping("/signup")
     public RestResponse<UserSignupRes> signup(@Valid @RequestBody UserSignupReq userSignupReq) {
         return RestResponse.success(userService.signup(userSignupReq));
     }
 
-    @GetMapping("/profile")
-    public RestResponse<UserProfileGetRes> getProfile(@RequestParam(required = false) Long userId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(userService.getProfile(userId, userDetails.getUser()));
+    @PostMapping("/signup/email")
+    public RestResponse<UserEmailAuthRes> sendAuthEmail(
+        @Valid @RequestBody UserEmailAuthReq req) {
+        return RestResponse.success(userService.sendAuthEmail(req));
     }
 
     @PatchMapping("/profile")
@@ -60,12 +74,6 @@ public class UserController {
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
             userService.updatePassword(userDetails.getUser().getId(), userUpdatePasswordReq));
-    }
-
-    @PostMapping("/signup/email")
-    public RestResponse<UserEmailAuthRes> sendAuthEmail(
-        @Valid @RequestBody UserEmailAuthReq req) {
-        return RestResponse.success(userService.sendAuthEmail(req));
     }
 
     @PatchMapping("/signup/email")

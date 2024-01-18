@@ -1,10 +1,12 @@
 package com.clover.youngchat.domain.user.service;
 
+import static com.clover.youngchat.domain.user.constant.UserConstant.EMAIL_AUTHENTICATION;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 import static com.clover.youngchat.global.exception.ResultCode.SAME_OLD_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.UNAUTHORIZED_EMAIL;
@@ -19,6 +21,7 @@ import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
+import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.entity.User;
@@ -39,8 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserService {
 
-    private static final String EMAIL_AUTHENTICATION = "YOUngChat! [이메일 인증]";
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final S3Util s3Util;
@@ -48,6 +49,27 @@ public class UserService {
 
     @Value("${default.image.url}")
     private String defaultProfileImageUrl;
+
+
+    public UserProfileGetRes getProfile(Long userId, User user) {
+        String email = null;
+
+        if (userId != null) {
+            user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+        } else {
+            email = user.getEmail();
+        }
+
+        return UserProfileGetRes.to(user, email);
+    }
+
+    public UserProfileSearchRes searchProfile(String email) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_EMAIL));
+
+        return UserProfileSearchRes.to(user);
+    }
 
     public UserSignupRes signup(UserSignupReq userSignupReq) {
 
@@ -66,18 +88,6 @@ public class UserService {
         return new UserSignupRes();
     }
 
-    public UserProfileGetRes getProfile(Long userId, User user) {
-        String email = null;
-
-        if (userId != null) {
-            user = userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
-        } else {
-            email = user.getEmail();
-        }
-
-        return UserProfileGetRes.to(user, email);
-    }
 
     @Transactional
     public UserProfileEditRes editProfile(Long userId, UserProfileEditReq req,
@@ -125,6 +135,16 @@ public class UserService {
         return new UserUpdatePasswordRes();
     }
 
+    public UserEmailAuthRes sendAuthEmail(final UserEmailAuthReq req) {
+        emailUtil.sendMessage(req.getEmail(), EMAIL_AUTHENTICATION);
+        return new UserEmailAuthRes();
+    }
+
+    public UserEmailAuthCheckRes checkAuthEmail(final UserEmailAuthCheckReq req) {
+        emailUtil.checkCode(req.getEmail(), req.getCode());
+        return new UserEmailAuthCheckRes();
+    }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
@@ -153,15 +173,5 @@ public class UserService {
         if (req.getPrePassword().equals(req.getNewPassword())) {
             throw new GlobalException(SAME_OLD_PASSWORD);
         }
-    }
-
-    public UserEmailAuthRes sendAuthEmail(final UserEmailAuthReq req) {
-        emailUtil.sendMessage(req.getEmail(), EMAIL_AUTHENTICATION);
-        return new UserEmailAuthRes();
-    }
-
-    public UserEmailAuthCheckRes checkAuthEmail(final UserEmailAuthCheckReq req) {
-        emailUtil.checkCode(req.getEmail(), req.getCode());
-        return new UserEmailAuthCheckRes();
     }
 }
