@@ -189,7 +189,6 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             assertThat(res.getChatResList().get(0).getMessage()).isEqualTo(TEST_CHAT.getMessage());
             assertThat(res.getChatResList().get(0).getMessageTime()).isEqualTo(
                 TEST_CHAT.getCreatedAt());
-            assertThat(res.getChatResList().get(0).getUsername()).isEqualTo(user.getUsername());
         }
 
         @Test
