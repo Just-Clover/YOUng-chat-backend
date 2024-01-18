@@ -4,6 +4,7 @@ import static com.clover.youngchat.global.exception.ResultCode.SUCCESS;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +21,7 @@ import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
+import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.service.UserService;
@@ -53,6 +55,26 @@ class UserControllerTest extends BaseMvcTest {
         // when - then
         mockMvc.perform(post("/api/v1/users/signup")
                 .content(objectMapper.writeValueAsString(req))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("이메일로 사용자 검색 테스트")
+    void findUserByEmailTest() throws Exception {
+        // given
+        given(userService.searchProfile(anyString())).willReturn(
+            UserProfileSearchRes.builder()
+                .userId(TEST_USER_ID)
+                .email(TEST_USER_EMAIL)
+                .profileImage(TEST_USER_PROFILE_IMAGE)
+                .build()
+        );
+        
+        // when - then
+        mockMvc.perform(get("/api/v1/users/search")
+                .header("Keyword", TEST_USER_EMAIL)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());
