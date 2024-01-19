@@ -69,7 +69,8 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
+        port: ${{ secrets.EC2_PORT }}
+        username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_KEY }}
         script: |
           sudo docker rm -f $(docker ps -qa)
