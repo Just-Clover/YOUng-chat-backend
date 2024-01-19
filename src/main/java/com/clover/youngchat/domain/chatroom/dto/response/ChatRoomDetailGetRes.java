@@ -26,20 +26,31 @@ public class ChatRoomDetailGetRes {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ChatRes {
 
-        Long userId;
-        String message;
-        LocalDateTime messageTime;
+        private Long chatId;
+        private Long userId;
+        private String username;
+        private String profileImage;
+        private String message;
+        private LocalDateTime messageTime;
 
         @Builder
-        private ChatRes(Long userId, String message, LocalDateTime messageTime) {
+        public ChatRes(Long chatId, Long userId, String username, String profileImage,
+            String message,
+            LocalDateTime messageTime) {
+            this.chatId = chatId;
             this.userId = userId;
+            this.username = username;
+            this.profileImage = profileImage;
             this.message = message;
             this.messageTime = messageTime;
         }
 
         public static ChatRes to(Chat chat) {
             return ChatRes.builder()
+                .chatId(chat.getId())
                 .userId(chat.getSender().getId())
+                .username(chat.getSender().getUsername())
+                .profileImage(chat.getSender().getProfileImage())
                 .message(chat.getMessage())
                 .messageTime(chat.getCreatedAt())
                 .build();
