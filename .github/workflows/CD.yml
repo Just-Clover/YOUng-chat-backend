@@ -64,3 +64,15 @@ jobs:
     - name: Docker Hub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
             
+    # 서버에서 Docker 이미지 실행
+    - name: EC2 Docker Run
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          sudo docker rm -f $(docker ps -qa)
+          sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/example-repo-01 
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/example-repo-01 
+          docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/example-repo-01 
