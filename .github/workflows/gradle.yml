@@ -1,0 +1,55 @@
+name: CI Build & Upload DockerHub
+
+
+on:
+# develop 브랜치로 push 되면 동작
+  push:
+    branches: [ "develop" ]
+# develp 브랜치로 PR 올라오면 동작
+  pull_request:
+    branches: [ "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 저장소 checkout
+      uses: actions/setup=java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # 캐시를 통해 빌드 시간 단축
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew build
+
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/foodlink-springboot .
+
+    - name: Docker Hub login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Docker Hub push
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/foodlink-springboot
+            
