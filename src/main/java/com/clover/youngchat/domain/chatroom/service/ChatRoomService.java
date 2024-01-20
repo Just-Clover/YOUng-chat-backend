@@ -43,27 +43,10 @@ public class ChatRoomService {
         User friend = userRepository.findById(req.getFriendId()).orElseThrow(() ->
             new GlobalException(ResultCode.NOT_FOUND_USER));
 
-        ChatRoom chatRoom = ChatRoom.builder()
-            .title(req.getTitle())
-            .build();
+        ChatRoom chatRoom = chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(user.getId(),
+            req.getFriendId()).orElseGet(() -> saveChatRoom(req.getTitle(), user, friend));
 
-        chatRoomRepository.save(chatRoom);
-
-        ChatRoomUser myChat = ChatRoomUser.builder()
-            .user(user)
-            .chatRoom(chatRoom)
-            .build();
-
-        chatRoomUserRepository.save(myChat);
-
-        ChatRoomUser friendChat = ChatRoomUser.builder()
-            .user(friend)
-            .chatRoom(chatRoom)
-            .build();
-
-        chatRoomUserRepository.save(friendChat);
-
-        return new ChatRoomCreateRes();
+        return ChatRoomCreateRes.to(chatRoom.getId());
     }
 
     @Transactional
@@ -133,6 +116,31 @@ public class ChatRoomService {
     private ChatRoom findById(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
             new GlobalException(NOT_FOUND_CHATROOM));
+    }
+
+    @Transactional
+    public ChatRoom saveChatRoom(String title, User user, User friend) {
+        ChatRoom chatRoom = ChatRoom.builder()
+            .title(title)
+            .build();
+
+        chatRoomRepository.save(chatRoom);
+
+        ChatRoomUser myChat = ChatRoomUser.builder()
+            .user(user)
+            .chatRoom(chatRoom)
+            .build();
+
+        chatRoomUserRepository.save(myChat);
+
+        ChatRoomUser friendChat = ChatRoomUser.builder()
+            .user(friend)
+            .chatRoom(chatRoom)
+            .build();
+
+        chatRoomUserRepository.save(friendChat);
+
+        return chatRoom;
     }
 
     private void isChatRoomMember(Long chatRoomId, Long userId) {

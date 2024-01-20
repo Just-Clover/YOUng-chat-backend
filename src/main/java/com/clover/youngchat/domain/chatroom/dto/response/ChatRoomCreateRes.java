@@ -1,8 +1,24 @@
 package com.clover.youngchat.domain.chatroom.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@JsonIgnoreProperties
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoomCreateRes {
 
+    private Long chatRoomId;
+
+    @Builder
+    private ChatRoomCreateRes(Long chatRoomId) {
+        this.chatRoomId = chatRoomId;
+    }
+
+    public static ChatRoomCreateRes to(Long chatRoomId) {
+        return ChatRoomCreateRes.builder()
+            .chatRoomId(chatRoomId)
+            .build();
+    }
 }
