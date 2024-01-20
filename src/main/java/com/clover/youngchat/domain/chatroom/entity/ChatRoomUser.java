@@ -39,4 +39,11 @@ public class ChatRoomUser {
         this.user = user;
         this.chatRoom = chatRoom;
     }
+
+    public static ChatRoomUser to(User user, ChatRoom chatRoom) {
+        return ChatRoomUser.builder()
+            .user(user)
+            .chatRoom(chatRoom)
+            .build();
+    }
 }
