@@ -1,8 +1,6 @@
 package com.clover.youngchat.domain.chatroom.dto.request;
 
-import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.NOT_NULL_CHATROOM_TITLE;
-
-import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,14 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoomCreateReq {
 
-    private Long friendId;
-
-    @NotNull(message = NOT_NULL_CHATROOM_TITLE)
+    private List<Long> friendIds;
     private String title;
 
     @Builder
-    private ChatRoomCreateReq(Long friendId, String title) {
-        this.friendId = friendId;
+    private ChatRoomCreateReq(List<Long> friendIds, String title) {
+        this.friendIds = friendIds;
         this.title = title;
     }
 }
