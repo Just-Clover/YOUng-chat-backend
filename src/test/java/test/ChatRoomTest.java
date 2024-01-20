@@ -7,6 +7,7 @@ public interface ChatRoomTest extends UserTest {
     Long TEST_CHAT_ROOM_ID = 1L;
     Long TEST_ANOTHER_CHAT_ROOM_ID = 2L;
 
+    String TEST_CHAT_ROOM_TITLE_BLANK = "";
     String TEST_CHAT_ROOM_TITLE = "test title";
     String TEST_ANOTHER_CHAT_ROOM_TITLE = "test title";
 
