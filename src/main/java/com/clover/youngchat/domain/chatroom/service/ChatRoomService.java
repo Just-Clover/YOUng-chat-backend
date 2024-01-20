@@ -40,12 +40,25 @@ public class ChatRoomService {
 
     @Transactional
     public ChatRoomCreateRes createChatRoom(ChatRoomCreateReq req, User user) {
-        User friend = userRepository.findById(req.getFriendId()).orElseThrow(() ->
-            new GlobalException(ResultCode.NOT_FOUND_USER));
+        List<User> friends = req.getFriendIds().stream()
+            .map(
+                friendId -> userRepository.findById(friendId).orElseThrow(()
+                    -> new GlobalException(ResultCode.NOT_FOUND_USER))
+            ).toList();
 
-        ChatRoom chatRoom = chatRoomUserRepository
-            .findChatRoomIdByOnlyTwoUsers(user.getId(),
-                req.getFriendId()).orElseGet(() -> saveChatRoom(req.getTitle(), user, friend));
+        ChatRoom chatRoom;
+
+        // 1:1 채팅일 경우
+        if (friends.size() == 1) {
+            chatRoom = chatRoomUserRepository
+                .findChatRoomIdByOnlyTwoUsers(user.getId(), friends.get(0).getId())
+                .orElseGet(()
+                    -> saveChatRoom(setChatRoomTitle(user, friends), user, friends));
+        } else {
+            String title =
+                req.getTitle().isBlank() ? setChatRoomTitle(user, friends) : req.getTitle();
+            chatRoom = saveChatRoom(setChatRoomTitle(user, friends), user, friends);
+        }
 
         return ChatRoomCreateRes.to(chatRoom.getId());
     }
@@ -119,27 +132,28 @@ public class ChatRoomService {
             new GlobalException(NOT_FOUND_CHATROOM));
     }
 
+    private String setChatRoomTitle(User user, List<User> friends) {
+        if (friends.size() == 1) {
+            return String.format("%s, %s의 채팅방", user.getUsername(), friends.get(0).getUsername());
+        }
+        return String.format("%s, %s 외 %d 명",
+            user.getUsername(), friends.get(0).getUsername(), friends.size() - 1);
+    }
+
     @Transactional
-    protected ChatRoom saveChatRoom(String title, User user, User friend) {
+    protected ChatRoom saveChatRoom(String title, User user, List<User> friends) {
         ChatRoom chatRoom = ChatRoom.builder()
             .title(title)
             .build();
-
         chatRoomRepository.save(chatRoom);
 
-        ChatRoomUser myChat = ChatRoomUser.builder()
-            .user(user)
-            .chatRoom(chatRoom)
-            .build();
+        List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
-        chatRoomUserRepository.save(myChat);
-
-        ChatRoomUser friendChat = ChatRoomUser.builder()
-            .user(friend)
-            .chatRoom(chatRoom)
-            .build();
-
-        chatRoomUserRepository.save(friendChat);
+        chatRoomUsers.add(ChatRoomUser.to(user, chatRoom));
+        for (User friend : friends) {
+            chatRoomUsers.add(ChatRoomUser.to(friend, chatRoom));
+        }
+        chatRoomUserRepository.saveAll(chatRoomUsers);
 
         return chatRoom;
     }
