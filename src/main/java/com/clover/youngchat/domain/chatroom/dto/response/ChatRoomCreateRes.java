@@ -10,15 +10,18 @@ import lombok.NoArgsConstructor;
 public class ChatRoomCreateRes {
 
     private Long chatRoomId;
+    private String title;
 
     @Builder
-    private ChatRoomCreateRes(Long chatRoomId) {
+    private ChatRoomCreateRes(Long chatRoomId, String title) {
         this.chatRoomId = chatRoomId;
+        this.title = title;
     }
 
-    public static ChatRoomCreateRes to(Long chatRoomId) {
+    public static ChatRoomCreateRes to(Long chatRoomId, String title) {
         return ChatRoomCreateRes.builder()
             .chatRoomId(chatRoomId)
+            .title(title)
             .build();
     }
 }

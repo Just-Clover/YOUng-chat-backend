@@ -22,6 +22,7 @@ import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -94,20 +95,42 @@ public class ChatRoomServiceTest implements ChatRoomTest {
     class createChatRoom {
 
         @Test
-        @DisplayName("채팅방 생성 성공")
+        @DisplayName("1:1 채팅방 생성 성공 : 해당 유저랑 1:1 채팅방이 없는 경우")
         void createChatRoomSuccess() {
             ChatRoomCreateReq req = ChatRoomCreateReq.builder()
-                .title(TEST_CHAT_ROOM_TITLE)
-                .friendId(ANOTHER_TEST_USER_ID)
+                .title(TEST_CHAT_ROOM_TITLE_BLANK)
+                .friendIds(List.of(ANOTHER_TEST_USER_ID))
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(any(), any()))
+                .willReturn(Optional.empty());
 
-            chatRoomService.createChatRoom(req, TEST_USER);
+            ChatRoomCreateRes res = chatRoomService.createChatRoom(req, TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(chatRoomRepository, times(1)).save(any());
-            verify(chatRoomUserRepository, times(2)).save(any());
+            verify(chatRoomUserRepository, times(1)).saveAll(any());
+        }
+
+        @Test
+        @DisplayName("1:1 채팅방 생성 성공 : 해당 유저랑 1:1채팅방이 이미 있는 경우")
+        void createChatRoomSuccess_alreadyExist() {
+            ChatRoomCreateReq req = ChatRoomCreateReq.builder()
+                .title(TEST_CHAT_ROOM_TITLE_BLANK)
+                .friendIds(List.of(ANOTHER_TEST_USER_ID))
+                .build();
+
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(any(), any()))
+                .willReturn(Optional.of(chatRoom));
+
+            ChatRoomCreateRes res = chatRoomService.createChatRoom(req, TEST_USER);
+
+            verify(userRepository, times(1)).findById(anyLong());
+            verify(chatRoomRepository, times(0)).save(any());
+            verify(chatRoomUserRepository, times(0)).saveAll(any());
+            assertThat(res.getChatRoomId()).isEqualTo(chatRoom.getId());
         }
 
         @Test
@@ -115,7 +138,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
         void createChatRoomFail_NotFoundUser() {
             ChatRoomCreateReq req = ChatRoomCreateReq.builder()
                 .title(TEST_CHAT_ROOM_TITLE)
-                .friendId(ANOTHER_TEST_USER_ID)
+                .friendIds(List.of(ANOTHER_TEST_USER_ID))
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.empty());
