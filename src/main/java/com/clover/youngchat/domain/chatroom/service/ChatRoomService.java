@@ -43,8 +43,9 @@ public class ChatRoomService {
         User friend = userRepository.findById(req.getFriendId()).orElseThrow(() ->
             new GlobalException(ResultCode.NOT_FOUND_USER));
 
-        ChatRoom chatRoom = chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(user.getId(),
-            req.getFriendId()).orElseGet(() -> saveChatRoom(req.getTitle(), user, friend));
+        ChatRoom chatRoom = chatRoomUserRepository
+            .findChatRoomIdByOnlyTwoUsers(user.getId(),
+                req.getFriendId()).orElseGet(() -> saveChatRoom(req.getTitle(), user, friend));
 
         return ChatRoomCreateRes.to(chatRoom.getId());
     }
@@ -119,7 +120,7 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public ChatRoom saveChatRoom(String title, User user, User friend) {
+    protected ChatRoom saveChatRoom(String title, User user, User friend) {
         ChatRoom chatRoom = ChatRoom.builder()
             .title(title)
             .build();
