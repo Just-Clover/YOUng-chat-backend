@@ -148,11 +148,12 @@ public class ChatRoomService {
         chatRoomRepository.save(chatRoom);
 
         List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
-
         chatRoomUsers.add(ChatRoomUser.to(user, chatRoom));
+
         for (User friend : friends) {
             chatRoomUsers.add(ChatRoomUser.to(friend, chatRoom));
         }
+
         chatRoomUserRepository.saveAll(chatRoomUsers);
 
         return chatRoom;
