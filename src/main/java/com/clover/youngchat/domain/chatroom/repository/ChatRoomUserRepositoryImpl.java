@@ -13,7 +13,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Optional<ChatRoom> findChatRoomIdByOnlyTwoUsers(final Long userId1, final Long userId2) {
+    public Optional<ChatRoom> findChatRoomIdByOnlyTwoUsers(final Long userId, final Long friendId) {
         QChatRoomUser chatRoomUser = QChatRoomUser.chatRoomUser;
         QChatRoomUser chatRoomUserSub = new QChatRoomUser("chatRoomUserSub");
 
@@ -26,7 +26,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
                         .from(chatRoomUserSub)
                         .groupBy(chatRoomUserSub.chatRoom.id)
                         .having(chatRoomUserSub.user.count().eq(2L))),
-                chatRoomUser.user.id.in(userId1, userId2))
+                chatRoomUser.user.id.in(userId, friendId))
             .fetchOne();
 
         return Optional.ofNullable(chatRoom);
