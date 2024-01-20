@@ -1,7 +1,5 @@
 package com.clover.youngchat.domain.chat.entity;
 
-import static com.clover.youngchat.domain.chat.constant.ChatConstant.DELETE_MESSAGE;
-
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.model.BaseEntity;
 import com.clover.youngchat.domain.user.entity.User;
@@ -27,7 +25,7 @@ public class Chat extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private boolean isDeleted = false;
     private String message;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,6 +46,6 @@ public class Chat extends BaseEntity {
     }
 
     public void deleteChat() {
-        this.message = DELETE_MESSAGE;
+        this.isDeleted = true;
     }
 }
