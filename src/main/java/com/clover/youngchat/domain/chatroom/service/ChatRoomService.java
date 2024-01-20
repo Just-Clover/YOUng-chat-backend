@@ -57,10 +57,10 @@ public class ChatRoomService {
         } else {
             String title =
                 req.getTitle().isBlank() ? setChatRoomTitle(user, friends) : req.getTitle();
-            chatRoom = saveChatRoom(setChatRoomTitle(user, friends), user, friends);
+            chatRoom = saveChatRoom(title, user, friends);
         }
 
-        return ChatRoomCreateRes.to(chatRoom.getId());
+        return ChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
     }
 
     @Transactional
