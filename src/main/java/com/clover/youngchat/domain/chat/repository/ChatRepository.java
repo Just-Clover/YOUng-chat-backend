@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
 @RepositoryDefinition(domainClass = Chat.class, idClass = Long.class)
-public interface ChatRepository {
+public interface ChatRepository extends ChatRepositoryCustom {
 
     Chat save(Chat chat);
 

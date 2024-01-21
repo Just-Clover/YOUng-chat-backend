@@ -5,6 +5,7 @@ import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 
+import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
@@ -12,9 +13,9 @@ import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes.ChatRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomPaginationDetailGetRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -26,6 +27,7 @@ import com.clover.youngchat.global.exception.ResultCode;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -163,5 +165,23 @@ public class ChatRoomService {
         if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
             throw new GlobalException(ACCESS_DENY);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoomPaginationDetailGetRes getPaginationDetailChatRoom(Long chatRoomId,
+        Long lastChatId,
+        User user) {
+        // 채팅방에 속한 사람만 조회 가능
+        isChatRoomMember(chatRoomId, user.getId());
+        ChatRoom chatRoom = findById(chatRoomId);
+
+        int LIMIT_SIZE = 10;
+        Slice<ChatRes> chatResList =
+            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId, LIMIT_SIZE);
+
+        return ChatRoomPaginationDetailGetRes.builder()
+            .title(chatRoom.getTitle())
+            .chatResList(chatResList)
+            .build();
     }
 }
