@@ -61,7 +61,9 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker image
-      run: docker build -t youngchat-repo -f ./Dockerfile .
+      run: |
+        docker build -t youngchat-repo -f ./Dockerfile .
+        docker tag youngchat-repo:latest ${{ secrets.DOCKER_USER }}/youngchat-repo:latest
 
     - name: Docker Hub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
