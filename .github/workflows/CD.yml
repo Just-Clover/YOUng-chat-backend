@@ -49,6 +49,8 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
+      env:
+          SPRING_PROFILES_ACTIVE: prod
       run: ./gradlew bootJar
       
   # Docker 로그인
