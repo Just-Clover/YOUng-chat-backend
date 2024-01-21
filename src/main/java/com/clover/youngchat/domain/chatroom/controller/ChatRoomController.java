@@ -7,6 +7,7 @@ import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomPaginationDetailGetRes;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,6 +51,18 @@ public class ChatRoomController {
             userDetails) {
         return RestResponse.success(
             chatRoomService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
+    }
+
+    @GetMapping("/slice/{chatRoomId}")
+    public RestResponse<ChatRoomPaginationDetailGetRes> getPaginationDetailChatRoom(
+        @PathVariable Long chatRoomId,
+        @RequestParam(required = false) Long lastChatId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return RestResponse.success(
+            chatRoomService.getPaginationDetailChatRoom(chatRoomId, lastChatId,
+                userDetails.getUser())
+        );
     }
 
     @PatchMapping("/{chatRoomId}")
