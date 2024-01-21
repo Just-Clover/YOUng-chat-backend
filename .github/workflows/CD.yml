@@ -61,7 +61,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo .
+      run: docker build -t youngchat-repo -f ./Dockerfile.
 
     - name: Docker Hub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
@@ -75,7 +75,7 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_KEY }}
         script: |
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/youngchat-repo:lastest
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/youngchat-repo
           sudo docker stop youngchat-repo
           sudo docker rm youngchat-repo
           sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/youngchat-repo
