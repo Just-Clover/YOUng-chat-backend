@@ -6,6 +6,7 @@ import com.clover.youngchat.domain.user.entity.QUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +29,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
         QUser user = QUser.user;
         BooleanExpression queryCondition = createQueryCondition(chat, chatRoomId, lastChatId);
 
-        return queryFactory
+        List<ChatRes> chats = queryFactory
             .select(Projections.constructor(
                 ChatRes.class,
                 chat.id,
@@ -44,6 +45,10 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
             .orderBy(chat.id.desc())
             .limit(limitSize + 1)
             .fetch();
+
+        Collections.reverse(chats);
+
+        return chats;
     }
 
     private BooleanExpression createQueryCondition(QChat chat, Long chatRoomId, Long lastChatId) {
@@ -57,7 +62,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
     private Slice<ChatRes> createSlice(List<ChatRes> chats, int limitSize) {
         boolean hasNext = chats.size() > limitSize;
         if (hasNext) {
-            chats.remove(limitSize);
+            chats.remove(0);
         }
         return new SliceImpl<>(chats, PageRequest.of(0, limitSize), hasNext);
     }
