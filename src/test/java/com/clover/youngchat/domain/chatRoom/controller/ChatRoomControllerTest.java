@@ -17,6 +17,7 @@ import com.clover.youngchat.domain.chatroom.controller.ChatRoomController;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,7 +35,7 @@ public class ChatRoomControllerTest extends BaseMvcTest {
     void createChatRoom() throws Exception {
         ChatRoomCreateReq req = ChatRoomCreateReq.builder()
             .title(TEST_CHAT_ROOM_TITLE)
-            .friendId(ANOTHER_TEST_USER_ID)
+            .friendIds(List.of(ANOTHER_TEST_USER_ID))
             .build();
 
         mockMvc.perform(post("/api/v1/chat-rooms")

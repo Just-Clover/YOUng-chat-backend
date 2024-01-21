@@ -10,7 +10,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 
-import com.clover.youngchat.domain.chat.constant.ChatConstant;
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
@@ -125,7 +124,7 @@ class ChatServiceTest implements ChatTest {
             chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
 
             // then
-            assertThat(TEST_CHAT.getMessage()).isEqualTo(ChatConstant.DELETE_MESSAGE);
+            assertThat(TEST_CHAT.isDeleted()).isTrue();
         }
 
         @Test

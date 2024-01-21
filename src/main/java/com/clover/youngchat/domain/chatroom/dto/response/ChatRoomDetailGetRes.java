@@ -31,17 +31,18 @@ public class ChatRoomDetailGetRes {
         private String username;
         private String profileImage;
         private String message;
+        private boolean isDeleted;
         private LocalDateTime messageTime;
 
         @Builder
         public ChatRes(Long chatId, Long userId, String username, String profileImage,
-            String message,
-            LocalDateTime messageTime) {
+            String message, boolean isDeleted, LocalDateTime messageTime) {
             this.chatId = chatId;
             this.userId = userId;
             this.username = username;
             this.profileImage = profileImage;
             this.message = message;
+            this.isDeleted = isDeleted;
             this.messageTime = messageTime;
         }
 
@@ -52,6 +53,7 @@ public class ChatRoomDetailGetRes {
                 .username(chat.getSender().getUsername())
                 .profileImage(chat.getSender().getProfileImage())
                 .message(chat.getMessage())
+                .isDeleted(chat.isDeleted())
                 .messageTime(chat.getCreatedAt())
                 .build();
         }

@@ -31,7 +31,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     @PostMapping
-    public RestResponse<ChatRoomCreateRes> createChatRoom(@RequestBody @Valid ChatRoomCreateReq req,
+    public RestResponse<ChatRoomCreateRes> createChatRoom(@RequestBody ChatRoomCreateReq req,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
             chatRoomService.createChatRoom(req, userDetails.getUser()));
