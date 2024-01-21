@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/chat-rooms/{chatRoomId}/chats")
+@RequestMapping("/api/v1/chat-rooms/{chatRoomId}/chats")
 @RequiredArgsConstructor
 public class ChatController {
 
