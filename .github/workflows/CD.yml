@@ -79,4 +79,4 @@ jobs:
           sudo docker stop youngchat-container
           sudo docker rm youngchat-container
           sudo docker run -d -p 8080:8080 --name youngchat-container ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
-          sudo docker rmi $(docker images -f "dangling=true" -q)
+          sudo docker rmi $(sudo docker images -f "dangling=true" -q)
