@@ -76,9 +76,7 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         script: |
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
-          sudo docker stop youngchat-repo
-          sudo docker rm youngchat-repo
-          sudo docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
-          if docker images -f "dangling=true" -q | grep . > /dev/null; then
-            docker rmi $(docker images -f "dangling=true" -q)
-          fi
+          sudo docker stop youngchat-container
+          sudo docker rm youngchat-container
+          sudo docker run -d -p 8080:8080 --name youngchat-container ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
+          sudo docker rmi $(docker images -f "dangling=true" -q)
