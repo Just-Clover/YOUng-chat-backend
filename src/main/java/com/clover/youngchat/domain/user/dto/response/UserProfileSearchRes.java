@@ -11,12 +11,14 @@ public class UserProfileSearchRes {
 
     private Long userId;
     private String email;
+    private String username;
     private String profileImage;
 
     @Builder
-    private UserProfileSearchRes(Long userId, String email, String profileImage) {
+    private UserProfileSearchRes(Long userId, String email, String username, String profileImage) {
         this.userId = userId;
         this.email = email;
+        this.username = username;
         this.profileImage = profileImage;
     }
 
@@ -24,6 +26,7 @@ public class UserProfileSearchRes {
         return UserProfileSearchRes.builder()
             .userId(user.getId())
             .email(user.getEmail())
+            .username(user.getUsername())
             .profileImage(user.getProfileImage())
             .build();
     }
