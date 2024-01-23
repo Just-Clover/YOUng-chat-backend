@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FriendGetSearchListRes {
 
+    private Long userId;
     private String username;
     private String profileImage;
 
