@@ -7,6 +7,7 @@ import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
+import com.clover.youngchat.domain.user.dto.response.UserEmailCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
@@ -46,6 +47,12 @@ public class UserController {
     public RestResponse<UserProfileSearchRes> searchProfile(
         @RequestHeader("Keyword") String email) {
         return RestResponse.success(userService.searchProfile(email));
+    }
+
+    @GetMapping(value = "/signup/email", headers = "Email")
+    public RestResponse<UserEmailCheckRes> checkEmailDuplicated(
+        @RequestHeader("Email") String email) {
+        return RestResponse.success(userService.checkEmailDuplicated(email));
     }
 
     @PostMapping("/signup")

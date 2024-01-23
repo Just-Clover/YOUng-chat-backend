@@ -19,6 +19,7 @@ import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
+import com.clover.youngchat.domain.user.dto.response.UserEmailCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
@@ -174,5 +175,9 @@ public class UserService {
         if (req.getPrePassword().equals(req.getNewPassword())) {
             throw new GlobalException(SAME_OLD_PASSWORD);
         }
+    }
+
+    public UserEmailCheckRes checkEmailDuplicated(final String email) {
+        return UserEmailCheckRes.to(userRepository.existsByEmail(email));
     }
 }
