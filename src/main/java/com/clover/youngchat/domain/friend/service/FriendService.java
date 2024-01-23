@@ -1,5 +1,7 @@
 package com.clover.youngchat.domain.friend.service;
 
+import static com.clover.youngchat.global.exception.ResultCode.ALREADY_FRIEND;
+import static com.clover.youngchat.global.exception.ResultCode.INVALID_INPUT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.friend.dto.response.FriendAddRes;
@@ -43,7 +45,10 @@ public class FriendService {
 
     public FriendAddRes addFriend(Long friendId, User user) {
         if (user.getId().equals(friendId)) {
-            throw new GlobalException(ResultCode.INVALID_INPUT);
+            throw new GlobalException(INVALID_INPUT);
+        }
+        if (friendRepository.existsByUser_IdAndFriend_Id(user.getId(), friendId)) {
+            throw new GlobalException(ALREADY_FRIEND);
         }
         User friendUser = userRepository.findById(friendId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));

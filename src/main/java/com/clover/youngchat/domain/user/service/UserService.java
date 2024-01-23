@@ -108,7 +108,8 @@ public class UserService {
             profileImageUrl = user.getProfileImage();
         } else {
             // user가 업로드 할 파일의 확장자가 png 인지 확인, png가 아니라면 exception 발생
-            if (!Objects.equals(multipartFile.getContentType(), "image/png")) {
+            if (!Objects.equals(multipartFile.getContentType(), "image/png") &&
+                !Objects.equals(multipartFile.getContentType(), "image/jpeg")) {
                 throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
             }
             // user의 프로필 url이 기본 프로필과 같지 않을 경우 s3에서 삭제
