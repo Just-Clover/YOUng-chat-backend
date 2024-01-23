@@ -20,7 +20,8 @@ public class FriendRepositoryImpl implements FriendRepositoryCustom {
         QFriend friend = QFriend.friend1;
 
         return queryFactory.select(
-                Projections.constructor(FriendGetSearchListRes.class, user.username, user.profileImage))
+                Projections.constructor(FriendGetSearchListRes.class,
+                    user.id, user.username, user.profileImage))
             .from(user)
             .where(
                 user.id.in(
