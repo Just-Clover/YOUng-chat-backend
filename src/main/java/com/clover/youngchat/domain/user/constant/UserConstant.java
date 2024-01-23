@@ -5,7 +5,7 @@ public class UserConstant {
     // 정규식
     public static final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     public static final String USERNAME_REGEX = "^[a-z가-힣]{4,10}$";
-    public static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,15}$";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,15}$";
 
     // 메시지
     public static final String EMAIL_AUTHENTICATION = "YOUngChat! [이메일 인증]";
