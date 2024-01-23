@@ -45,6 +45,10 @@ public class Chat extends BaseEntity {
         this.chatRoom = chatRoom;
     }
 
+    public boolean getIsDeleted() {
+        return this.isDeleted;
+    }
+
     public void deleteChat() {
         this.isDeleted = true;
     }

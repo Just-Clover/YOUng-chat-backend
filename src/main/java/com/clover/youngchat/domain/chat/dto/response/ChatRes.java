@@ -38,8 +38,12 @@ public class ChatRes {
             .username(chat.getSender().getUsername())
             .profileImage(chat.getSender().getProfileImage())
             .message(chat.getMessage())
-            .isDeleted(chat.isDeleted())
+            .isDeleted(chat.getIsDeleted())
             .messageTime(chat.getCreatedAt())
             .build();
+    }
+
+    public boolean getIsDeleted() {
+        return this.isDeleted;
     }
 }

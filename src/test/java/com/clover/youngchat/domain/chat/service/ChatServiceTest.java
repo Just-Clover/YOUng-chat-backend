@@ -124,7 +124,7 @@ class ChatServiceTest implements ChatTest {
             chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
 
             // then
-            assertThat(TEST_CHAT.isDeleted()).isTrue();
+            assertThat(TEST_CHAT.getIsDeleted()).isTrue();
         }
 
         @Test
