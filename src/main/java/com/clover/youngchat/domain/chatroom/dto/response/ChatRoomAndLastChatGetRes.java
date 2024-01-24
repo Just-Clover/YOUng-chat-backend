@@ -16,20 +16,23 @@ public class ChatRoomAndLastChatGetRes {
     private String title;
     private String lastChat;
     private LocalDateTime lastChatTime;
+    private boolean lastChatDeleted;
 
     @Builder
     private ChatRoomAndLastChatGetRes(Long chatRoomId, String title, String lastChat,
-        LocalDateTime lastChatTime) {
+        LocalDateTime lastChatTime, boolean lastChatDeleted) {
         this.chatRoomId = chatRoomId;
         this.title = title;
         this.lastChat = lastChat;
         this.lastChatTime = lastChatTime;
+        this.lastChatDeleted = lastChatDeleted;
     }
 
     public static ChatRoomAndLastChatGetRes to(ChatRoom chatRoom, Chat chat) {
         return ChatRoomAndLastChatGetRes.builder()
             .chatRoomId(chatRoom.getId())
             .title(chatRoom.getTitle())
+            .lastChatDeleted(chat == null || chat.isDeleted())
             .lastChat((chat == null) ? "" : chat.getMessage())
             .lastChatTime((chat == null) ? chatRoom.getCreatedAt() : chat.getCreatedAt())
             .build();
