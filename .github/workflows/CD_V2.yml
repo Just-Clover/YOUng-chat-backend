@@ -28,13 +28,40 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ secret.AWS_IAM }}
+        role-to-assume: ${{ secrets.AWS_IAM }}
         aws-region: ap-northeast-2
 
     # Amazon ECR 로그인
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
+      
+    # prod yml 생성
+    - name: make application-prod.yml
+      if: contains(github.ref, 'develop') || contains(github.ref, 'main')
+      run: |
+        touch ./src/main/resources/application-prod.yml
+        echo "${{ secrets.PROD_YML }}" > ./src/main/resources/application-prod.yml
+      shell: bash
+      
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    # Gradle Caching  
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Build with Gradle
+      env:
+          SPRING_PROFILES_ACTIVE: prod
+      run: ./gradlew bootJar
       
     # 도커 이미지 빌드 및 ECR에 푸시
     - name: Build Docker Image and Push to Amazon ECR
