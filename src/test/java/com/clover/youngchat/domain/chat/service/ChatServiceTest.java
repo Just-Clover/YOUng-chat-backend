@@ -6,15 +6,18 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
+import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
+import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import test.ChatTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +43,9 @@ class ChatServiceTest implements ChatTest {
     @Mock
     private ChatRoomUserRepository chatRoomUserRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private ChatService chatService;
 
@@ -52,6 +59,7 @@ class ChatServiceTest implements ChatTest {
         void setup() {
             req = ChatCreateReq.builder()
                 .message(TEST_CHAT_MESSAGE)
+                .userId(TEST_USER_ID)
                 .build();
         }
 
@@ -64,11 +72,16 @@ class ChatServiceTest implements ChatTest {
             given(
                 chatRoomUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
                 .willReturn(Optional.of(TEST_CHAT_ROOM_USER));
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
+            given(chatRepository.save(any(Chat.class))).willReturn(TEST_CHAT);
 
+            ReflectionTestUtils.setField(TEST_USER, "id", 1L);
+            ReflectionTestUtils.setField(TEST_CHAT, "id", 1L);
             // when
-            chatService.createChat(TEST_CHAT_ROOM_ID, req, TEST_USER_ID);
+            ChatRes actual = chatService.sendMessage(TEST_CHAT_ROOM_ID, req);
 
             // then
+            assertThat(actual.getUsername()).isEqualTo(TEST_USER_NAME);
             verify(chatRepository).save(any(Chat.class));
         }
 
@@ -81,30 +94,11 @@ class ChatServiceTest implements ChatTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatService.createChat(TEST_CHAT_ROOM_ID, req, TEST_USER_ID));
+                () -> chatService.sendMessage(TEST_CHAT_ROOM_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
                 .isEqualTo(NOT_FOUND_CHATROOM.getMessage());
-        }
-
-        @Test
-        @DisplayName("실패 : 채팅룸에 없는 유저가 채팅 입력 시도")
-        void createChatFailTest_accessDeny() {
-            // given
-            given(chatRoomRepository.findById(TEST_CHAT_ROOM_ID)).willReturn(
-                Optional.of(TEST_CHAT_ROOM));
-            given(
-                chatRoomUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
-                .willReturn(Optional.empty());
-
-            // when
-            GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatService.createChat(TEST_CHAT_ROOM_ID, req, TEST_USER_ID));
-
-            // then
-            assertThat(exception.getResultCode().getMessage())
-                .isEqualTo(ACCESS_DENY.getMessage());
         }
     }
 

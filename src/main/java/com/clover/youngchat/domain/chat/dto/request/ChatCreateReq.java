@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 public class ChatCreateReq {
 
     private String message;
+    private Long userId;
 
     @Builder
-    private ChatCreateReq(String message) {
+    private ChatCreateReq(String message, Long userId) {
         this.message = message;
+        this.userId = userId;
     }
 }
