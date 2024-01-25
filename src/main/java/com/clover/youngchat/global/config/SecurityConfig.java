@@ -84,8 +84,8 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll()
                 .requestMatchers("/api/v1/users/signup/**").permitAll()
-                .requestMatchers("/health").permitAll()
                 .requestMatchers("/stomp").permitAll()
+                .requestMatchers("/health").permitAll()
                 .anyRequest().authenticated()
         );
 
