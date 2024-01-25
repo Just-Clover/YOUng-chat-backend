@@ -30,7 +30,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-        aws-region: ap-northeast-2
+        aws-region: ${{ secrets.AWS_REGION }}
 
     # Amazon ECR 로그인
     - name: Login to Amazon ECR
@@ -81,5 +81,6 @@ jobs:
         REPOSITORY: ${{ secrets.ECR_REPO }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login -u AWS --password-stdin $REGISTRY
         sudo docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         sudo docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
