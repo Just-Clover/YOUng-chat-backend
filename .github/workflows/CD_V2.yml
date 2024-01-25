@@ -30,12 +30,14 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-        aws-region: ap-northeast-2
+        aws-region: ${{ secrets.AWS_REGION }}
 
     # Amazon ECR 로그인
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
+      with: 
+        mask-password: 'true'
       
     # prod yml 생성
     - name: make application-prod.yml
@@ -63,8 +65,8 @@ jobs:
       env:
           SPRING_PROFILES_ACTIVE: prod
       run: ./gradlew bootJar
-      
-    # 도커 이미지 빌드 및 ECR에 푸시
+    
+    # 도커 이미지 빌드 및 ECR에 푸시, 배포파일 세팅
     - name: Build Docker Image and Push to Amazon ECR
       env: 
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -73,3 +75,24 @@ jobs:
       run: |
         sudo docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         sudo docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        mkdir scripts
+        touch scripts/deploy.sh
+        echo "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin $ECR_REGISTRY" >> scripts/deploy.sh
+        echo "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+        echo "sudo docker run -p 8080:8080 -e PROFILE=dev -d --restart always --name youngchat-container $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+   
+    - name: upload to s3
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        zip -r deploy-$IMAGE_TAG.zip ./scripts appspec.yml
+        aws s3 cp --region ap-northeast-2 --acl private ./deploy-$IMAGE_TAG.zip s3://youngchat-bucket
+ 
+    - name: start deploy
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        aws deploy create-deployment --application-name youngchat \
+        --deployment-config-name CodeDeployDefault.OneAtATime \
+        --deployment-group-name youngchat \
+        --s3-location bucket=cs-broker-bucket,bundleType=zip,key=deploy-$IMAGE_TAG.zip
