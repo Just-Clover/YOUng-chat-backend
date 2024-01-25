@@ -19,6 +19,7 @@ import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserEmailAuthRes;
+import com.clover.youngchat.domain.user.dto.response.UserEmailCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
@@ -108,7 +109,8 @@ public class UserService {
             profileImageUrl = user.getProfileImage();
         } else {
             // user가 업로드 할 파일의 확장자가 png 인지 확인, png가 아니라면 exception 발생
-            if (!Objects.equals(multipartFile.getContentType(), "image/png")) {
+            if (!Objects.equals(multipartFile.getContentType(), "image/png") &&
+                !Objects.equals(multipartFile.getContentType(), "image/jpeg")) {
                 throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
             }
             // user의 프로필 url이 기본 프로필과 같지 않을 경우 s3에서 삭제
@@ -173,5 +175,9 @@ public class UserService {
         if (req.getPrePassword().equals(req.getNewPassword())) {
             throw new GlobalException(SAME_OLD_PASSWORD);
         }
+    }
+
+    public UserEmailCheckRes checkEmailDuplicated(final String email) {
+        return UserEmailCheckRes.to(userRepository.existsByEmail(email));
     }
 }

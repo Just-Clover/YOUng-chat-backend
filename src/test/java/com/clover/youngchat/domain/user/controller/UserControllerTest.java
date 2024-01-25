@@ -19,6 +19,7 @@ import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.user.dto.request.UserProfileEditReq;
 import com.clover.youngchat.domain.user.dto.request.UserSignupReq;
 import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
+import com.clover.youngchat.domain.user.dto.response.UserEmailCheckRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileEditRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
@@ -71,10 +72,26 @@ class UserControllerTest extends BaseMvcTest {
                 .profileImage(TEST_USER_PROFILE_IMAGE)
                 .build()
         );
-        
+
         // when - then
         mockMvc.perform(get("/api/v1/users/search")
                 .header("Keyword", TEST_USER_EMAIL)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("이메일로 중복 체크테스트")
+    void checkEmailDuplicatedTest() throws Exception {
+        // given
+        given(userService.checkEmailDuplicated(anyString())).willReturn(
+            UserEmailCheckRes.to(true)
+        );
+
+        // when - then
+        mockMvc.perform(get("/api/v1/users/signup/email")
+                .header("Email", TEST_USER_EMAIL)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(SUCCESS.getCode())))
             .andDo(print());

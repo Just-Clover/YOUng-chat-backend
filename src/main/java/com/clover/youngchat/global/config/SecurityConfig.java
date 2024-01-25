@@ -85,6 +85,7 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers("/api/v1/users/signup/**").permitAll()
                 .requestMatchers("/stomp").permitAll()
+                .requestMatchers("/health").permitAll()
                 .anyRequest().authenticated()
         );
 

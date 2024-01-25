@@ -36,7 +36,8 @@ public enum ResultCode {
     NOT_FOUND_CHAT(HttpStatus.NOT_FOUND, 4000, "채팅을 찾을 수 없습니다."),
 
     // 친구 5000번대
-    NOT_FOUND_FRIEND(HttpStatus.NOT_FOUND, 5000, "친구를 찾을 수 없습니다.");
+    NOT_FOUND_FRIEND(HttpStatus.NOT_FOUND, 5000, "친구를 찾을 수 없습니다."),
+    ALREADY_FRIEND(HttpStatus.BAD_REQUEST, 5001, "이미 추가된 친구입니다");
 
     private final HttpStatus status;
     private final Integer code;

@@ -27,7 +27,8 @@ public class UserValidTest implements UserTest {
         Pattern pattern = Pattern.compile(USERNAME_REGEX);
 
         assertThat(pattern.matcher(TEST_USER_NAME).matches()).isTrue();
-        assertThat(pattern.matcher("in").matches()).isFalse();
+        assertThat(pattern.matcher("하1").matches()).isTrue();
+        assertThat(pattern.matcher("i").matches()).isFalse();
     }
 
     @Test
