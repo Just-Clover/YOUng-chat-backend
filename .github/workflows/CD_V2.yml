@@ -80,7 +80,7 @@ jobs:
         touch scripts/deploy.sh
         echo "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin $REGISTRY" >> scripts/deploy.sh
         echo "sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
-        echo "sudo docker run -p 8080:8080 -e PROFILE=dev -d --restart always --name youngchat-container $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+        echo "sudo docker run -p 8080:8080 -e PROFILE=dev -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
    
     - name: upload to s3
       env:
@@ -93,7 +93,7 @@ jobs:
       env:
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        aws deploy create-deployment --application-name youngchat \
+        aws deploy create-deployment --application-name ${{ secrets.APPLICATION_NAME }} \
         --deployment-config-name CodeDeployDefault.OneAtATime \
-        --deployment-group-name youngchat \
+        --deployment-group-name ${{ secrets.DEPLOY_GROUP }} \
         --s3-location bucket=${{ secrets.S3_BUCKETNAME }},bundleType=zip,key=deploy-$IMAGE_TAG.zip
