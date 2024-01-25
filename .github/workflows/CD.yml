@@ -4,7 +4,7 @@ name: Upload DockerHub
 on:
 # develop 브랜치로 push 되면 동작
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
