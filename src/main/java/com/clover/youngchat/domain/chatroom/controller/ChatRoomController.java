@@ -14,6 +14,7 @@ import com.clover.youngchat.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/chat-rooms")
 @RequiredArgsConstructor
@@ -49,6 +51,7 @@ public class ChatRoomController {
     public RestResponse<ChatRoomDetailGetRes> getDetailChatRoom(@PathVariable Long chatRoomId,
         @AuthenticationPrincipal UserDetailsImpl
             userDetails) {
+        log.info("user: {}님이 채팅방 {} 에 들어갔습니다.", userDetails.getUser().getId(), chatRoomId);
         return RestResponse.success(
             chatRoomService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
     }
