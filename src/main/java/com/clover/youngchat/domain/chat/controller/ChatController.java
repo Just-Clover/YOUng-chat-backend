@@ -1,17 +1,19 @@
 package com.clover.youngchat.domain.chat.controller;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatCreateRes;
 import com.clover.youngchat.domain.chat.dto.response.ChatDeleteRes;
+import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.service.ChatService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,14 +24,11 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping
-    public RestResponse<ChatCreateRes> inputChat(
-        @PathVariable Long chatRoomId,
-        @RequestBody ChatCreateReq req,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
-        return RestResponse.success(
-            chatService.createChat(chatRoomId, req, userDetails.getUser().getId()));
+    @SendTo("/sub/chat-rooms/{chatRoomId}/chats")
+    @MessageMapping("/chat-rooms/{chatRoomId}/chats")
+    public RestResponse<ChatRes> sendMessage(@DestinationVariable Long chatRoomId,
+        @Payload ChatCreateReq chatCreateReq) {
+        return RestResponse.success(chatService.sendMessage(chatRoomId, chatCreateReq));
     }
 
     @DeleteMapping("/{chatId}")
