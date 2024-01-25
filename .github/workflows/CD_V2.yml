@@ -66,6 +66,14 @@ jobs:
           SPRING_PROFILES_ACTIVE: prod
       run: ./gradlew bootJar
       
+    - name: pull base image
+      continue-on-error: true
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: repository_name
+      run: |
+        docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPO }}:latest
+    
     # 도커 이미지 빌드 및 ECR에 푸시
     - name: Build Docker Image and Push to Amazon ECR
       env: 
