@@ -73,6 +73,7 @@ jobs:
         REPOSITORY: ${{ secrets.ECR_REPO }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login -u AWS --password-stdin $REGISTRY
         sudo docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         sudo docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
         mkdir scripts
