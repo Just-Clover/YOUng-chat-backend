@@ -1,6 +1,8 @@
 package com.clover.youngchat.domain.chat.dto.response;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,6 +19,8 @@ public class ChatRes {
     private String profileImage;
     private String message;
     private boolean isDeleted;
+    
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime messageTime;
 
     @Builder

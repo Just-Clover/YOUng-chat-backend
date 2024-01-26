@@ -49,7 +49,7 @@ dependencies {
     // lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    
+
     // query-dsl
     implementation("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
     annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
@@ -60,7 +60,7 @@ dependencies {
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    
+
     // jwt test
     testCompileOnly("io.jsonwebtoken:jjwt-api:0.11.5")
     testRuntimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
@@ -80,6 +80,20 @@ dependencies {
     // email
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
+    // websocket
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+    // rabbit
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+    // reactor-netty * 필수 외부 STOMP 사용*
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty")
+
+    // rabbit jackson
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.1")
+
+    //jackson2json LocalDateTime handling
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2")
 }
 
 tasks.withType<Test> {
