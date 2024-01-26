@@ -73,7 +73,7 @@ public class RabbitConfig {
         factory.setPort(rabbitmqPort);
         factory.setUsername(rabbitmqUsername);
         factory.setPassword(rabbitmqPassword);
-
+        factory.setVirtualHost("/");
         return factory;
     }
 
