@@ -36,8 +36,6 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
-      with: 
-        mask-password: 'true'
       
     # prod yml 생성
     - name: make application-prod.yml
@@ -66,7 +64,7 @@ jobs:
           SPRING_PROFILES_ACTIVE: prod
       run: ./gradlew bootJar
     
-    # 도커 이미지 빌드 및 ECR에 푸시, 배포파일 세팅
+    # 도커 이미지 빌드 및 ECR에 푸시
     - name: Build Docker Image and Push to Amazon ECR
       env: 
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -76,11 +74,15 @@ jobs:
         aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login -u AWS --password-stdin $REGISTRY
         sudo docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         sudo docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+    #  배포파일 세팅
+    - name: Prepare deployment scripts and appspec.yml
+      run: |
         mkdir scripts
         touch scripts/deploy.sh
         echo "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin $REGISTRY" >> scripts/deploy.sh
         echo "sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
-        echo "sudo docker run -p 8080:8080 -e PROFILE=dev -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+        echo "sudo docker run -p 8080:8080 -e PROFILE=prod -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
    
     - name: upload to s3
       env:
