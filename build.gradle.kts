@@ -82,6 +82,18 @@ dependencies {
 
     // websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+    // rabbit
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+    // reactor-netty * 필수 외부 STOMP 사용*
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty")
+
+    // rabbit jackson
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.1")
+
+    //jackson2json LocalDateTime handling
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2")
 }
 
 tasks.withType<Test> {

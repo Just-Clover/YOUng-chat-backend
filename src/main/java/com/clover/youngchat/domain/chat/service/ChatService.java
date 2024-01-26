@@ -19,6 +19,8 @@ import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +33,16 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final UserRepository userRepository;
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${rabbitmq.exchange.name}")
+    private String exchangeName;
+
+    @Value("${rabbitmq.queue.name}")
+    private String queueName;
 
     @Transactional
-    public ChatRes sendMessage(Long chatRoomId, ChatCreateReq req) {
+    public void sendMessage(Long chatRoomId, ChatCreateReq req) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
 
@@ -50,11 +59,11 @@ public class ChatService {
             .chatRoom(chatRoom)
             .build());
 
+        rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
+
         log.info("Message [{}] send by member: {} to chatting room: {}", req.getMessage(),
             user.getId(),
             chatRoom.getId());
-
-        return ChatRes.to(chat);
     }
 
     @Transactional

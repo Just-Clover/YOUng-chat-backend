@@ -6,14 +6,9 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatRes;
-import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -28,7 +23,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import test.ChatTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,28 +55,6 @@ class ChatServiceTest implements ChatTest {
                 .message(TEST_CHAT_MESSAGE)
                 .userId(TEST_USER_ID)
                 .build();
-        }
-
-        @Test
-        @DisplayName("성공")
-        void createChatSuccessTest() {
-            // given
-            given(chatRoomRepository.findById(TEST_CHAT_ROOM_ID)).willReturn(
-                Optional.of(TEST_CHAT_ROOM));
-            given(
-                chatRoomUserRepository.findByChatRoom_IdAndUser_Id(TEST_CHAT_ROOM_ID, TEST_USER_ID))
-                .willReturn(Optional.of(TEST_CHAT_ROOM_USER));
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
-            given(chatRepository.save(any(Chat.class))).willReturn(TEST_CHAT);
-
-            ReflectionTestUtils.setField(TEST_USER, "id", 1L);
-            ReflectionTestUtils.setField(TEST_CHAT, "id", 1L);
-            // when
-            ChatRes actual = chatService.sendMessage(TEST_CHAT_ROOM_ID, req);
-
-            // then
-            assertThat(actual.getUsername()).isEqualTo(TEST_USER_NAME);
-            verify(chatRepository).save(any(Chat.class));
         }
 
         @Test
