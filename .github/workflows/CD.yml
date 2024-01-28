@@ -82,7 +82,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker-compose -f $COMPOSE down --volumes
+            sudo docker-compose -f $COMPOSE down
+            sudo docker volume prune
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
             sudo docker-compose -f $COMPOSE up -d
             sudo docker rmi $(sudo docker images -f "dangling=true" -q)
