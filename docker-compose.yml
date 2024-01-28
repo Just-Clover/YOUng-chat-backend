@@ -16,6 +16,11 @@ services:
       RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
     networks:
       - rabbitmq_net
+    command: >
+      bash -c '
+        rabbitmq-plugins enable rabbitmq_stomp;
+        rabbitmq-server
+      '
 
   web:
     container_name: youngchat
