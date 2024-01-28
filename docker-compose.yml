@@ -1,19 +1,18 @@
-version: '3'
+version: '3.7'
 services:
   rabbitmq:
-    image: rabbitmq:latest
+    image: rabbitmq:3.12.12-management
     container_name: rabbitmq
     volumes:
-      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
-      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
-      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_log:/var/log/rabbitmq/
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "youngchat123!!"
-      RABBITMQ_LOGS: "/home/ubuntu/var/log/rabbitmq/rabbit.log"
+      RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
   web:
     container_name: youngchat
     image: yongcowhee/youngchat-repo
