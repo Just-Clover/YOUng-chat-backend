@@ -64,7 +64,7 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
 
-      # 서버에서 Docker 이미지 실행
+      # 서버에서 Docker compose 실행
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
         with:
@@ -73,8 +73,5 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker-compose -f down
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
-            sudo docker-compose -f up -d
-            sudo docker rmi $(sudo docker images -f "dangling=true" -q)
-            sudo docker volume prune
+            sudo docker-compose down
+            sudo docker-compose up
