@@ -67,16 +67,14 @@ jobs:
       # 서버에서 Docker 이미지 실행
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
-        env:
-          COMPOSE: "/root/docker-compose.yml"
         with:
           host: ${{ secrets.EC2_HOST }}
           port: ${{ secrets.EC2_PORT }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker-compose -f $COMPOSE down
-            sudo docker volume prune
+            sudo docker-compose -f down
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
-            sudo docker-compose -f $COMPOSE up -d
+            sudo docker-compose -f up -d
             sudo docker rmi $(sudo docker images -f "dangling=true" -q)
+            sudo docker volume prune
