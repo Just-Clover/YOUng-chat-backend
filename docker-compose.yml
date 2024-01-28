@@ -11,8 +11,8 @@ services:
       - "15672:15672"
       - "61613:61613"
     environment:
-      RABBITMQ_DEFAULT_USER: "admin"
-      RABBITMQ_DEFAULT_PASS: "youngchat123!!"
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
       RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
     networks:
       - rabbitmq_net
