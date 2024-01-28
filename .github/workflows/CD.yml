@@ -64,11 +64,15 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
 
+      # DockerCompose 파일 ec2로 복사
+      - name: Copy docker-compose.yml to EC2
+        run: scp -i ${{ secrets.EC2_KEY }} ./docker-compose.yml ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu
+
       # 서버에서 Docker compose 실행
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
         env:
-          COMPOSE: ./docker-compose.yml
+          COMPOSE: "/home/ubuntu"
         with:
           host: ${{ secrets.EC2_HOST }}
           port: ${{ secrets.EC2_PORT }}
