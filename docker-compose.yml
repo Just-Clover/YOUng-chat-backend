@@ -13,7 +13,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "youngchat123!!"
-      RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
+      RABBITMQ_LOGS: "/home/ubuntu/var/log/rabbitmq/rabbit.log"
   web:
     container_name: youngchat
     image: yongcowhee/youngchat-repo
