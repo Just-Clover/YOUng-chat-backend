@@ -72,7 +72,7 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
-          source: "docker-compose.yml"
+          source: "./docker-compose.yml"
           target: "/home/ubuntu/"
 
       # 서버에서 Docker compose 실행
@@ -84,6 +84,6 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker-compose pull
+            cd /home/ubuntu
             sudo docker-compose down
             sudo docker-compose up -d
