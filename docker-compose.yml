@@ -1,5 +1,18 @@
 version: '3'
 services:
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: rabbitmq
+    volumes:
+      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "youngchat123!!"
   web:
     container_name: youngchat
     image: yongcowhee/youngchat-repo
