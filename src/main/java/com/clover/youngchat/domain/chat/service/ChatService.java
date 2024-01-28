@@ -17,6 +17,7 @@ import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -38,9 +39,6 @@ public class ChatService {
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
 
-    @Value("${rabbitmq.queue.name}")
-    private String queueName;
-
     @Transactional
     public void sendMessage(Long chatRoomId, ChatCreateReq req) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
@@ -61,6 +59,10 @@ public class ChatService {
 
         rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
 
+        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId);
+
+        sendMessagesToUsers(userIds);
+
         log.info("Message [{}] send by member: {} to chatting room: {}", req.getMessage(),
             user.getId(),
             chatRoom.getId());
@@ -78,5 +80,22 @@ public class ChatService {
         chat.deleteChat();
 
         return new ChatDeleteRes();
+    }
+
+    private List<Long> getUserIdListByChatRoomId(Long chatRoomId) {
+        List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findChatRoomUserByChatRoomId(
+                chatRoomId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
+
+        return chatRoomUsers.stream()
+            .map(chatRoomUser -> chatRoomUser.getUser().getId())
+            .toList();
+    }
+
+    private void sendMessagesToUsers(List<Long> userIds) {
+        userIds.forEach(userId -> {
+            String routingKey = "users." + userId;
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, "Test");
+        });
     }
 }
