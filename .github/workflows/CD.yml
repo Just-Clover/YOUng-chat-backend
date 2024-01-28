@@ -1,6 +1,5 @@
 name: Run Youngchat Via DockerHub, EC2
 
-
 on:
   # develop 브랜치로 push 되면 동작
   push:
@@ -84,6 +83,5 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker-compose pull
             sudo docker-compose down
             sudo docker-compose up -d
