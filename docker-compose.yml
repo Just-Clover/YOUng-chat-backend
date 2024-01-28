@@ -9,13 +9,14 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+      - "61613:61613"
     environment:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "youngchat123!!"
       RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
-
     networks:
       - rabbitmq_net
+
   web:
     container_name: youngchat
     image: yongcowhee/youngchat-repo
