@@ -76,4 +76,4 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             sudo docker-compose -f $COMPOSE down
-            sudo docker-compose -f $COMPOSE up -d
+            sudo docker-compose -f $COMPOSE up
