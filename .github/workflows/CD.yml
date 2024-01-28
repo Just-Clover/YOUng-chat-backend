@@ -68,12 +68,12 @@ jobs:
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
         env:
-          COMPOSE: "./docker-compose.yml"
+          COMPOSE: ./docker-compose.yml
         with:
           host: ${{ secrets.EC2_HOST }}
           port: ${{ secrets.EC2_PORT }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker-compose -f $COMPOSE $down
-            sudo docker-compose -f $COMPOSE up -d --force-recreate --build
+            sudo docker-compose -f $COMPOSE down
+            sudo docker-compose -f $COMPOSE up -d
