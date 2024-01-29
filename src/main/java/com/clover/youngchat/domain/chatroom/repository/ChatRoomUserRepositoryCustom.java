@@ -10,5 +10,5 @@ public interface ChatRoomUserRepositoryCustom {
 
     Optional<ChatRoom> findChatRoomIdByOnlyTwoUsers(Long userId1, Long userId2);
 
-    Optional<List<Long>> findUserIdByChatRoomId(Long chatRoomId, Long userId);
+    Optional<List<Long>> getOtherUsersInChatRoom(Long chatRoomId, Long userId);
 }

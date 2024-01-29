@@ -41,7 +41,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
     }
 
     @Override
-    public Optional<List<Long>> findUserIdByChatRoomId(Long chatRoomId, Long userId) {
+    public Optional<List<Long>> getOtherUsersInChatRoom(Long chatRoomId, Long userId) {
         QChatRoomUser chatRoomUser = QChatRoomUser.chatRoomUser;
 
         return Optional.ofNullable(

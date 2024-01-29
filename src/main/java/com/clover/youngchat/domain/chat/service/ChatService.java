@@ -90,7 +90,7 @@ public class ChatService {
     }
 
     private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
-        return chatRoomUserRepository.findUserIdByChatRoomId(chatRoomId, userId)
+        return chatRoomUserRepository.getOtherUsersInChatRoom(chatRoomId, userId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
     }
 }
