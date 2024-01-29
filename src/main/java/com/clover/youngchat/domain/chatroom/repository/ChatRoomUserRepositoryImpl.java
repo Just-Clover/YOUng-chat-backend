@@ -2,9 +2,11 @@ package com.clover.youngchat.domain.chatroom.repository;
 
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.QChatRoomUser;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
@@ -36,5 +38,18 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
             .fetchOne();
 
         return Optional.ofNullable(chatRoom);
+    }
+
+    @Override
+    public Optional<List<Long>> findUserIdByChatRoomId(Long chatRoomId, Long userId) {
+        QChatRoomUser chatRoomUser = QChatRoomUser.chatRoomUser;
+
+        return Optional.ofNullable(
+            queryFactory.select(Projections.constructor(Long.class, chatRoomUser.user.id))
+                .from(chatRoomUser)
+                .where(chatRoomUser.chatRoom.id.in(chatRoomId))
+                .groupBy(chatRoomUser.user.id)
+                .having(chatRoomUser.user.id.notIn(userId))
+                .fetch());
     }
 }

@@ -59,7 +59,7 @@ public class ChatService {
 
         rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
 
-        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId);
+        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
 
         sendMessagesToUsers(userIds);
 
@@ -82,14 +82,9 @@ public class ChatService {
         return new ChatDeleteRes();
     }
 
-    private List<Long> getUserIdListByChatRoomId(Long chatRoomId) {
-        List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findChatRoomUserByChatRoomId(
-                chatRoomId)
+    private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
+        return chatRoomUserRepository.findUserIdByChatRoomId(chatRoomId, userId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
-
-        return chatRoomUsers.stream()
-            .map(chatRoomUser -> chatRoomUser.getUser().getId())
-            .toList();
     }
 
     private void sendMessagesToUsers(List<Long> userIds) {
