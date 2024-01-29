@@ -18,7 +18,5 @@ public interface ChatRoomUserRepository extends ChatRoomUserRepositoryCustom {
 
     void delete(ChatRoomUser chatRoomUser);
 
-    Optional<List<ChatRoomUser>> findChatRoomUserByChatRoomId(Long chatRoomId);
-
     List<ChatRoomUser> saveAll(Iterable<ChatRoomUser> chatRoomUsers);
 }
