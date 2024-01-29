@@ -3,6 +3,7 @@ package com.clover.youngchat.global.config;
 import com.clover.youngchat.global.jwt.JwtUtil;
 import com.clover.youngchat.global.security.FilterChannelInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -16,6 +17,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @Value("${spring.rabbitmq.username}")
+    private String rabbitmqUsername;
+
+    @Value("${spring.rabbitmq.password}")
+    private String rabbitmqPassword;
+
     private final JwtUtil jwtUtil;
 
     @Override
@@ -28,7 +35,11 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
-        registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
+        registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
+            .setRelayHost("rabbitmq")
+            .setRelayPort(61613)
+            .setClientLogin(rabbitmqUsername)
+            .setClientPasscode(rabbitmqPassword);
 
     }
 

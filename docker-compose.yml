@@ -1,7 +1,39 @@
-version: '3'
+version: '3.7'
 services:
+  rabbitmq:
+    image: rabbitmq:3.12.12-management
+    container_name: rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_log:/var/log/rabbitmq/
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "61613:61613"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      RABBITMQ_LOGS: "/var/log/rabbitmq/rabbit.log"
+    networks:
+      - rabbitmq_net
+    command: >
+      bash -c '
+        rabbitmq-plugins enable rabbitmq_stomp;
+        rabbitmq-server
+      '
+
   web:
     container_name: youngchat
     image: yongcowhee/youngchat-repo
     ports:
       - '8080:8080'
+    networks:
+      - rabbitmq_net
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_log:
+
+networks:
+  rabbitmq_net:
+    driver: bridge
