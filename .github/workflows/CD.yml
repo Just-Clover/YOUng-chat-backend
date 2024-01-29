@@ -1,9 +1,9 @@
 name: Run Youngchat Via DockerHub, EC2
 
 on:
-  # develop 브랜치로 push 되면 동작
+  # main 브랜치로 push 되면 동작
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
