@@ -51,7 +51,7 @@ public class ChatRoomService {
         User friend = findByUserId(req.getFriendId());
 
         ChatRoom chatRoom = chatRoomUserRepository
-            .findChatRoomIdByOnlyTwoUsers(user.getId(), friend.getId())
+            .findChatRoomByOnlyTwoUsers(user.getId(), friend.getId())
             .orElseGet(() -> {
                 String title = determineChatRoomTitle(req.getTitle(), user, friend);
                 return saveChatRoom(title, Arrays.asList(user, friend));

@@ -103,7 +103,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
-            given(chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(any(), any()))
+            given(chatRoomUserRepository.findChatRoomByOnlyTwoUsers(any(), any()))
                 .willReturn(Optional.empty());
 
             PrivateChatRoomCreateRes res = chatRoomService.createPrivateChatRoom(req, TEST_USER);
@@ -122,7 +122,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
-            given(chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(any(), any()))
+            given(chatRoomUserRepository.findChatRoomByOnlyTwoUsers(any(), any()))
                 .willReturn(Optional.of(chatRoom));
 
             PrivateChatRoomCreateRes res = chatRoomService.createPrivateChatRoom(req, TEST_USER);

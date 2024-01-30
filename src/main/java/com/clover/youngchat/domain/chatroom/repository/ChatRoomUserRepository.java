@@ -27,5 +27,5 @@ public interface ChatRoomUserRepository extends ChatRoomUserRepositoryCustom {
         + "GROUP BY c.id "
         + "HAVING COUNT(cu.chatRoom.id) = 2 AND "
         + "SUM(CASE WHEN cu.user.id IN (:userId, :friendId) THEN 1 ELSE 0 END) = 2")
-    Optional<ChatRoom> findChatRoomIdByOnlyTwoUsers(Long userId, Long friendId);
+    Optional<ChatRoom> findChatRoomByOnlyTwoUsers(Long userId, Long friendId);
 }
