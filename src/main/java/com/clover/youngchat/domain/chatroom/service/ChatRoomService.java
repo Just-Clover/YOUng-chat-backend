@@ -43,13 +43,9 @@ public class ChatRoomService {
     @Transactional
     public ChatRoomCreateRes createChatRoom(ChatRoomCreateReq req, User user) {
         List<User> friends = req.getFriendIds().stream()
-            .map(
-                friendId -> userRepository.findById(friendId).orElseThrow(()
-                    -> new GlobalException(ResultCode.NOT_FOUND_USER))
-            ).toList();
+            .map(this::findByUserId).toList();
 
         ChatRoom chatRoom;
-
         // 1:1 채팅일 경우
         if (friends.size() == 1) {
             chatRoom = chatRoomUserRepository
@@ -132,6 +128,11 @@ public class ChatRoomService {
     private ChatRoom findById(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
             new GlobalException(NOT_FOUND_CHATROOM));
+    }
+
+    private User findByUserId(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+            new GlobalException(ResultCode.NOT_FOUND_USER));
     }
 
     private String setChatRoomTitle(User user, List<User> friends) {
