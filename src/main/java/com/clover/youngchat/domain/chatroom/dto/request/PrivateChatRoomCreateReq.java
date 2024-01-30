@@ -1,6 +1,5 @@
 package com.clover.youngchat.domain.chatroom.dto.request;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,14 +7,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatRoomCreateReq {
+public class PrivateChatRoomCreateReq {
 
-    private List<Long> friendIds;
+    private Long friendId;
     private String title;
 
     @Builder
-    private ChatRoomCreateReq(List<Long> friendIds, String title) {
-        this.friendIds = friendIds;
+    private PrivateChatRoomCreateReq(Long friendId, String title) {
+        this.friendId = friendId;
         this.title = title;
     }
 }
