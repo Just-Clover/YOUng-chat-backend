@@ -19,11 +19,11 @@ import static test.ChatTest.TEST_CHAT_MESSAGE;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
-import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.request.PrivateChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.PrivateChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
@@ -91,41 +91,41 @@ public class ChatRoomServiceTest implements ChatRoomTest {
     }
 
     @Nested
-    @DisplayName("채팅방 생성")
-    class createChatRoom {
+    @DisplayName("1:1 채팅방 생성")
+    class createPrivateChatRoom {
 
         @Test
         @DisplayName("1:1 채팅방 생성 성공 : 해당 유저랑 1:1 채팅방이 없는 경우")
-        void createChatRoomSuccess() {
-            ChatRoomCreateReq req = ChatRoomCreateReq.builder()
+        void createPrivateChatRoomSuccess() {
+            PrivateChatRoomCreateReq req = PrivateChatRoomCreateReq.builder()
                 .title(TEST_CHAT_ROOM_TITLE_BLANK)
-                .friendIds(List.of(ANOTHER_TEST_USER_ID))
+                .friendId(ANOTHER_TEST_USER_ID)
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
             given(chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(any(), any()))
                 .willReturn(Optional.empty());
 
-            ChatRoomCreateRes res = chatRoomService.createChatRoom(req, TEST_USER);
+            PrivateChatRoomCreateRes res = chatRoomService.createPrivateChatRoom(req, TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(chatRoomRepository, times(1)).save(any());
-            verify(chatRoomUserRepository, times(1)).saveAll(any());
+            verify(chatRoomUserRepository, times(2)).save(any());
         }
 
         @Test
         @DisplayName("1:1 채팅방 생성 성공 : 해당 유저랑 1:1채팅방이 이미 있는 경우")
-        void createChatRoomSuccess_alreadyExist() {
-            ChatRoomCreateReq req = ChatRoomCreateReq.builder()
+        void createPrivateChatRoomSuccess_alreadyExist() {
+            PrivateChatRoomCreateReq req = PrivateChatRoomCreateReq.builder()
                 .title(TEST_CHAT_ROOM_TITLE_BLANK)
-                .friendIds(List.of(ANOTHER_TEST_USER_ID))
+                .friendId(ANOTHER_TEST_USER_ID)
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
             given(chatRoomUserRepository.findChatRoomIdByOnlyTwoUsers(any(), any()))
                 .willReturn(Optional.of(chatRoom));
 
-            ChatRoomCreateRes res = chatRoomService.createChatRoom(req, TEST_USER);
+            PrivateChatRoomCreateRes res = chatRoomService.createPrivateChatRoom(req, TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(chatRoomRepository, times(0)).save(any());
@@ -135,16 +135,16 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
         @Test
         @DisplayName("채팅방 생성 실패 : 존재하지 않는 유저")
-        void createChatRoomFail_NotFoundUser() {
-            ChatRoomCreateReq req = ChatRoomCreateReq.builder()
+        void createPrivateChatRoomFail_NotFoundUser() {
+            PrivateChatRoomCreateReq req = PrivateChatRoomCreateReq.builder()
                 .title(TEST_CHAT_ROOM_TITLE)
-                .friendIds(List.of(ANOTHER_TEST_USER_ID))
+                .friendId(ANOTHER_TEST_USER_ID)
                 .build();
 
             given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatRoomService.createChatRoom(req, TEST_USER));
+                () -> chatRoomService.createPrivateChatRoom(req, TEST_USER));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_USER.getMessage());

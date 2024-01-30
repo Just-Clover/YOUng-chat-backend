@@ -8,14 +8,16 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROO
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
-import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.request.GroupChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.PrivateChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomPaginationDetailGetRes;
+import com.clover.youngchat.domain.chatroom.dto.response.GroupChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.PrivateChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -35,30 +37,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
+    private static final Integer PRIVATE_CHATROOM_SIZE = 1;
+    private static final Integer COUNT_ONE_FRIEND = 1;
+
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
 
     @Transactional
-    public ChatRoomCreateRes createChatRoom(ChatRoomCreateReq req, User user) {
+    public PrivateChatRoomCreateRes createPrivateChatRoom(PrivateChatRoomCreateReq req, User user) {
+        User friend = findByUserId(req.getFriendId());
+
+        ChatRoom chatRoom = chatRoomUserRepository
+            .findChatRoomIdByOnlyTwoUsers(user.getId(), friend.getId())
+            .orElseGet(() -> {
+                String title = req.getTitle().isBlank() ?
+                    setChatRoomTitle(user, friend, PRIVATE_CHATROOM_SIZE) : req.getTitle();
+                return savePrivateChatRoom(title, user, friend);
+            });
+        return PrivateChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
+    }
+
+    @Transactional
+    public GroupChatRoomCreateRes createGroupChatRoom(GroupChatRoomCreateReq req, User user) {
         List<User> friends = req.getFriendIds().stream()
             .map(this::findByUserId).toList();
 
-        ChatRoom chatRoom;
-        // 1:1 채팅일 경우
-        if (friends.size() == 1) {
-            chatRoom = chatRoomUserRepository
-                .findChatRoomIdByOnlyTwoUsers(user.getId(), friends.get(0).getId())
-                .orElseGet(()
-                    -> saveChatRoom(setChatRoomTitle(user, friends), user, friends));
-        } else {
-            String title =
-                req.getTitle().isBlank() ? setChatRoomTitle(user, friends) : req.getTitle();
-            chatRoom = saveChatRoom(title, user, friends);
-        }
+        String title = req.getTitle().isBlank() ?
+            setChatRoomTitle(user, friends.get(0), friends.size()) : req.getTitle();
 
-        return ChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
+        ChatRoom chatRoom = saveGroupChatRoom(title, user, friends);
+
+        return GroupChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
     }
 
     @Transactional
@@ -135,16 +146,29 @@ public class ChatRoomService {
             new GlobalException(ResultCode.NOT_FOUND_USER));
     }
 
-    private String setChatRoomTitle(User user, List<User> friends) {
-        if (friends.size() == 1) {
-            return String.format("%s, %s의 채팅방", user.getUsername(), friends.get(0).getUsername());
+    private String setChatRoomTitle(User user, User friend, Integer chatRoomSize) {
+        if (chatRoomSize.equals(PRIVATE_CHATROOM_SIZE)) {
+            return String.format("%s, %s의 채팅방", user.getUsername(), friend.getUsername());
         }
         return String.format("%s, %s 외 %d 명",
-            user.getUsername(), friends.get(0).getUsername(), friends.size() - 1);
+            user.getUsername(), friend.getUsername(), chatRoomSize - COUNT_ONE_FRIEND);
     }
 
     @Transactional
-    protected ChatRoom saveChatRoom(String title, User user, List<User> friends) {
+    protected ChatRoom savePrivateChatRoom(String title, User user, User friend) {
+        ChatRoom chatRoom = ChatRoom.builder()
+            .title(title)
+            .build();
+        chatRoomRepository.save(chatRoom);
+
+        chatRoomUserRepository.save(ChatRoomUser.to(user, chatRoom));
+        chatRoomUserRepository.save(ChatRoomUser.to(friend, chatRoom));
+
+        return chatRoom;
+    }
+
+    @Transactional
+    protected ChatRoom saveGroupChatRoom(String title, User user, List<User> friends) {
         ChatRoom chatRoom = ChatRoom.builder()
             .title(title)
             .build();
