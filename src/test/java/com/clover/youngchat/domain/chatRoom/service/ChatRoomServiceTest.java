@@ -110,7 +110,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(chatRoomRepository, times(1)).save(any());
-            verify(chatRoomUserRepository, times(2)).save(any());
+            verify(chatRoomUserRepository, times(1)).saveAll(any());
         }
 
         @Test

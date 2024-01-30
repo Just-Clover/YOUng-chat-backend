@@ -45,7 +45,7 @@ public class ChatRoomController {
     }
 
     @PostMapping("/group")
-    public RestResponse<GroupChatRoomCreateRes> createChatRoom(
+    public RestResponse<GroupChatRoomCreateRes> createGroupChatRoom(
         @RequestBody GroupChatRoomCreateReq req,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
