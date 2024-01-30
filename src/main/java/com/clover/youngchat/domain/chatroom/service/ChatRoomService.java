@@ -35,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
+    private static final int LIMIT_SIZE = 10;
+
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ChatRepository chatRepository;
@@ -129,6 +131,23 @@ public class ChatRoomService {
             .build();
     }
 
+    @Transactional(readOnly = true)
+    public ChatRoomPaginationDetailGetRes getPaginationDetailChatRoom(Long chatRoomId,
+        Long lastChatId,
+        User user) {
+        // 채팅방에 속한 사람만 조회 가능
+        isChatRoomMember(chatRoomId, user.getId());
+        ChatRoom chatRoom = findById(chatRoomId);
+
+        Slice<ChatRes> chatResList =
+            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId, LIMIT_SIZE);
+
+        return ChatRoomPaginationDetailGetRes.builder()
+            .title(chatRoom.getTitle())
+            .chatResList(chatResList)
+            .build();
+    }
+
     private ChatRoom findById(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
             new GlobalException(NOT_FOUND_CHATROOM));
@@ -165,23 +184,5 @@ public class ChatRoomService {
         if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
             throw new GlobalException(ACCESS_DENY);
         }
-    }
-
-    @Transactional(readOnly = true)
-    public ChatRoomPaginationDetailGetRes getPaginationDetailChatRoom(Long chatRoomId,
-        Long lastChatId,
-        User user) {
-        // 채팅방에 속한 사람만 조회 가능
-        isChatRoomMember(chatRoomId, user.getId());
-        ChatRoom chatRoom = findById(chatRoomId);
-
-        int LIMIT_SIZE = 10;
-        Slice<ChatRes> chatResList =
-            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId, LIMIT_SIZE);
-
-        return ChatRoomPaginationDetailGetRes.builder()
-            .title(chatRoom.getTitle())
-            .chatResList(chatResList)
-            .build();
     }
 }
