@@ -1,9 +1,9 @@
 package com.clover.youngchat.domain.chatroom.service;
 
 
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_DETAIL_LIMIT_SIZE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.COUNT_ONE_FRIEND;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.GROUP_CHATROOM_TITLE;
-import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.LIMIT_SIZE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.PERSONAL_CHATROOM_TITLE;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
@@ -134,7 +134,8 @@ public class ChatRoomService {
         ChatRoom chatRoom = findById(chatRoomId);
 
         Slice<ChatRes> chatResList =
-            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId, LIMIT_SIZE);
+            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId,
+                CHAT_ROOM_DETAIL_LIMIT_SIZE);
 
         return ChatRoomPaginationDetailGetRes.builder()
             .title(chatRoom.getTitle())
