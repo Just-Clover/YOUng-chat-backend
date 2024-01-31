@@ -2,6 +2,7 @@ package com.clover.youngchat.domain.chatroom.service;
 
 
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_DETAIL_LIMIT_SIZE;
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_LIMIT_SIZE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.COUNT_ONE_FRIEND;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.GROUP_CHATROOM_TITLE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.PERSONAL_CHATROOM_TITLE;
@@ -102,9 +103,8 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public Slice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
         userRepository.findById(user.getId());
-        int limit = 15;
         return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
-            cursorChatId, limit);
+            cursorChatId, CHAT_ROOM_LIMIT_SIZE);
     }
 
     @Transactional(readOnly = true)
