@@ -102,7 +102,7 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public Slice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
         userRepository.findById(user.getId());
-        int limit = 3;
+        int limit = 15;
         return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
             cursorChatId, limit);
     }
