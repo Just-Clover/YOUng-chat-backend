@@ -12,9 +12,9 @@ import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,9 +42,11 @@ public class ChatRoomController {
     }
 
     @GetMapping
-    public RestResponse<List<ChatRoomAndLastChatGetRes>> getChatRoomList(
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(chatRoomService.getChatRoomList(userDetails.getUser()));
+    public RestResponse<Slice<ChatRoomAndLastChatGetRes>> getChatRoomList(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestParam(required = false) Long cursorChatId) {
+        return RestResponse.success(
+            chatRoomService.getChatRoomList(userDetails.getUser(), cursorChatId));
     }
 
     @GetMapping("/{chatRoomId}")
