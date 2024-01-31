@@ -98,7 +98,6 @@ public class ChatRoomServiceTest implements ChatRoomTest {
         @DisplayName("1:1 채팅방 생성 성공 : 해당 유저랑 1:1 채팅방이 없는 경우")
         void createPrivateChatRoomSuccess() {
             PersonalChatRoomCreateReq req = PersonalChatRoomCreateReq.builder()
-                .title(TEST_CHAT_ROOM_TITLE_BLANK)
                 .friendId(ANOTHER_TEST_USER_ID)
                 .build();
 
@@ -117,7 +116,6 @@ public class ChatRoomServiceTest implements ChatRoomTest {
         @DisplayName("1:1 채팅방 생성 성공 : 해당 유저랑 1:1채팅방이 이미 있는 경우")
         void createPrivateChatRoomSuccess_alreadyExist() {
             PersonalChatRoomCreateReq req = PersonalChatRoomCreateReq.builder()
-                .title(TEST_CHAT_ROOM_TITLE_BLANK)
                 .friendId(ANOTHER_TEST_USER_ID)
                 .build();
 
@@ -137,7 +135,6 @@ public class ChatRoomServiceTest implements ChatRoomTest {
         @DisplayName("채팅방 생성 실패 : 존재하지 않는 유저")
         void createPrivateChatRoomFail_NotFoundUser() {
             PersonalChatRoomCreateReq req = PersonalChatRoomCreateReq.builder()
-                .title(TEST_CHAT_ROOM_TITLE)
                 .friendId(ANOTHER_TEST_USER_ID)
                 .build();
 

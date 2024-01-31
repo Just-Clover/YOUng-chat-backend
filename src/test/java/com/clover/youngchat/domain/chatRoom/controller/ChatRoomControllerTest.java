@@ -33,11 +33,10 @@ public class ChatRoomControllerTest extends BaseMvcTest {
     @DisplayName("1:1 채팅방 생성 테스트 : 성공")
     void createChatRoom() throws Exception {
         PersonalChatRoomCreateReq req = PersonalChatRoomCreateReq.builder()
-            .title(TEST_CHAT_ROOM_TITLE)
             .friendId(ANOTHER_TEST_USER_ID)
             .build();
 
-        mockMvc.perform(post("/api/v1/chat-rooms/private")
+        mockMvc.perform(post("/api/v1/chat-rooms/personal")
                 .content(objectMapper.writeValueAsString(req))
                 .contentType(MediaType.APPLICATION_JSON)
                 .principal(mockPrincipal))

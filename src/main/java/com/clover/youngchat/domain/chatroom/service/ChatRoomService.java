@@ -47,14 +47,15 @@ public class ChatRoomService {
     private final UserRepository userRepository;
 
     @Transactional
-    public PersonalChatRoomCreateRes createPersonalChatRoom(PersonalChatRoomCreateReq req,
-        User user) {
+    public PersonalChatRoomCreateRes createPersonalChatRoom(
+        PersonalChatRoomCreateReq req, User user) {
         User friend = findByUserId(req.getFriendId());
 
         ChatRoom chatRoom = chatRoomUserRepository
             .findChatRoomByOnlyTwoUsers(user.getId(), friend.getId())
             .orElseGet(() -> {
-                String title = determineChatRoomTitle(req.getTitle(), user, friend);
+                String title = String.format("%s, %s의 채팅방", user.getUsername(),
+                    friend.getUsername());
                 return saveChatRoom(title, Arrays.asList(user, friend));
             });
         return PersonalChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
@@ -66,7 +67,8 @@ public class ChatRoomService {
             .map(this::findByUserId).toList());
         participants.add(user);
 
-        String title = determineChatRoomTitle(req.getTitle(), participants);
+        String title = String.format("%s 외 %d 명",
+            participants.get(0).getUsername(), participants.size() - COUNT_ONE_FRIEND);
         ChatRoom chatRoom = saveChatRoom(title, participants);
         return GroupChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
     }
@@ -160,21 +162,6 @@ public class ChatRoomService {
     private User findByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
             new GlobalException(ResultCode.NOT_FOUND_USER));
-    }
-
-    private String determineChatRoomTitle(String title, User user, User friend) {
-        if (title.isBlank()) {
-            return String.format("%s, %s의 채팅방", user.getUsername(), friend.getUsername());
-        }
-        return title;
-    }
-
-    private String determineChatRoomTitle(String title, List<User> participants) {
-        if (title.isBlank()) {
-            return String.format("%s 외 %d 명",
-                participants.get(0).getUsername(), participants.size() - COUNT_ONE_FRIEND);
-        }
-        return title;
     }
 
     @Transactional

@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 public class PersonalChatRoomCreateReq {
 
     private Long friendId;
-    private String title;
 
     @Builder
-    private PersonalChatRoomCreateReq(Long friendId, String title) {
+    private PersonalChatRoomCreateReq(Long friendId) {
         this.friendId = friendId;
-        this.title = title;
     }
 }

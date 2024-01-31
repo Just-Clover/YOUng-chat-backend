@@ -11,11 +11,9 @@ import lombok.NoArgsConstructor;
 public class GroupChatRoomCreateReq {
 
     private List<Long> friendIds;
-    private String title;
 
     @Builder
-    private GroupChatRoomCreateReq(List<Long> friendIds, String title) {
+    private GroupChatRoomCreateReq(List<Long> friendIds) {
         this.friendIds = friendIds;
-        this.title = title;
     }
 }
