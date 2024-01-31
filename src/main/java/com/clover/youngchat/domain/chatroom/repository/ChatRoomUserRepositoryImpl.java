@@ -36,9 +36,9 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
 
     @Override
     public Slice<ChatRoomAndLastChatGetRes> findChatRoomsAndLastChatByUserId(Long userId,
-        Long cursorChatRoomId,
+        Long cursorChatId,
         int limitSize) {
-        List<ChatRoomAndLastChatGetRes> resList = queryChatRooms(userId, cursorChatRoomId,
+        List<ChatRoomAndLastChatGetRes> resList = queryChatRooms(userId, cursorChatId,
             limitSize);
         return createSlice(resList, limitSize);
     }
@@ -48,13 +48,14 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
         QChatRoomUser qChatRoomUser = QChatRoomUser.chatRoomUser;
         QChatRoom qChatRoom = QChatRoom.chatRoom;
         QChat qChat = QChat.chat;
-        BooleanExpression queryCondition = createQueryCondition(qChatRoom, cursorChatRoomId);
+        BooleanExpression queryCondition = createQueryCondition(qChat, cursorChatRoomId);
 
         return queryFactory
             .select(
                 Projections.constructor(ChatRoomAndLastChatGetRes.class,
                     qChatRoom.id,
                     qChatRoom.title,
+                    qChat.id,
                     qChat.message,
                     qChat.createdAt,
                     qChat.isDeleted))
@@ -68,14 +69,15 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
                     .from(qChat)
                     .groupBy(qChat.chatRoom.id)))
             .where(queryCondition)
+            .orderBy(qChat.id.desc())
             .limit(limitSize)
             .fetch();
     }
 
-    private BooleanExpression createQueryCondition(QChatRoom chatRoom, Long cursorChatRoomId) {
-        BooleanExpression condition = chatRoom.id.eq(1L);
-        if (cursorChatRoomId != null) {
-            condition = condition.and(chatRoom.id.gt(cursorChatRoomId));
+    private BooleanExpression createQueryCondition(QChat qChat, Long cursorChatId) {
+        BooleanExpression condition = qChat.id.gt(1L);
+        if (cursorChatId != null) {
+            condition = condition.and(qChat.id.lt(cursorChatId));
         }
         return condition;
     }
