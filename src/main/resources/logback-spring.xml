@@ -1,0 +1,30 @@
+<configuration>
+  <conversionRule conversionWord="clr"
+    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <property name="CONSOLE_LOG_PATTERN"
+    value="[%d{yyyy-MM-dd HH:mm:ss}:%-4relative] %green([%-20thread]) %highlight(%-5level) [%X{traceId}] %boldWhite([%-30M:%yellow(%L)]) - %msg%n"/>
+  <property name="FILE_LOG_PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level [%X{traceId}] %logger - %msg%n"/>
+
+  <!--local-->
+  <springProfile name="local">
+    <include resource="console-appender.xml"/>
+    <include resource="file-warn-appender.xml"/>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE-WARN"/>
+    </root>
+  </springProfile>
+
+  <!--prod-->
+  <springProfile name="prod">
+    <include resource="file-error-appender.xml"/>
+
+    <root level="ERROR">
+      <appender-ref ref="FILE-ERROR"/>
+    </root>
+  </springProfile>
+
+</configuration>
