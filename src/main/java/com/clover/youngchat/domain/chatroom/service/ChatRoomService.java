@@ -1,16 +1,16 @@
 package com.clover.youngchat.domain.chatroom.service;
 
 
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_DETAIL_LIMIT_SIZE;
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_LIMIT_SIZE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.COUNT_ONE_FRIEND;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.GROUP_CHATROOM_TITLE;
-import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.LIMIT_SIZE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.PERSONAL_CHATROOM_TITLE;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
-import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.request.GroupChatRoomCreateReq;
@@ -101,23 +101,10 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
-        List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
-            .orElseThrow(() ->
-                new GlobalException(NOT_FOUND_CHATROOM));
-
-        List<ChatRoomAndLastChatGetRes> getResList = new ArrayList<>();
-
-        // TODO: 차후 로직 수정요함.
-        for (ChatRoomUser c : chatRoomUserList) {
-            Chat chat = chatRepository.findLastChatByChatRoom_Id(c.getChatRoom().getId())
-                .orElse(null);
-
-            ChatRoomAndLastChatGetRes res = ChatRoomAndLastChatGetRes.to(c.getChatRoom(), chat);
-            getResList.add(res);
-        }
-
-        return getResList;
+    public Slice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
+        userRepository.findById(user.getId());
+        return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
+            cursorChatId, CHAT_ROOM_LIMIT_SIZE);
     }
 
     @Transactional(readOnly = true)
@@ -147,7 +134,8 @@ public class ChatRoomService {
         ChatRoom chatRoom = findById(chatRoomId);
 
         Slice<ChatRes> chatResList =
-            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId, LIMIT_SIZE);
+            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId,
+                CHAT_ROOM_DETAIL_LIMIT_SIZE);
 
         return ChatRoomPaginationDetailGetRes.builder()
             .title(chatRoom.getTitle())
