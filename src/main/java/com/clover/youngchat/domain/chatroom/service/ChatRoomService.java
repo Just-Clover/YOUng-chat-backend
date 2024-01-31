@@ -6,7 +6,6 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
-import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
@@ -92,23 +91,11 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
-        List<ChatRoomUser> chatRoomUserList = chatRoomUserRepository.findByUser_Id(user.getId())
-            .orElseThrow(() ->
-                new GlobalException(NOT_FOUND_CHATROOM));
-
-        List<ChatRoomAndLastChatGetRes> getResList = new ArrayList<>();
-
-        // TODO: 차후 로직 수정요함.
-        for (ChatRoomUser c : chatRoomUserList) {
-            Chat chat = chatRepository.findLastChatByChatRoom_Id(c.getChatRoom().getId())
-                .orElse(null);
-
-            ChatRoomAndLastChatGetRes res = ChatRoomAndLastChatGetRes.to(c.getChatRoom(), chat);
-            getResList.add(res);
-        }
-
-        return getResList;
+    public Slice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
+        userRepository.findById(user.getId());
+        int limit = 3;
+        return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
+            cursorChatId, limit);
     }
 
     @Transactional(readOnly = true)
