@@ -17,13 +17,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final JwtUtil jwtUtil;
     @Value("${spring.rabbitmq.username}")
     private String rabbitmqUsername;
-
     @Value("${spring.rabbitmq.password}")
     private String rabbitmqPassword;
-
-    private final JwtUtil jwtUtil;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
