@@ -69,7 +69,7 @@ public class ChatRoomService {
         participants.add(user);
 
         String title = String.format(GROUP_CHATROOM_TITLE,
-            participants.get(0).getUsername(), participants.size() - COUNT_ONE_FRIEND);
+            user.getUsername(), participants.size() - COUNT_ONE_FRIEND);
         ChatRoom chatRoom = saveChatRoom(title, participants);
         return GroupChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
     }
