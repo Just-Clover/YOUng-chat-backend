@@ -36,8 +36,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
 
     @Override
     public Slice<ChatRoomAndLastChatGetRes> findChatRoomsAndLastChatByUserId(Long userId,
-        Long cursorChatId,
-        int limitSize) {
+        Long cursorChatId, int limitSize) {
         List<ChatRoomAndLastChatGetRes> resList = queryChatRooms(userId, cursorChatId,
             limitSize);
         return createSlice(resList, limitSize);

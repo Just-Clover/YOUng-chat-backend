@@ -20,8 +20,6 @@ import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
-import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.PersonalChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
