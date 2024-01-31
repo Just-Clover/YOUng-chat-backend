@@ -18,6 +18,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtUtil jwtUtil;
+
+    @Value("${spring.rabbitmq.port}")
+    private Integer rabbitmqPort;
+
+    @Value("${spring.rabbitmq.host}")
+    private String rabbitmqHost;
+
     @Value("${spring.rabbitmq.username}")
     private String rabbitmqUsername;
     @Value("${spring.rabbitmq.password}")
@@ -33,7 +40,11 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
-        registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
+        registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
+            .setRelayHost(rabbitmqHost)
+            .setRelayPort(61613)
+            .setClientLogin(rabbitmqUsername)
+            .setClientPasscode(rabbitmqPassword);
     }
 
     @Override
