@@ -1,9 +1,9 @@
-name: Run Youngchat Via DockerHub, EC2
+name: Push&Pull Dokcer Image and Run EC2
 
 on:
-  # main 브랜치로 push 되면 동작
+# develop 브랜치로 push 되면 동작
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -12,77 +12,69 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
 
     steps:
-      # Checkout
-      - name: Checkout
-        uses: actions/checkout@v3
+    # Checkout
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      # JDK version 설정
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+    # JDK version 설정
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: make application-prod.yml
-        if: contains(github.ref, 'develop') || contains(github.ref, 'main')
-        run: |
-          touch ./src/main/resources/application-prod.yml
-          echo "${{ secrets.PROD_YML }}" > ./src/main/resources/application-prod.yml
-        shell: bash
+    - name: make application-prod.yml
+      if: contains(github.ref, 'develop') || contains(github.ref, 'main')
+      run: |
+        touch ./src/main/resources/application-prod.yml
+        echo "${{ secrets.PROD_YML }}" > ./src/main/resources/application-prod.yml
+      shell: bash
 
-      # 캐시를 통해 빌드 시간 단축
-      - name: Gradle Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+    # 캐시를 통해 빌드 시간 단축
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        env:
+    - name: Build with Gradle
+      env:
           SPRING_PROFILES_ACTIVE: prod
-        run: ./gradlew bootJar
+      run: ./gradlew bootJar
+      
+  # Docker 로그인
+    - name: Docker Hub login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Docker 로그인
-      - name: Docker Hub login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build Docker image and Docker Hub Push
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
-
-      # DockerCompose 파일 ec2로 복사
-      - name: Copy docker-compose.yml to EC2
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          port: ${{ secrets.EC2_PORT }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "./docker-compose.yml"
-          target: "/home/ubuntu/"
-
-      # 서버에서 Docker compose 실행
-      - name: EC2 Docker Run
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          port: ${{ secrets.EC2_PORT }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            sudo docker-compose pull
-            sudo docker-compose down
-            sudo docker-compose up -d
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo .
+      
+    - name: Docker Hub push
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
+            
+    # 서버에서 Docker 이미지 실행
+    - name: EC2 Docker Run
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        port: ${{ secrets.EC2_PORT }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
+          sudo docker stop youngchat-container
+          sudo docker rm youngchat-container
+          sudo docker run -d -p 8080:8080 --name youngchat-container ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
+          sudo docker rmi $(sudo docker images -f "dangling=true" -q)
