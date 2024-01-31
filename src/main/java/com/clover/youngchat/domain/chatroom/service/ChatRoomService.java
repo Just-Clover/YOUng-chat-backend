@@ -1,6 +1,10 @@
 package com.clover.youngchat.domain.chatroom.service;
 
 
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.COUNT_ONE_FRIEND;
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.GROUP_CHATROOM_TITLE;
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.LIMIT_SIZE;
+import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.PERSONAL_CHATROOM_TITLE;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
@@ -38,9 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
-    private static final int LIMIT_SIZE = 10;
-    private static final int COUNT_ONE_FRIEND = 1;
-
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ChatRepository chatRepository;
@@ -54,7 +55,7 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomUserRepository
             .findChatRoomByOnlyTwoUsers(user.getId(), friend.getId())
             .orElseGet(() -> {
-                String title = String.format("%s, %s의 채팅방", user.getUsername(),
+                String title = String.format(PERSONAL_CHATROOM_TITLE, user.getUsername(),
                     friend.getUsername());
                 return saveChatRoom(title, Arrays.asList(user, friend));
             });
@@ -67,7 +68,7 @@ public class ChatRoomService {
             .map(this::findByUserId).toList());
         participants.add(user);
 
-        String title = String.format("%s 외 %d 명",
+        String title = String.format(GROUP_CHATROOM_TITLE,
             participants.get(0).getUsername(), participants.size() - COUNT_ONE_FRIEND);
         ChatRoom chatRoom = saveChatRoom(title, participants);
         return GroupChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
