@@ -14,15 +14,17 @@ public class ChatRoomAndLastChatGetRes {
 
     private Long chatRoomId;
     private String title;
+    private Long chatId;
     private String lastChat;
     private LocalDateTime lastChatTime;
     private boolean lastChatDeleted;
 
     @Builder
-    private ChatRoomAndLastChatGetRes(Long chatRoomId, String title, String lastChat,
+    public ChatRoomAndLastChatGetRes(Long chatRoomId, String title, Long chatId, String lastChat,
         LocalDateTime lastChatTime, boolean lastChatDeleted) {
         this.chatRoomId = chatRoomId;
         this.title = title;
+        this.chatId = chatId;
         this.lastChat = lastChat;
         this.lastChatTime = lastChatTime;
         this.lastChatDeleted = lastChatDeleted;
@@ -32,9 +34,10 @@ public class ChatRoomAndLastChatGetRes {
         return ChatRoomAndLastChatGetRes.builder()
             .chatRoomId(chatRoom.getId())
             .title(chatRoom.getTitle())
-            .lastChatDeleted(chat == null || chat.isDeleted())
-            .lastChat((chat == null) ? "" : chat.getMessage())
-            .lastChatTime((chat == null) ? chatRoom.getCreatedAt() : chat.getCreatedAt())
+            .chatId(chat.getId())
+            .lastChatDeleted(chat.isDeleted())
+            .lastChat(chat.getMessage())
+            .lastChatTime(chat.getCreatedAt())
             .build();
     }
 }
