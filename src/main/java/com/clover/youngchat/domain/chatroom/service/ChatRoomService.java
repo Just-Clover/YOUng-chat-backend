@@ -170,11 +170,11 @@ public class ChatRoomService {
         ChatRoom chatRoom = ChatRoom.builder()
             .title(title)
             .build();
-        chatRoomRepository.save(chatRoom);
+        ChatRoom saveChatRoom = chatRoomRepository.save(chatRoom);
 
         List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
         for (User participant : participants) {
-            chatRoomUsers.add(ChatRoomUser.to(participant, chatRoom));
+            chatRoomUsers.add(ChatRoomUser.to(participant, saveChatRoom));
         }
         chatRoomUserRepository.saveAll(chatRoomUsers);
 
