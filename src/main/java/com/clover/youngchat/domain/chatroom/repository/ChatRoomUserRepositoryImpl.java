@@ -6,6 +6,7 @@ import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.QChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.QChatRoomUser;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
@@ -53,7 +54,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
         int limitSize) {
         List<ChatRoomAndLastChatGetRes> resList = queryChatRooms(userId, cursorChatRoomId,
             limitSize);
-        return null;
+        return createSlice(resList, limitSize);
     }
 
     private List<ChatRoomAndLastChatGetRes> queryChatRooms(Long userId, Long cursorChatRoomId,
@@ -61,6 +62,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
         QChatRoomUser qChatRoomUser = QChatRoomUser.chatRoomUser;
         QChatRoom qChatRoom = QChatRoom.chatRoom;
         QChat qChat = QChat.chat;
+        BooleanExpression queryCondition = createQueryCondition(qChatRoom, cursorChatRoomId);
 
         return queryFactory
             .select(
@@ -79,9 +81,18 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
                     .select(qChat.chatRoom.id, qChat.createdAt.max())
                     .from(qChat)
                     .groupBy(qChat.chatRoom.id)))
+            .where(queryCondition)
+            .limit(limitSize)
             .fetch();
     }
 
+    private BooleanExpression createQueryCondition(QChatRoom chatRoom, Long cursorChatRoomId) {
+        BooleanExpression condition = chatRoom.id.eq(1L);
+        if (cursorChatRoomId != null) {
+            condition = condition.and(chatRoom.id.gt(cursorChatRoomId));
+        }
+        return condition;
+    }
 
     private Slice<ChatRoomAndLastChatGetRes> createSlice(List<ChatRoomAndLastChatGetRes> res,
         int limitSize) {
