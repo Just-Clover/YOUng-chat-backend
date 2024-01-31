@@ -7,19 +7,19 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PrivateChatRoomCreateRes {
+public class PersonalChatRoomCreateRes {
 
     private Long chatRoomId;
     private String title;
 
     @Builder
-    private PrivateChatRoomCreateRes(Long chatRoomId, String title) {
+    private PersonalChatRoomCreateRes(Long chatRoomId, String title) {
         this.chatRoomId = chatRoomId;
         this.title = title;
     }
 
-    public static PrivateChatRoomCreateRes to(Long chatRoomId, String title) {
-        return PrivateChatRoomCreateRes.builder()
+    public static PersonalChatRoomCreateRes to(Long chatRoomId, String title) {
+        return PersonalChatRoomCreateRes.builder()
             .chatRoomId(chatRoomId)
             .title(title)
             .build();

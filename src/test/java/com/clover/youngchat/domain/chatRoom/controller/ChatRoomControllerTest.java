@@ -15,7 +15,7 @@ import static test.ChatRoomTest.TEST_CHAT_ROOM_TITLE;
 import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.chatroom.controller.ChatRoomController;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
-import com.clover.youngchat.domain.chatroom.dto.request.PrivateChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class ChatRoomControllerTest extends BaseMvcTest {
     @Test
     @DisplayName("1:1 채팅방 생성 테스트 : 성공")
     void createChatRoom() throws Exception {
-        PrivateChatRoomCreateReq req = PrivateChatRoomCreateReq.builder()
+        PersonalChatRoomCreateReq req = PersonalChatRoomCreateReq.builder()
             .title(TEST_CHAT_ROOM_TITLE)
             .friendId(ANOTHER_TEST_USER_ID)
             .build();

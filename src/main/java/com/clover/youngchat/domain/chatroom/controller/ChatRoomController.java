@@ -2,14 +2,14 @@ package com.clover.youngchat.domain.chatroom.controller;
 
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.request.GroupChatRoomCreateReq;
-import com.clover.youngchat.domain.chatroom.dto.request.PrivateChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomPaginationDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.GroupChatRoomCreateRes;
-import com.clover.youngchat.domain.chatroom.dto.response.PrivateChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.PersonalChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
@@ -36,12 +36,12 @@ public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
 
-    @PostMapping("/private")
-    public RestResponse<PrivateChatRoomCreateRes> createPrivateChatRoom(
-        @RequestBody PrivateChatRoomCreateReq req,
+    @PostMapping("/personal")
+    public RestResponse<PersonalChatRoomCreateRes> createPersonalChatRoom(
+        @RequestBody PersonalChatRoomCreateReq req,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatRoomService.createPrivateChatRoom(req, userDetails.getUser()));
+            chatRoomService.createPersonalChatRoom(req, userDetails.getUser()));
     }
 
     @PostMapping("/group")

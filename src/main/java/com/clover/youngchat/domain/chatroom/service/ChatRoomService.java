@@ -10,14 +10,14 @@ import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.request.GroupChatRoomCreateReq;
-import com.clover.youngchat.domain.chatroom.dto.request.PrivateChatRoomCreateReq;
+import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomEditRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomPaginationDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.GroupChatRoomCreateRes;
-import com.clover.youngchat.domain.chatroom.dto.response.PrivateChatRoomCreateRes;
+import com.clover.youngchat.domain.chatroom.dto.response.PersonalChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -47,7 +47,8 @@ public class ChatRoomService {
     private final UserRepository userRepository;
 
     @Transactional
-    public PrivateChatRoomCreateRes createPrivateChatRoom(PrivateChatRoomCreateReq req, User user) {
+    public PersonalChatRoomCreateRes createPersonalChatRoom(PersonalChatRoomCreateReq req,
+        User user) {
         User friend = findByUserId(req.getFriendId());
 
         ChatRoom chatRoom = chatRoomUserRepository
@@ -56,7 +57,7 @@ public class ChatRoomService {
                 String title = determineChatRoomTitle(req.getTitle(), user, friend);
                 return saveChatRoom(title, Arrays.asList(user, friend));
             });
-        return PrivateChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
+        return PersonalChatRoomCreateRes.to(chatRoom.getId(), chatRoom.getTitle());
     }
 
     @Transactional
