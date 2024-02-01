@@ -43,8 +43,8 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
             .setRelayHost(rabbitmqHost) //
             .setRelayPort(61613)
-            .setClientLogin("guest") // rabbitmq
-            .setClientPasscode("guest"); //rabbitmq
+            .setClientLogin(rabbitmqUsername) // rabbitmq
+            .setClientPasscode(rabbitmqPassword); //rabbitmq
     }
 
     @Override
