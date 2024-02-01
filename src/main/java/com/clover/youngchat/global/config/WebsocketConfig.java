@@ -41,10 +41,10 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
-            .setRelayHost(rabbitmqHost)
+            .setRelayHost(rabbitmqHost) // rabbitmq ec2 host ipv4
             .setRelayPort(61613)
-            .setClientLogin(rabbitmqUsername)
-            .setClientPasscode(rabbitmqPassword);
+            .setClientLogin("guest") // rabbitmq
+            .setClientPasscode("guest"); //rabbitmq
     }
 
     @Override
