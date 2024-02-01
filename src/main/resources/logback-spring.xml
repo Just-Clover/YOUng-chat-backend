@@ -21,7 +21,9 @@
   <!--prod-->
   <springProfile name="prod">
     <include resource="file-error-appender.xml"/>
-    <root level="ERROR">
+    <include resource="console-appender.xml"/>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE-ERROR"/>
     </root>
   </springProfile>
