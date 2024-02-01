@@ -22,7 +22,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${spring.rabbitmq.port}")
     private Integer rabbitmqPort;
 
-    @Value("${spring.rabbitmq.host}")
+    @Value("${spring.data.redis.host}")
     private String rabbitmqHost;
 
     @Value("${spring.rabbitmq.username}")
@@ -41,10 +41,10 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
-            .setRelayHost(rabbitmqHost) // rabbitmq ec2 host ipv4
+            .setRelayHost(rabbitmqHost)
             .setRelayPort(61613)
-            .setClientLogin("guest") // rabbitmq
-            .setClientPasscode("guest"); //rabbitmq
+            .setClientLogin("guest")
+            .setClientPasscode("guest");
     }
 
     @Override
