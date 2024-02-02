@@ -10,6 +10,7 @@ import com.clover.youngchat.domain.chat.dto.response.ChatDeleteRes;
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
+import com.clover.youngchat.domain.chatroom.dto.response.ChatAlertRes;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.ChatRoomUser;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -59,9 +60,15 @@ public class ChatService {
 
         rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
 
-        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId);
+        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
 
-        sendMessagesToUsers(userIds);
+        ChatAlertRes res = ChatAlertRes.to(chatRoom.getTitle(), user.getUsername(),
+            user.getProfileImage(), req.getMessage());
+
+        userIds.forEach(userId -> {
+            String routingKey = "users." + userId;
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, res);
+        });
 
         log.info("Message [{}] send by member: {} to chatting room: {}", req.getMessage(),
             user.getId(),
@@ -82,20 +89,8 @@ public class ChatService {
         return new ChatDeleteRes();
     }
 
-    private List<Long> getUserIdListByChatRoomId(Long chatRoomId) {
-        List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findChatRoomUserByChatRoomId(
-                chatRoomId)
+    private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
+        return chatRoomUserRepository.getOtherUsersInChatRoom(chatRoomId, userId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
-
-        return chatRoomUsers.stream()
-            .map(chatRoomUser -> chatRoomUser.getUser().getId())
-            .toList();
-    }
-
-    private void sendMessagesToUsers(List<Long> userIds) {
-        userIds.forEach(userId -> {
-            String routingKey = "users." + userId;
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, "Test");
-        });
     }
 }

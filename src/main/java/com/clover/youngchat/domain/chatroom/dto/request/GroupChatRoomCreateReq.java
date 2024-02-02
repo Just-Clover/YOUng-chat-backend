@@ -8,14 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatRoomCreateReq {
+public class GroupChatRoomCreateReq {
 
     private List<Long> friendIds;
-    private String title;
 
     @Builder
-    private ChatRoomCreateReq(List<Long> friendIds, String title) {
+    private GroupChatRoomCreateReq(List<Long> friendIds) {
         this.friendIds = friendIds;
-        this.title = title;
     }
 }

@@ -14,10 +14,9 @@ import static test.ChatRoomTest.TEST_CHAT_ROOM_TITLE;
 
 import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.chatroom.controller.ChatRoomController;
-import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
+import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
 import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,14 +30,13 @@ public class ChatRoomControllerTest extends BaseMvcTest {
     private ChatRoomService chatRoomService;
 
     @Test
-    @DisplayName("채팅방 생성 테스트 : 성공")
+    @DisplayName("1:1 채팅방 생성 테스트 : 성공")
     void createChatRoom() throws Exception {
-        ChatRoomCreateReq req = ChatRoomCreateReq.builder()
-            .title(TEST_CHAT_ROOM_TITLE)
-            .friendIds(List.of(ANOTHER_TEST_USER_ID))
+        PersonalChatRoomCreateReq req = PersonalChatRoomCreateReq.builder()
+            .friendId(ANOTHER_TEST_USER_ID)
             .build();
 
-        mockMvc.perform(post("/api/v1/chat-rooms")
+        mockMvc.perform(post("/api/v1/chat-rooms/personal")
                 .content(objectMapper.writeValueAsString(req))
                 .contentType(MediaType.APPLICATION_JSON)
                 .principal(mockPrincipal))
