@@ -1,11 +1,9 @@
 package com.clover.youngchat.global.config;
 
 import com.clover.youngchat.global.jwt.JwtUtil;
-import com.clover.youngchat.global.security.FilterChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -36,8 +34,9 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
             .setRelayHost(rabbitmqHost);
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new FilterChannelInterceptor(jwtUtil));
-    }
+    // TODO:: Websocket handler
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(new FilterChannelInterceptor(jwtUtil));
+//    }
 }
