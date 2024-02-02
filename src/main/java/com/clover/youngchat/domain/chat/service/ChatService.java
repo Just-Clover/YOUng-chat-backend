@@ -62,7 +62,7 @@ public class ChatService {
 
         List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
 
-        ChatAlertRes res = ChatAlertRes.to(chatRoom.getTitle(), user.getUsername(),
+        ChatAlertRes res = ChatAlertRes.to(chatRoomId, chatRoom.getTitle(), user.getUsername(),
             user.getProfileImage(), req.getMessage());
 
         userIds.forEach(userId -> {
