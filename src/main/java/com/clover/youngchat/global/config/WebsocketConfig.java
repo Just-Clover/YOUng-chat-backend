@@ -33,9 +33,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setPathMatcher(new AntPathMatcher("."));
         registry.setApplicationDestinationPrefixes("/pub");
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
-            .setRelayHost(rabbitmqHost)
-            .setClientLogin("test")
-            .setClientPasscode("test");
+            .setRelayHost(rabbitmqHost);
     }
 
     @Override
