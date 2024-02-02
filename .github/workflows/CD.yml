@@ -30,7 +30,7 @@ jobs:
       if: contains(github.ref, 'develop') || contains(github.ref, 'main')
       run: |
         touch ./src/main/resources/application-prod.yml
-        echo "${{ secrets.PROD_YML }}" > ./src/main/resources/application-prod.yml
+        echo "${{ secrets.PROD_DEV_YML }}" > ./src/main/resources/application-prod.yml
       shell: bash
 
     # 캐시를 통해 빌드 시간 단축
@@ -68,10 +68,10 @@ jobs:
     - name: EC2 Docker Run
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ secrets.EC2_DEV_HOST }}
         port: ${{ secrets.EC2_PORT }}
         username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_KEY }}
+        key: ${{ secrets.EC2_DEV_KEY }}
         script: |
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
           sudo docker stop youngchat-container
