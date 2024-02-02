@@ -68,10 +68,10 @@ jobs:
     - name: EC2 Docker Run
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ secrets.EC2_DEV_HOST }}
         port: ${{ secrets.EC2_PORT }}
         username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_KEY }}
+        key: ${{ secrets.EC2_DEV_KEY }}
         script: |
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/youngchat-repo
           sudo docker stop youngchat-container
