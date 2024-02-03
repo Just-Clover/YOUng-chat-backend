@@ -76,7 +76,7 @@ jobs:
           touch scripts/deploy.sh
           echo "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin $REGISTRY" >> scripts/deploy.sh
           echo "sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
-          echo "sudo docker run -p 8080:8080 -e PROFILE=dev -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+          echo "sudo docker run -p 8080:8080 -e PROFILE=prod -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
 
       - name: upload to s3
         env:
