@@ -3,14 +3,12 @@ package com.clover.youngchat.domain.chat.repository;
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.entity.QChat;
 import com.clover.youngchat.domain.user.entity.QUser;
+import com.clover.youngchat.global.response.RestSlice;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class ChatRepositoryImpl implements ChatRepositoryCustom {
@@ -18,7 +16,8 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Slice<ChatRes> findChatsByChatRoomId(Long chatRoomId, Long lastChatId, int limitSize) {
+    public RestSlice<ChatRes> findChatsByChatRoomId(Long chatRoomId, Long lastChatId,
+        int limitSize) {
         List<ChatRes> chats = fetchChatsCursorPagination(chatRoomId, lastChatId, limitSize);
         return createSlice(chats, limitSize);
     }
@@ -55,11 +54,11 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
         return condition;
     }
 
-    private Slice<ChatRes> createSlice(List<ChatRes> chats, int limitSize) {
+    private RestSlice<ChatRes> createSlice(List<ChatRes> chats, int limitSize) {
         boolean hasNext = chats.size() > limitSize;
         if (hasNext) {
             chats.remove(limitSize); // 하나더 가져온 값 제거
         }
-        return new SliceImpl<>(chats, PageRequest.of(0, limitSize), hasNext);
+        return new RestSlice<>(chats, 0, limitSize, hasNext);
     }
 }
