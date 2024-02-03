@@ -1,7 +1,6 @@
 package com.clover.youngchat.domain.chat.dto.response;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import java.time.LocalDateTime;
@@ -19,15 +18,14 @@ public class ChatRes {
     private String username;
     private String profileImage;
     private String message;
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime messageTime;
 
     @Builder
     public ChatRes(Long chatId, Long userId, String username, String profileImage,
-        String message, boolean isDeleted, LocalDateTime messageTime) {
+        String message, Boolean isDeleted, LocalDateTime messageTime) {
         this.chatId = chatId;
         this.userId = userId;
         this.username = username;
@@ -36,6 +34,7 @@ public class ChatRes {
         this.isDeleted = isDeleted;
         this.messageTime = messageTime;
     }
+
 
     public static ChatRes to(Chat chat) {
         return ChatRes.builder()
