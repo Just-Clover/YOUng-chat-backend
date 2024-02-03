@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,7 +103,7 @@ public class ChatRoomService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
+    public RestSlice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
         userRepository.findById(user.getId());
         return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
             cursorChatId, CHAT_ROOM_LIMIT_SIZE);
