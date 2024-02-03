@@ -1,93 +1,95 @@
-#name: CD
-#on:
-## develop 브랜치로 push 되면 동작
-#  push:
-#    branches: [ "develop" ]
-#permissions:
-#  contents: read
-#jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#    # Checkout
-#    - name: Checkout
-#      uses: actions/checkout@v3
-#    # JDK version 설정
-#    - name: Set up JDK 17
-#      uses: actions/setup-java@v3
-#      with:
-#        java-version: '17'
-#        distribution: 'temurin'
-#
-#    # AWS 자격 증명
-#    - name: Configure AWS credentials
-#      uses: aws-actions/configure-aws-credentials@v1
-#      with:
-#        aws-access-key-id: ${{ secrets.AWS_KEY }}
-#        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-#        aws-region: ${{ secrets.AWS_REGION }}
-#    # Amazon ECR 로그인
-#    - name: Login to Amazon ECR
-#      id: login-ecr
-#      uses: aws-actions/amazon-ecr-login@v2
-#      with:
-#        mask-password: 'true'
-#
-#    # prod yml 생성
-#    - name: make application-prod.yml
-#      if: contains(github.ref, 'develop') || contains(github.ref, 'main')
-#      run: |
-#        touch ./src/main/resources/application-prod.yml
-#        echo "${{ secrets.PROD_YML }}" > ./src/main/resources/application-prod.yml
-#      shell: bash
-#
-#    - name: Grant execute permission for gradlew
-#      run: chmod +x gradlew
-#
-#    # Gradle Caching
-#    - name: Gradle Caching
-#      uses: actions/cache@v3
-#      with:
-#        path: |
-#          ~/.gradle/caches
-#          ~/.gradle/wrapper
-#        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#        restore-keys: |
-#          ${{ runner.os }}-gradle-
-#    - name: Build with Gradle
-#      env:
-#          SPRING_PROFILES_ACTIVE: prod
-#      run: ./gradlew bootJar
-#
-#    # 도커 이미지 빌드 및 ECR에 푸시, 배포파일 세팅
-#    - name: Build Docker Image and Push to Amazon ECR
-#      env:
-#        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#        REPOSITORY: ${{ secrets.ECR_REPO }}
-#        IMAGE_TAG: ${{ github.sha }}
-#      run: |
-#        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login -u AWS --password-stdin $REGISTRY
-#        sudo docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-#        sudo docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-#        mkdir scripts
-#        touch scripts/deploy.sh
-#        echo "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin $REGISTRY" >> scripts/deploy.sh
-#        echo "sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
-#        echo "sudo docker run -p 8080:8080 -e PROFILE=dev -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
-#
-#    - name: upload to s3
-#      env:
-#        IMAGE_TAG: ${{ github.sha }}
-#      run: |
-#        zip -r deploy-$IMAGE_TAG.zip ./scripts appspec.yml
-#        aws s3 cp --region ${{ secrets.AWS_REGION }} --acl private ./deploy-$IMAGE_TAG.zip s3://${{ secrets.S3_BUCKETNAME }}
-#
-#    - name: start deploy
-#      env:
-#        IMAGE_TAG: ${{ github.sha }}
-#      run: |
-#        aws deploy create-deployment --application-name ${{ secrets.APPLICATION_NAME }} \
-#        --deployment-config-name CodeDeployDefault.OneAtATime \
-#        --deployment-group-name ${{ secrets.DEPLOY_GROUP }} \
-#        --s3-location bucket=${{ secrets.S3_BUCKETNAME }},bundleType=zip,key=deploy-$IMAGE_TAG.zip
+name: CD with ECR & CodeDeploy
+on:
+  # main 브랜치로 push 되면 동작
+  push:
+    branches: [ "main" ]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+      # JDK version 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # AWS 자격 증명
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Amazon ECR 로그인
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      # prod yml 생성
+      - name: make application-prod.yml
+        if: contains(github.ref, 'develop') || contains(github.ref, 'main')
+        run: |
+          touch ./src/main/resources/application-prod.yml
+          echo "${{ secrets.PROD_YML }}" > ./src/main/resources/application-prod.yml
+        shell: bash
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Gradle Caching
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+        run: ./gradlew bootJar
+
+      # 도커 이미지 빌드 및 ECR에 푸시, 배포파일 세팅
+      - name: Build Docker Image and Push to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login -u AWS --password-stdin $REGISTRY
+          sudo docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          sudo docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          mkdir scripts
+          touch scripts/deploy.sh
+          echo "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin $REGISTRY" >> scripts/deploy.sh
+          echo "sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+          echo "sudo docker run -p 8080:8080 -e PROFILE=prod -d --restart always --name ${{ secrets.CONTAINER_NAME }} $REGISTRY/$REPOSITORY:$IMAGE_TAG" >> scripts/deploy.sh
+
+      - name: upload to s3
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          zip -r deploy-$IMAGE_TAG.zip ./scripts appspec.yml
+          aws s3 cp --region ${{ secrets.AWS_REGION }} --acl private ./deploy-$IMAGE_TAG.zip s3://${{ secrets.S3_BUCKETNAME }}
+
+      - name: start deploy
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          aws deploy create-deployment --application-name ${{ secrets.APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.OneAtATime \
+          --deployment-group-name ${{ secrets.DEPLOY_GROUP }} \
+          --s3-location bucket=${{ secrets.S3_BUCKETNAME }},bundleType=zip,key=deploy-$IMAGE_TAG.zip
