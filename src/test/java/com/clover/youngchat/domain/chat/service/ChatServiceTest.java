@@ -10,9 +10,9 @@ import static org.mockito.BDDMockito.given;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
+import com.clover.youngchat.domain.chat.service.command.ChatCommandService;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
-import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,11 +37,8 @@ class ChatServiceTest implements ChatTest {
     @Mock
     private ChatRoomUserRepository chatRoomUserRepository;
 
-    @Mock
-    private UserRepository userRepository;
-
     @InjectMocks
-    private ChatService chatService;
+    private ChatCommandService chatCommandService;
 
     @Nested
     @DisplayName("채팅 입력 테스트")
@@ -66,7 +63,7 @@ class ChatServiceTest implements ChatTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatService.sendMessage(TEST_CHAT_ROOM_ID, req));
+                () -> chatCommandService.sendMessage(TEST_CHAT_ROOM_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -87,7 +84,7 @@ class ChatServiceTest implements ChatTest {
             given(chatRepository.findById(any())).willReturn(Optional.of(TEST_CHAT));
 
             // when
-            chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
+            chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
 
             // then
             assertThat(TEST_CHAT.isDeleted()).isTrue();
@@ -102,7 +99,7 @@ class ChatServiceTest implements ChatTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
+                () -> chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -120,7 +117,7 @@ class ChatServiceTest implements ChatTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
+                () -> chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
 
             // then
             assertThat(exception.getResultCode().getMessage())

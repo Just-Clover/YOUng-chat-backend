@@ -25,7 +25,8 @@ import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
 import com.clover.youngchat.domain.user.entity.User;
-import com.clover.youngchat.domain.user.service.UserService;
+import com.clover.youngchat.domain.user.service.command.UserCommandService;
+import com.clover.youngchat.domain.user.service.query.UserQueryService;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,10 @@ import org.springframework.mock.web.MockMultipartFile;
 class UserControllerTest extends BaseMvcTest {
 
     @MockBean
-    private UserService userService;
+    private UserCommandService userCommandService;
+
+    @MockBean
+    private UserQueryService userQueryService;
 
     @Test
     @DisplayName("회원가입 테스트 : 성공")
@@ -65,7 +69,7 @@ class UserControllerTest extends BaseMvcTest {
     @DisplayName("이메일로 사용자 검색 테스트")
     void findUserByEmailTest() throws Exception {
         // given
-        given(userService.searchProfile(anyString())).willReturn(
+        given(userQueryService.searchProfile(anyString())).willReturn(
             UserProfileSearchRes.builder()
                 .userId(TEST_USER_ID)
                 .email(TEST_USER_EMAIL)
@@ -85,7 +89,7 @@ class UserControllerTest extends BaseMvcTest {
     @DisplayName("이메일로 중복 체크테스트")
     void checkEmailDuplicatedTest() throws Exception {
         // given
-        given(userService.checkEmailDuplicated(anyString())).willReturn(
+        given(userQueryService.checkEmailDuplicated(anyString())).willReturn(
             UserEmailCheckRes.to(true)
         );
 
@@ -107,7 +111,8 @@ class UserControllerTest extends BaseMvcTest {
             .checkNewPassword(TEST_ANOTHER_USER_PASSWORD)
             .build();
 
-        given(userService.updatePassword(any(), any())).willReturn(new UserUpdatePasswordRes());
+        given(userCommandService.updatePassword(any(), any())).willReturn(
+            new UserUpdatePasswordRes());
 
         // when - then
         mockMvc.perform(patch("/api/v1/users/password")
@@ -123,7 +128,7 @@ class UserControllerTest extends BaseMvcTest {
     void getUserProfileSuccess() throws Exception {
         Long userId = 1L;
 
-        given(userService.getProfile(anyLong(), any(User.class))).willReturn(
+        given(userQueryService.getProfile(anyLong(), any(User.class))).willReturn(
             UserProfileGetRes.builder()
                 .username(TEST_USER_NAME)
                 .profileImage(TEST_USER_PROFILE_IMAGE)
@@ -142,7 +147,7 @@ class UserControllerTest extends BaseMvcTest {
     void editUserProfileSuccess() throws Exception {
         Long userId = 1L;
 
-        given(userService.editProfile(anyLong(), any(), any(), anyLong())).willReturn(
+        given(userCommandService.editProfile(anyLong(), any(), any(), anyLong())).willReturn(
             new UserProfileEditRes());
         UserProfileEditReq req = UserProfileEditReq.builder()
             .username(TEST_USER_NAME)

@@ -26,6 +26,8 @@ import com.clover.youngchat.domain.user.dto.request.UserUpdatePasswordReq;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
+import com.clover.youngchat.domain.user.service.command.UserCommandService;
+import com.clover.youngchat.domain.user.service.query.UserQueryService;
 import com.clover.youngchat.global.email.EmailUtil;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.s3.S3Util;
@@ -64,7 +66,10 @@ class UserServiceTest implements UserTest, EmailAuthTest {
     private S3Util s3Util;
 
     @InjectMocks
-    private UserService userService;
+    private UserQueryService userQueryService;
+
+    @InjectMocks
+    private UserCommandService userCommandService;
 
     private User testUser;
 
@@ -104,7 +109,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             given(userRepository.save(any(User.class))).willReturn(testUser);
 
             // when
-            userService.signup(req);
+            userCommandService.signup(req);
 
             // then
             verify(passwordEncoder, times(1)).encode(TEST_USER_PASSWORD);
@@ -120,7 +125,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.signup(req));
+                () -> userCommandService.signup(req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -136,7 +141,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.signup(req));
+                () -> userCommandService.signup(req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -163,7 +168,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             given(passwordEncoder.matches(eq(TEST_USER_PASSWORD), any())).willReturn(true);
 
             // when
-            userService.updatePassword(TEST_USER_ID, req);
+            userCommandService.updatePassword(TEST_USER_ID, req);
 
             // then
             verify(passwordEncoder, times(1)).encode(TEST_ANOTHER_USER_PASSWORD);
@@ -185,7 +190,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.updatePassword(TEST_USER_ID, req));
+                () -> userCommandService.updatePassword(TEST_USER_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -207,7 +212,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.updatePassword(TEST_USER_ID, req));
+                () -> userCommandService.updatePassword(TEST_USER_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -230,7 +235,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.updatePassword(TEST_USER_ID, req));
+                () -> userCommandService.updatePassword(TEST_USER_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -247,7 +252,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
         void getUserProfileSuccess() {
             given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
-            userService.getProfile(TEST_USER_ID, TEST_USER);
+            userQueryService.getProfile(TEST_USER_ID, TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
         }
@@ -258,7 +263,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                userService.getProfile(TEST_USER_ID, TEST_USER));
+                userQueryService.getProfile(TEST_USER_ID, TEST_USER));
 
             verify(userRepository, times(1)).findById(anyLong());
 
@@ -273,7 +278,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
             given(userRepository.findByEmail(anyString())).willReturn(Optional.of(TEST_USER));
 
             // when
-            UserProfileSearchRes actual = userService.searchProfile(TEST_USER_EMAIL);
+            UserProfileSearchRes actual = userQueryService.searchProfile(TEST_USER_EMAIL);
 
             // then
             assertThat(actual).extracting("email", "profileImage")
@@ -303,7 +308,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
                 given(s3Util.uploadFile(any(), any())).willReturn(TEST_ANOTHER_USER_PROFILE_IMAGE);
 
-                userService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
+                userCommandService.editProfile(TEST_USER_ID, req, multipartFile, TEST_USER_ID);
 
                 verify(userRepository, times(1)).findById(anyLong());
                 verify(s3Util, times(1)).uploadFile(any(), any());
@@ -322,7 +327,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
 
                 given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
-                userService.editProfile(TEST_USER_ID, req, null, TEST_USER_ID);
+                userCommandService.editProfile(TEST_USER_ID, req, null, TEST_USER_ID);
 
                 verify(userRepository, times(1)).findById(anyLong());
                 verify(s3Util, times(0)).uploadFile(null, null);
@@ -347,7 +352,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                     fileResource.getInputStream()); // 컨텐츠 내용
 
                 GlobalException exception = assertThrows(GlobalException.class,
-                    () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
+                    () -> userCommandService.editProfile(TEST_USER_ID, req, multipartFile,
                         ANOTHER_TEST_USER_ID));
 
                 assertThat(exception.getResultCode().getMessage()).isEqualTo(
@@ -371,7 +376,7 @@ class UserServiceTest implements UserTest, EmailAuthTest {
                 given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
 
                 GlobalException exception = assertThrows(GlobalException.class,
-                    () -> userService.editProfile(TEST_USER_ID, req, multipartFile,
+                    () -> userCommandService.editProfile(TEST_USER_ID, req, multipartFile,
                         TEST_USER_ID));
 
                 assertThat(exception.getResultCode().getMessage()).isEqualTo(

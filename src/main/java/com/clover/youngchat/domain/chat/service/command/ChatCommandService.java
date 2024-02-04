@@ -1,4 +1,4 @@
-package com.clover.youngchat.domain.chat.service;
+package com.clover.youngchat.domain.chat.service.command;
 
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
@@ -29,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChatService {
+@Transactional
+public class ChatCommandService {
 
     private final ChatRepository chatRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -40,7 +41,6 @@ public class ChatService {
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
 
-    @Transactional
     public void sendMessage(Long chatRoomId, ChatCreateReq req) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
@@ -75,7 +75,6 @@ public class ChatService {
             chatRoom.getId());
     }
 
-    @Transactional
     public ChatDeleteRes deleteChat(
         final Long chatRoomId, final Long chatId, final Long userId) {
         if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {

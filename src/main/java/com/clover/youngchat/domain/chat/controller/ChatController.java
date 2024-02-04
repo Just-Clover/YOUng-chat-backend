@@ -2,7 +2,7 @@ package com.clover.youngchat.domain.chat.controller;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.dto.response.ChatDeleteRes;
-import com.clover.youngchat.domain.chat.service.ChatService;
+import com.clover.youngchat.domain.chat.service.command.ChatCommandService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final ChatService chatService;
+    private final ChatCommandService chatCommandService;
 
     @MessageMapping("chat-rooms.{chatRoomId}")
     public void sendMessage(@DestinationVariable Long chatRoomId,
         @Payload ChatCreateReq chatCreateReq) {
-        chatService.sendMessage(chatRoomId, chatCreateReq);
+        chatCommandService.sendMessage(chatRoomId, chatCreateReq);
     }
 
     @DeleteMapping("/{chatId}")
@@ -33,7 +33,7 @@ public class ChatController {
         @PathVariable Long chatRoomId, @PathVariable Long chatId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatService.deleteChat(chatRoomId, chatId, userDetails.getUser().getId()));
+            chatCommandService.deleteChat(chatRoomId, chatId, userDetails.getUser().getId()));
     }
 
 }
