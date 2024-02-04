@@ -16,7 +16,8 @@ import com.clover.youngchat.domain.BaseMvcTest;
 import com.clover.youngchat.domain.chatroom.controller.ChatRoomController;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
-import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
+import com.clover.youngchat.domain.chatroom.service.command.ChatRoomCommandService;
+import com.clover.youngchat.domain.chatroom.service.query.ChatRoomQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,7 +28,10 @@ import org.springframework.http.MediaType;
 public class ChatRoomControllerTest extends BaseMvcTest {
 
     @MockBean
-    private ChatRoomService chatRoomService;
+    private ChatRoomCommandService chatRoomCommandService;
+
+    @MockBean
+    private ChatRoomQueryService chatRoomQueryService;
 
     @Test
     @DisplayName("1:1 채팅방 생성 테스트 : 성공")
