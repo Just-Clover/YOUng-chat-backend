@@ -8,6 +8,5 @@ public class ChatRoomConstant {
     public static final int COUNT_ONE_FRIEND = 1;
     public static final String PERSONAL_CHATROOM_TITLE = "%s, %s의 채팅방";
     public static final String GROUP_CHATROOM_TITLE = "%s 외 %d 명";
-    public static final String CHAT_ROOM_CACHE = "chatroom";
 
 }
