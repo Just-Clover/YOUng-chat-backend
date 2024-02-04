@@ -9,7 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.clover.youngchat.domain.BaseMvcTest;
-import com.clover.youngchat.domain.friend.service.FriendService;
+import com.clover.youngchat.domain.friend.service.command.FriendCommandService;
+import com.clover.youngchat.domain.friend.service.query.FriendQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,7 +21,10 @@ import org.springframework.http.MediaType;
 public class FriendControllerTest extends BaseMvcTest {
 
     @MockBean
-    private FriendService friendService;
+    private FriendQueryService friendQueryService;
+
+    @MockBean
+    private FriendCommandService friendCommandService;
 
     @Test
     @DisplayName("친구목록 조회 테스트")
