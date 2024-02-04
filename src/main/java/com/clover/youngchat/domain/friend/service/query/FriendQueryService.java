@@ -1,11 +1,5 @@
-package com.clover.youngchat.domain.friend.service;
+package com.clover.youngchat.domain.friend.service.query;
 
-import static com.clover.youngchat.global.exception.ResultCode.ALREADY_FRIEND;
-import static com.clover.youngchat.global.exception.ResultCode.INVALID_INPUT;
-import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
-
-import com.clover.youngchat.domain.friend.dto.response.FriendAddRes;
-import com.clover.youngchat.domain.friend.dto.response.FriendDeleteRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetListRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetSearchListRes;
 import com.clover.youngchat.domain.friend.entity.Friend;
@@ -22,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class FriendService {
+@Transactional(readOnly = true)
+public class FriendQueryService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
 
-    @Transactional(readOnly = true)
     public List<FriendGetListRes> getFriendList(User user) {
         List<Friend> friends = findByUser(user);
 
@@ -38,39 +32,8 @@ public class FriendService {
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public List<FriendGetSearchListRes> getFriendSearchList(String keyword, User user) {
         return friendRepository.findFriendByKeyword(user.getId(), keyword);
-    }
-
-    public FriendAddRes addFriend(Long friendId, User user) {
-        if (user.getId().equals(friendId)) {
-            throw new GlobalException(INVALID_INPUT);
-        }
-        if (friendRepository.existsByUser_IdAndFriend_Id(user.getId(), friendId)) {
-            throw new GlobalException(ALREADY_FRIEND);
-        }
-        User friendUser = userRepository.findById(friendId)
-            .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
-
-        Friend friend = Friend.builder()
-            .user(user)
-            .friend(friendUser)
-            .build();
-
-        friendRepository.save(friend);
-
-        return new FriendAddRes();
-    }
-
-    @Transactional
-    public FriendDeleteRes deleteFriend(Long friendId, User user) {
-        if (!friendRepository.existsByUser_IdAndFriend_Id(user.getId(), friendId)) {
-            throw new GlobalException(ResultCode.NOT_FOUND_FRIEND);
-        }
-        friendRepository.deleteByFriend_Id(friendId);
-
-        return new FriendDeleteRes();
     }
 
     private List<Friend> findByUser(User user) {
