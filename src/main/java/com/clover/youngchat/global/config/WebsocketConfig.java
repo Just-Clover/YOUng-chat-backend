@@ -33,10 +33,4 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue")
             .setRelayHost(rabbitmqHost);
     }
-
-    // TODO:: Websocket handler
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(new FilterChannelInterceptor(jwtUtil));
-//    }
 }

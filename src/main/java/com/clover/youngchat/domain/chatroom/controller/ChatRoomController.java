@@ -10,7 +10,8 @@ import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomLeaveRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomPaginationDetailGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.GroupChatRoomCreateRes;
 import com.clover.youngchat.domain.chatroom.dto.response.PersonalChatRoomCreateRes;
-import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
+import com.clover.youngchat.domain.chatroom.service.command.ChatRoomCommandService;
+import com.clover.youngchat.domain.chatroom.service.query.ChatRoomQueryService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -34,14 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatRoomController {
 
-    private final ChatRoomService chatRoomService;
+    private final ChatRoomQueryService chatRoomQueryService;
+    private final ChatRoomCommandService chatRoomCommandService;
 
     @PostMapping("/personal")
     public RestResponse<PersonalChatRoomCreateRes> createPersonalChatRoom(
         @RequestBody PersonalChatRoomCreateReq req,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatRoomService.createPersonalChatRoom(req, userDetails.getUser()));
+            chatRoomCommandService.createPersonalChatRoom(req, userDetails.getUser()));
     }
 
     @PostMapping("/group")
@@ -49,7 +51,7 @@ public class ChatRoomController {
         @RequestBody GroupChatRoomCreateReq req,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatRoomService.createGroupChatRoom(req, userDetails.getUser()));
+            chatRoomCommandService.createGroupChatRoom(req, userDetails.getUser()));
     }
 
     @GetMapping
@@ -57,7 +59,7 @@ public class ChatRoomController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(required = false) Long cursorChatId) {
         return RestResponse.success(
-            chatRoomService.getChatRoomList(userDetails.getUser(), cursorChatId));
+            chatRoomQueryService.getChatRoomList(userDetails.getUser(), cursorChatId));
     }
 
     @GetMapping("/{chatRoomId}")
@@ -66,7 +68,7 @@ public class ChatRoomController {
             userDetails) {
         log.info("user: {}님이 채팅방 {} 에 들어갔습니다.", userDetails.getUser().getId(), chatRoomId);
         return RestResponse.success(
-            chatRoomService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
+            chatRoomQueryService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
     }
 
     @GetMapping("/slice/{chatRoomId}")
@@ -76,7 +78,7 @@ public class ChatRoomController {
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return RestResponse.success(
-            chatRoomService.getPaginationDetailChatRoom(chatRoomId, lastChatId,
+            chatRoomQueryService.getPaginationDetailChatRoom(chatRoomId, lastChatId,
                 userDetails.getUser())
         );
     }
@@ -86,13 +88,13 @@ public class ChatRoomController {
         @RequestBody @Valid ChatRoomEditReq req,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatRoomService.editChatRoom(chatRoomId, req, userDetails.getUser()));
+            chatRoomCommandService.editChatRoom(chatRoomId, req, userDetails.getUser()));
     }
 
     @DeleteMapping("/{chatRoomId}")
     public RestResponse<ChatRoomLeaveRes> leaveChatRoom(@PathVariable Long chatRoomId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatRoomService.leaveChatRoom(chatRoomId, userDetails.getUser()));
+            chatRoomCommandService.leaveChatRoom(chatRoomId, userDetails.getUser()));
     }
 }

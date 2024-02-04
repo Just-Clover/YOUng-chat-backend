@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.clover.youngchat.domain.BaseMvcTest;
-import com.clover.youngchat.domain.chat.service.ChatService;
+import com.clover.youngchat.domain.chat.service.command.ChatCommandService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +18,7 @@ import org.springframework.http.MediaType;
 class ChatControllerTest extends BaseMvcTest {
 
     @MockBean
-    private ChatService chatService;
+    private ChatCommandService chatCommandService;
 
     @Test
     @DisplayName("채팅삭제 테스트 : 성공")

@@ -14,9 +14,7 @@ import static org.mockito.Mockito.verify;
 import static test.ChatRoomUserTest.TEST_CHAT_ROOM_USER;
 import static test.ChatTest.TEST_CHAT;
 import static test.ChatTest.TEST_CHAT_LIST;
-import static test.ChatTest.TEST_CHAT_MESSAGE;
 
-import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.request.ChatRoomEditReq;
 import com.clover.youngchat.domain.chatroom.dto.request.PersonalChatRoomCreateReq;
@@ -25,11 +23,11 @@ import com.clover.youngchat.domain.chatroom.dto.response.PersonalChatRoomCreateR
 import com.clover.youngchat.domain.chatroom.entity.ChatRoom;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
-import com.clover.youngchat.domain.chatroom.service.ChatRoomService;
+import com.clover.youngchat.domain.chatroom.service.command.ChatRoomCommandService;
+import com.clover.youngchat.domain.chatroom.service.query.ChatRoomQueryService;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +44,10 @@ import test.ChatRoomTest;
 public class ChatRoomServiceTest implements ChatRoomTest {
 
     @InjectMocks
-    private ChatRoomService chatRoomService;
+    private ChatRoomCommandService chatRoomCommandService;
+
+    @InjectMocks
+    private ChatRoomQueryService chatRoomQueryService;
 
     @Mock
     private ChatRoomRepository chatRoomRepository;
@@ -62,7 +63,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
 
     private ChatRoom chatRoom;
     private User user;
-    private Chat chat;
+
 
     @BeforeEach
     void setup() {
@@ -80,12 +81,6 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             .build();
 
         ReflectionTestUtils.setField(user, "id", TEST_USER_ID);
-
-        chat = Chat.builder()
-            .chatRoom(chatRoom)
-            .sender(user)
-            .message(TEST_CHAT_MESSAGE)
-            .build();
     }
 
     @Nested
@@ -103,7 +98,8 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomUserRepository.findChatRoomByOnlyTwoUsers(any(), any()))
                 .willReturn(Optional.empty());
 
-            PersonalChatRoomCreateRes res = chatRoomService.createPersonalChatRoom(req, TEST_USER);
+            PersonalChatRoomCreateRes res = chatRoomCommandService.createPersonalChatRoom(req,
+                TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(chatRoomRepository, times(1)).save(any());
@@ -121,7 +117,8 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomUserRepository.findChatRoomByOnlyTwoUsers(any(), any()))
                 .willReturn(Optional.of(chatRoom));
 
-            PersonalChatRoomCreateRes res = chatRoomService.createPersonalChatRoom(req, TEST_USER);
+            PersonalChatRoomCreateRes res = chatRoomCommandService.createPersonalChatRoom(req,
+                TEST_USER);
 
             verify(userRepository, times(1)).findById(anyLong());
             verify(chatRoomRepository, times(0)).save(any());
@@ -139,17 +136,11 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatRoomService.createPersonalChatRoom(req, TEST_USER));
+                () -> chatRoomCommandService.createPersonalChatRoom(req, TEST_USER));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_USER.getMessage());
         }
-    }
-
-    @Nested
-    @DisplayName("채팅방 목록 조회")
-    class getChatRoomList {
-
     }
 
     @Nested
@@ -167,7 +158,8 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
 
             // when
-            ChatRoomDetailGetRes res = chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user);
+            ChatRoomDetailGetRes res = chatRoomQueryService.getDetailChatRoom(TEST_CHAT_ROOM_ID,
+                user);
 
             // then
             verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
@@ -186,7 +178,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 anyLong())).willReturn(false);
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+                chatRoomQueryService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
 
             verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
                 anyLong());
@@ -201,7 +193,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomRepository.findById(anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+                chatRoomQueryService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
 
             verify(chatRoomRepository, times(1)).findById(anyLong());
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
@@ -217,7 +209,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomRepository.findById(anyLong())).willReturn(Optional.of(chatRoom));
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                chatRoomService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
+                chatRoomQueryService.getDetailChatRoom(TEST_CHAT_ROOM_ID, user));
 
             verify(chatRoomUserRepository, times(1)).existsByChatRoom_IdAndUser_Id(anyLong(),
                 anyLong());
@@ -240,7 +232,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomUserRepository.findByChatRoom_IdAndUser_Id(anyLong(),
                 anyLong())).willReturn(Optional.of(TEST_CHAT_ROOM_USER));
 
-            chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user);
+            chatRoomCommandService.leaveChatRoom(TEST_CHAT_ROOM_ID, user);
 
             verify(chatRoomRepository, times(1)).existsById(anyLong());
             verify(chatRoomUserRepository, times(1)).findByChatRoom_IdAndUser_Id(anyLong(),
@@ -254,7 +246,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomRepository.existsById(anyLong())).willReturn(false);
 
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
+                () -> chatRoomCommandService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_CHATROOM.getMessage());
@@ -268,7 +260,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatRoomService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
+                () -> chatRoomCommandService.leaveChatRoom(TEST_CHAT_ROOM_ID, user));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(ACCESS_DENY.getMessage());
         }
@@ -289,7 +281,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(anyLong(),
                 anyLong())).willReturn(true);
 
-            chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user);
+            chatRoomCommandService.editChatRoom(TEST_CHAT_ROOM_ID, req, user);
 
             assertThat(chatRoom.getTitle()).isEqualTo(req.getTitle());
         }
@@ -304,7 +296,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
             given(chatRoomRepository.findById(anyLong())).willReturn(Optional.empty());
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
+                chatRoomCommandService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 NOT_FOUND_CHATROOM.getMessage());
@@ -322,7 +314,7 @@ public class ChatRoomServiceTest implements ChatRoomTest {
                 anyLong())).willReturn(false);
 
             GlobalException exception = assertThrows(GlobalException.class, () ->
-                chatRoomService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
+                chatRoomCommandService.editChatRoom(TEST_CHAT_ROOM_ID, req, user));
 
             assertThat(exception.getResultCode().getMessage()).isEqualTo(
                 ACCESS_DENY.getMessage());

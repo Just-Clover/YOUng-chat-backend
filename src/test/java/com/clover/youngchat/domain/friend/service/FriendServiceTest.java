@@ -10,6 +10,8 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetListRes;
 import com.clover.youngchat.domain.friend.entity.Friend;
 import com.clover.youngchat.domain.friend.repository.FriendRepository;
+import com.clover.youngchat.domain.friend.service.command.FriendCommandService;
+import com.clover.youngchat.domain.friend.service.query.FriendQueryService;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
@@ -34,7 +36,10 @@ public class FriendServiceTest implements FriendTest {
     private FriendRepository friendRepository;
 
     @InjectMocks
-    private FriendService friendService;
+    private FriendCommandService friendCommandService;
+
+    @InjectMocks
+    private FriendQueryService friendQueryService;
 
     @Test
     @DisplayName("친구목록에서 두명의 친구를 조회한다.")
@@ -44,7 +49,7 @@ public class FriendServiceTest implements FriendTest {
             Optional.of(List.of(TEST_FRIEND, TEST_ANOTHER_FRIEND)));
 
         // when
-        List<FriendGetListRes> actual = friendService.getFriendList(TEST_USER);
+        List<FriendGetListRes> actual = friendQueryService.getFriendList(TEST_USER);
 
         // then
         Assertions.assertThat(actual).hasSize(2);
@@ -59,7 +64,7 @@ public class FriendServiceTest implements FriendTest {
             Optional.empty());
 
         // when, then
-        Assertions.assertThatThrownBy(() -> friendService.getFriendList(any(User.class)))
+        Assertions.assertThatThrownBy(() -> friendQueryService.getFriendList(any(User.class)))
             .isInstanceOf(GlobalException.class);
 
         verify(friendRepository, times(1)).findByUser(any());
@@ -74,7 +79,7 @@ public class FriendServiceTest implements FriendTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(TEST_USER));
 
         // when
-        friendService.addFriend(friendId, TEST_USER);
+        friendCommandService.addFriend(friendId, TEST_USER);
 
         // then
         verify(userRepository, times(1)).findById(anyLong());
@@ -89,7 +94,7 @@ public class FriendServiceTest implements FriendTest {
         setField(TEST_USER, "id", 1L);
 
         // when, then
-        Assertions.assertThatThrownBy(() -> friendService.addFriend(friendId, TEST_USER))
+        Assertions.assertThatThrownBy(() -> friendCommandService.addFriend(friendId, TEST_USER))
             .isInstanceOf(GlobalException.class);
     }
 
@@ -103,7 +108,7 @@ public class FriendServiceTest implements FriendTest {
         given(friendRepository.existsByUser_IdAndFriend_Id(anyLong(), anyLong())).willReturn(true);
 
         // when
-        friendService.deleteFriend(friendId, TEST_USER);
+        friendCommandService.deleteFriend(friendId, TEST_USER);
 
         // then
         verify(friendRepository, times(1)).existsByUser_IdAndFriend_Id(anyLong(), anyLong());
@@ -120,7 +125,7 @@ public class FriendServiceTest implements FriendTest {
         given(friendRepository.existsByUser_IdAndFriend_Id(anyLong(), anyLong())).willReturn(false);
 
         // when, then
-        Assertions.assertThatThrownBy(() -> friendService.deleteFriend(friendId, TEST_USER))
+        Assertions.assertThatThrownBy(() -> friendCommandService.deleteFriend(friendId, TEST_USER))
             .isInstanceOf(GlobalException.class);
     }
 }

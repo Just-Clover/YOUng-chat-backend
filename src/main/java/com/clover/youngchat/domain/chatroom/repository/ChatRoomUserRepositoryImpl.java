@@ -4,6 +4,7 @@ import com.clover.youngchat.domain.chat.entity.QChat;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.entity.QChatRoom;
 import com.clover.youngchat.domain.chatroom.entity.QChatRoomUser;
+import com.clover.youngchat.global.response.RestSlice;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -12,9 +13,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom {
@@ -35,7 +33,7 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
     }
 
     @Override
-    public Slice<ChatRoomAndLastChatGetRes> findChatRoomsAndLastChatByUserId(Long userId,
+    public RestSlice<ChatRoomAndLastChatGetRes> findChatRoomsAndLastChatByUserId(Long userId,
         Long cursorChatId, int limitSize) {
         List<ChatRoomAndLastChatGetRes> resList = queryChatRooms(userId, cursorChatId,
             limitSize);
@@ -81,12 +79,12 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
         return condition;
     }
 
-    private Slice<ChatRoomAndLastChatGetRes> createSlice(List<ChatRoomAndLastChatGetRes> res,
+    private RestSlice<ChatRoomAndLastChatGetRes> createSlice(List<ChatRoomAndLastChatGetRes> res,
         int limitSize) {
         boolean hasNext = res.size() > limitSize;
         if (hasNext) {
             res.remove(0);
         }
-        return new SliceImpl<>(res, PageRequest.of(0, limitSize), hasNext);
+        return new RestSlice<>(res, 0, limitSize, hasNext);
     }
 }

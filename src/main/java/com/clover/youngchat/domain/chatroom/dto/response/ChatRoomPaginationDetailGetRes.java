@@ -1,21 +1,21 @@
 package com.clover.youngchat.domain.chatroom.dto.response;
 
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
+import com.clover.youngchat.global.response.RestSlice;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Slice;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoomPaginationDetailGetRes {
 
     private String title;
-    private Slice<ChatRes> chatResList;
+    private RestSlice<ChatRes> chatResList;
 
     @Builder
-    private ChatRoomPaginationDetailGetRes(String title, Slice<ChatRes> chatResList) {
+    private ChatRoomPaginationDetailGetRes(String title, RestSlice<ChatRes> chatResList) {
         this.title = title;
         this.chatResList = chatResList;
     }

@@ -4,7 +4,8 @@ import com.clover.youngchat.domain.friend.dto.response.FriendAddRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendDeleteRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetListRes;
 import com.clover.youngchat.domain.friend.dto.response.FriendGetSearchListRes;
-import com.clover.youngchat.domain.friend.service.FriendService;
+import com.clover.youngchat.domain.friend.service.command.FriendCommandService;
+import com.clover.youngchat.domain.friend.service.query.FriendQueryService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import java.util.List;
@@ -23,12 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/friends")
 public class FriendController {
 
-    private final FriendService friendService;
+    private final FriendQueryService friendQueryService;
+    private final FriendCommandService friendCommandService;
 
     @GetMapping
     public RestResponse<List<FriendGetListRes>> getFriendList(
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(friendService.getFriendList(userDetails.getUser()));
+        return RestResponse.success(friendQueryService.getFriendList(userDetails.getUser()));
     }
 
     @GetMapping("/search")
@@ -36,18 +38,20 @@ public class FriendController {
         String keyword,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            friendService.getFriendSearchList(keyword, userDetails.getUser()));
+            friendQueryService.getFriendSearchList(keyword, userDetails.getUser()));
     }
 
     @PostMapping("/{friendId}")
     public RestResponse<FriendAddRes> addFriend(@PathVariable Long friendId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(friendService.addFriend(friendId, userDetails.getUser()));
+        return RestResponse.success(
+            friendCommandService.addFriend(friendId, userDetails.getUser()));
     }
 
     @DeleteMapping("/{friendId}")
     public RestResponse<FriendDeleteRes> deleteFriend(@PathVariable Long friendId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(friendService.deleteFriend(friendId, userDetails.getUser()));
+        return RestResponse.success(
+            friendCommandService.deleteFriend(friendId, userDetails.getUser()));
     }
 }
