@@ -1,6 +1,8 @@
 package com.clover.youngchat.domain.user.service.command;
 
 import static com.clover.youngchat.domain.user.constant.UserConstant.EMAIL_AUTHENTICATION;
+import static com.clover.youngchat.domain.user.constant.UserConstant.JPEG;
+import static com.clover.youngchat.domain.user.constant.UserConstant.PNG;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
 import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
@@ -80,8 +82,8 @@ public class UserCommandService {
         if (multipartFile == null || multipartFile.isEmpty()) {
             profileImageUrl = user.getProfileImage();
         } else {
-            if (!Objects.equals(multipartFile.getContentType(), "image/png") &&
-                !Objects.equals(multipartFile.getContentType(), "image/jpeg")) {
+            if (!Objects.equals(multipartFile.getContentType(), PNG) &&
+                !Objects.equals(multipartFile.getContentType(), JPEG)) {
                 throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
             }
             if (!profileImageUrl.equals(defaultProfileImageUrl)) {
