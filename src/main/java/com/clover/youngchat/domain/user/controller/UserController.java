@@ -13,7 +13,8 @@ import com.clover.youngchat.domain.user.dto.response.UserProfileGetRes;
 import com.clover.youngchat.domain.user.dto.response.UserProfileSearchRes;
 import com.clover.youngchat.domain.user.dto.response.UserSignupRes;
 import com.clover.youngchat.domain.user.dto.response.UserUpdatePasswordRes;
-import com.clover.youngchat.domain.user.service.UserService;
+import com.clover.youngchat.domain.user.service.command.UserCommandService;
+import com.clover.youngchat.domain.user.service.query.UserQueryService;
 import com.clover.youngchat.global.response.RestResponse;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -35,35 +36,36 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserQueryService userQueryService;
+    private final UserCommandService userCommandService;
 
     @GetMapping("/profile")
     public RestResponse<UserProfileGetRes> getProfile(@RequestParam(required = false) Long userId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(userService.getProfile(userId, userDetails.getUser()));
+        return RestResponse.success(userQueryService.getProfile(userId, userDetails.getUser()));
     }
 
     @GetMapping(value = "/search", headers = "Keyword")
     public RestResponse<UserProfileSearchRes> searchProfile(
         @RequestHeader("Keyword") String email) {
-        return RestResponse.success(userService.searchProfile(email));
+        return RestResponse.success(userQueryService.searchProfile(email));
     }
 
     @GetMapping(value = "/signup/email", headers = "Email")
     public RestResponse<UserEmailCheckRes> checkEmailDuplicated(
         @RequestHeader("Email") String email) {
-        return RestResponse.success(userService.checkEmailDuplicated(email));
+        return RestResponse.success(userQueryService.checkEmailDuplicated(email));
     }
 
     @PostMapping("/signup")
     public RestResponse<UserSignupRes> signup(@Valid @RequestBody UserSignupReq userSignupReq) {
-        return RestResponse.success(userService.signup(userSignupReq));
+        return RestResponse.success(userCommandService.signup(userSignupReq));
     }
 
     @PostMapping("/signup/email")
     public RestResponse<UserEmailAuthRes> sendAuthEmail(
         @Valid @RequestBody UserEmailAuthReq req) {
-        return RestResponse.success(userService.sendAuthEmail(req));
+        return RestResponse.success(userCommandService.sendAuthEmail(req));
     }
 
     @PatchMapping("/profile")
@@ -72,7 +74,8 @@ public class UserController {
         @RequestPart(name = "image", required = false) MultipartFile multipartFile,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            userService.editProfile(userId, req, multipartFile, userDetails.getUser().getId()));
+            userCommandService.editProfile(userId, req, multipartFile,
+                userDetails.getUser().getId()));
     }
 
     @PatchMapping("/password")
@@ -80,12 +83,13 @@ public class UserController {
         @Valid @RequestBody UserUpdatePasswordReq userUpdatePasswordReq,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            userService.updatePassword(userDetails.getUser().getId(), userUpdatePasswordReq));
+            userCommandService.updatePassword(userDetails.getUser().getId(),
+                userUpdatePasswordReq));
     }
 
     @PatchMapping("/signup/email")
     public RestResponse<UserEmailAuthCheckRes> checkAuthEmail(
         @RequestBody UserEmailAuthCheckReq req) {
-        return RestResponse.success(userService.checkAuthEmail(req));
+        return RestResponse.success(userCommandService.checkAuthEmail(req));
     }
 }
