@@ -6,9 +6,13 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
+import com.clover.youngchat.domain.chat.dto.request.ChatDeleteReq;
+import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chat.service.command.ChatCommandService;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -23,6 +27,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import test.ChatTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,8 +43,14 @@ class ChatServiceTest implements ChatTest {
     @Mock
     private ChatRoomUserRepository chatRoomUserRepository;
 
+    @Mock
+    private RabbitTemplate rabbitTemplate;
+
     @InjectMocks
     private ChatCommandService chatCommandService;
+
+    @Value("${rabbitmq.exchange.name}")
+    private String exchangeName;
 
     @Nested
     @DisplayName("채팅 입력 테스트")
@@ -75,6 +87,16 @@ class ChatServiceTest implements ChatTest {
     @DisplayName("채팅 삭제 테스트")
     class deleteChatTest {
 
+        ChatDeleteReq req;
+
+        @BeforeEach
+        void setup() {
+            req = ChatDeleteReq.builder()
+                .userId(TEST_USER_ID)
+                .chatId(TEST_CHAT_ID)
+                .build();
+        }
+
         @Test
         @DisplayName("성공")
         void deleteChatSuccessTest() {
@@ -84,10 +106,14 @@ class ChatServiceTest implements ChatTest {
             given(chatRepository.findById(any())).willReturn(Optional.of(TEST_CHAT));
 
             // when
-            chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID);
+            chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, req);
 
             // then
             assertThat(TEST_CHAT.isDeleted()).isTrue();
+            verify(rabbitTemplate).convertAndSend(eq(exchangeName),
+                eq("chat-rooms." + TEST_CHAT_ROOM_ID),
+                any(ChatRes.class));
+
         }
 
         @Test
@@ -99,7 +125,7 @@ class ChatServiceTest implements ChatTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
+                () -> chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
@@ -117,12 +143,11 @@ class ChatServiceTest implements ChatTest {
 
             // when
             GlobalException exception = assertThrows(GlobalException.class,
-                () -> chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, TEST_CHAT_ID, TEST_USER_ID));
+                () -> chatCommandService.deleteChat(TEST_CHAT_ROOM_ID, req));
 
             // then
             assertThat(exception.getResultCode().getMessage())
                 .isEqualTo(NOT_FOUND_CHAT.getMessage());
-
         }
     }
 }
