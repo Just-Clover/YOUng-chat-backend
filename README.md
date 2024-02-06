@@ -15,8 +15,9 @@
 ## 1. 프로젝트 소개
 
 * **프로젝트 기간** : 2024.1.4 ~ 2024.2.8
-* [YOUngChat 배포 사이트 바로가기](https://youngchat.store)
-* [FE GitHub Repository](https://github.com/Just-Clover/YOUng-chat-frontend)
+* **시연 영상** : [🍀YOUngChat 시연 영상 바로가기](https://www.youtube.com/watch?v=WZ4JzStrWnI)
+* **배포 사이트** : [🍀YOUngChat 배포 사이트 바로가기](https://youngchat.store)
+* **Front Gihub** : [FE GitHub Repository](https://github.com/Just-Clover/YOUng-chat-frontend)
 
 단순한 기능과 한 눈에 들어오는 UI로 남녀노소 누구나 쉽게 사용할 수 있는 **실시간 채팅 서비스** 입니다.
 서비스 로직보다는 **기술적인 도전**을 더 중점적으로 진행하였습니다.
@@ -30,7 +31,7 @@
 
 ## 3. 아키텍처
 
-![Untitled](https://github.com/Just-Clover/YOUng-chat-backend/assets/73452223/72e13a57-ece5-4838-9c73-36a6f1932f29)
+![스크린샷 2024-02-04 오후 10 53 51](https://github.com/Just-Clover/YOUng-chat-backend/assets/73452223/887acc02-6be4-4f26-a29e-4389336d6597)
 
 ## 4. ERD
 
