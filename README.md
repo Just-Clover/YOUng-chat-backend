@@ -1,6 +1,6 @@
 # YOUng-chat
 
-사용할 수록 젊어지는, 실시간 채팅 서비스
+사용할수록 젊어지는, 실시간 채팅 서비스
 
 ## 목차
 
@@ -17,7 +17,7 @@
 * **프로젝트 기간** : 2024.1.4 ~ 2024.2.8
 * **시연 영상** : [🍀YOUngChat 시연 영상 바로가기](https://www.youtube.com/watch?v=WZ4JzStrWnI)
 * **배포 사이트** : [🍀YOUngChat 배포 사이트 바로가기](https://youngchat.store)
-* **Front Gihub** : [FE GitHub Repository](https://github.com/Just-Clover/YOUng-chat-frontend)
+* **Front Repository** : [FE GitHub Repository](https://github.com/Just-Clover/YOUng-chat-frontend)
 
 단순한 기능과 한 눈에 들어오는 UI로 남녀노소 누구나 쉽게 사용할 수 있는 **실시간 채팅 서비스** 입니다.
 서비스 로직보다는 **기술적인 도전**을 더 중점적으로 진행하였습니다.
@@ -25,9 +25,9 @@
 ## 2. 팀원 소개
 
 | ![profile](https://avatars.githubusercontent.com/u/73452223?v=4) | ![profile](https://avatars.githubusercontent.com/u/75934088?v=4) | ![profile](https://avatars.githubusercontent.com/u/109781694?v=4) |
-|------------------------------------------------------------------|------------------------------------------------------------------|-------------------------------------------------------------------|
-| <center>리더                                                       | <center>부리더                                                      | <center>팀원                                                        |
-| <center>정해인</br> [@seaStamp](https://github.com/seaStamp)        | <center>최준영 </br> [@junxtar](https://github.com/junxtar)         | <center>용소희</br>[@yongcowhee](https://github.com/yongcowhee)      |
+|:----------------------------------------------------------------:|:----------------------------------------------------------------:|:-----------------------------------------------------------------:|
+|                                리더                                |                               부리더                                |                                팀원                                 |
+|        정해인</br> [@seaStamp](https://github.com/seaStamp)         |         최준영 </br> [@junxtar](https://github.com/junxtar)         |       용소희</br>[@yongcowhee](https://github.com/yongcowhee)        |
 
 ## 3. 아키텍처
 
