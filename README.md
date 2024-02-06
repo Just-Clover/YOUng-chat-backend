@@ -135,7 +135,7 @@
 
 [🔗 CI / CD](https://github.com/Just-Clover/YOUng-chat-backend/wiki/CI-CD)
 
-[🔗 로깅 전략]()
+[🔗 로깅 전략](https://github.com/Just-Clover/YOUng-chat-backend/wiki/%EB%A1%9C%EA%B9%85-%EC%A0%84%EB%9E%B5)
 
 ## 7. 트러블 슈팅
 
