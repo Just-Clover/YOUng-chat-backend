@@ -6,7 +6,7 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROO
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatDeleteRes;
+import com.clover.youngchat.domain.chat.dto.request.ChatDeleteReq;
 import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
@@ -75,17 +75,19 @@ public class ChatCommandService {
             chatRoom.getId());
     }
 
-    public ChatDeleteRes deleteChat(
-        final Long chatRoomId, final Long chatId, final Long userId) {
-        if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(chatRoomId, userId)) {
+    public void deleteChat(Long chatRoomId, ChatDeleteReq chatDeleteReq) {
+        if (!chatRoomUserRepository.existsByChatRoom_IdAndUser_Id(
+            chatRoomId, chatDeleteReq.getUserId())) {
             throw new GlobalException(ACCESS_DENY);
         }
-        Chat chat = chatRepository.findById(chatId)
+
+        Chat chat = chatRepository.findById(chatDeleteReq.getChatId())
             .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
 
         chat.deleteChat();
 
-        return new ChatDeleteRes();
+        rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId,
+            ChatRes.to(chat));
     }
 
     private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
