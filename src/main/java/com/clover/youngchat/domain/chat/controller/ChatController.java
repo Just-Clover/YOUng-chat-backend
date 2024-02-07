@@ -1,22 +1,15 @@
 package com.clover.youngchat.domain.chat.controller;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatDeleteRes;
+import com.clover.youngchat.domain.chat.dto.request.ChatDeleteReq;
 import com.clover.youngchat.domain.chat.service.command.ChatCommandService;
-import com.clover.youngchat.global.response.RestResponse;
-import com.clover.youngchat.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-@RestController
-@RequestMapping("/api/v1/chat-rooms/{chatRoomId}/chats")
+@Controller
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -28,12 +21,9 @@ public class ChatController {
         chatCommandService.sendMessage(chatRoomId, chatCreateReq);
     }
 
-    @DeleteMapping("/{chatId}")
-    public RestResponse<ChatDeleteRes> deleteChat(
-        @PathVariable Long chatRoomId, @PathVariable Long chatId,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return RestResponse.success(
-            chatCommandService.deleteChat(chatRoomId, chatId, userDetails.getUser().getId()));
+    @MessageMapping("chat-rooms.{chatRoomId}.delete")
+    public void deleteChat(@DestinationVariable Long chatRoomId,
+        @Payload ChatDeleteReq chatDeleteReq) {
+        chatCommandService.deleteChat(chatRoomId, chatDeleteReq);
     }
-
 }
