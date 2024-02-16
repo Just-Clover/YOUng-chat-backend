@@ -131,7 +131,7 @@
 
 [🔗 부하/성능 테스트 툴 - Jmeter](https://github.com/Just-Clover/YOUng-chat-backend/wiki/%EB%B6%80%ED%95%98-%EC%84%B1%EB%8A%A5-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%88%B4-Jmeter)
 
-[🔗 Polling/ WebSocket](https://github.com/Just-Clover/YOUng-chat-backend/wiki/Polling%EA%B3%BC-WebSocket)
+[🔗 Websocket 적용 및 RabbitMQ](https://github.com/Just-Clover/YOUng-chat-backend/wiki/Websocket-%EC%A0%81%EC%9A%A9-%EB%B0%8F-RabbitMQ#1-websocket-%EB%8F%84%EC%9E%85)
 
 [🔗 CI / CD](https://github.com/Just-Clover/YOUng-chat-backend/wiki/CI-CD)
 
