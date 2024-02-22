@@ -22,6 +22,9 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setMaxPoolSize(5);
         executor.setQueueCapacity(10);
         executor.setThreadNamePrefix("Async MailExecutor-");
+        executor.setRejectedExecutionHandler((r, exec) -> {
+            throw new IllegalArgumentException("더 이상 요청을 처리할 수 없습니다.");
+        });
         executor.initialize();
         return executor;
     }
