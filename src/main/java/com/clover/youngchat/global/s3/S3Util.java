@@ -1,11 +1,15 @@
 package com.clover.youngchat.global.s3;
 
+import static com.clover.youngchat.domain.user.constant.UserConstant.JPEG;
+import static com.clover.youngchat.domain.user.constant.UserConstant.PNG;
+import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_FILE;
 import static com.clover.youngchat.global.exception.ResultCode.SYSTEM_ERROR;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.clover.youngchat.global.exception.GlobalException;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +34,13 @@ public class S3Util {
     }
 
     public String uploadFile(MultipartFile multipartFile, FilePath filePath) {
-        if (multipartFile == null || multipartFile.isEmpty()) {
-            return null;
+        if (!Objects.equals(multipartFile.getContentType(), PNG) &&
+            !Objects.equals(multipartFile.getContentType(), JPEG)) {
+            throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
         }
 
-        String fileName = createFileName(multipartFile.getOriginalFilename());
+        String fileName = createFileName(
+            Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
         ObjectMetadata metadata = setObjectMetadata(multipartFile);
 
