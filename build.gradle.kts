@@ -97,6 +97,10 @@ dependencies {
 
     // mongo
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+    // marvin
+    implementation("com.github.downgoon:marvin:1.5.5")
+    implementation("com.github.downgoon:MarvinPlugins:1.5.5")
 }
 
 tasks.withType<Test> {

@@ -1,11 +1,8 @@
 package com.clover.youngchat.domain.user.service.command;
 
 import static com.clover.youngchat.domain.user.constant.UserConstant.EMAIL_AUTHENTICATION;
-import static com.clover.youngchat.domain.user.constant.UserConstant.JPEG;
-import static com.clover.youngchat.domain.user.constant.UserConstant.PNG;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
 import static com.clover.youngchat.global.exception.ResultCode.DUPLICATED_EMAIL;
-import static com.clover.youngchat.global.exception.ResultCode.INVALID_PROFILE_IMAGE_TYPE;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_CONFIRM_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.MISMATCH_PASSWORD;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
@@ -29,7 +26,6 @@ import com.clover.youngchat.global.email.EmailUtil;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.s3.S3Util;
 import com.clover.youngchat.global.s3.S3Util.FilePath;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,6 +45,12 @@ public class UserCommandService {
 
     @Value("${default.image.url}")
     private String defaultProfileImageUrl;
+
+    private static void validateUserId(Long userId, Long authUserId) {
+        if (!userId.equals(authUserId)) {
+            throw new GlobalException(ACCESS_DENY);
+        }
+    }
 
     public UserSignupRes signup(UserSignupReq userSignupReq) {
 
@@ -70,29 +72,20 @@ public class UserCommandService {
     public UserProfileEditRes editProfile(Long userId, UserProfileEditReq req,
         MultipartFile multipartFile,
         Long authUserId) {
-        if (!userId.equals(authUserId)) {
-            throw new GlobalException(ACCESS_DENY);
-        }
 
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+        validateUserId(userId, authUserId);
+
+        User user = findUserById(userId);
 
         String profileImageUrl = user.getProfileImage();
 
-        if (multipartFile == null || multipartFile.isEmpty()) {
-            profileImageUrl = user.getProfileImage();
-        } else {
-            if (!Objects.equals(multipartFile.getContentType(), PNG) &&
-                !Objects.equals(multipartFile.getContentType(), JPEG)) {
-                throw new GlobalException(INVALID_PROFILE_IMAGE_TYPE);
-            }
-            if (!profileImageUrl.equals(defaultProfileImageUrl)) {
-                s3Util.deleteFile(profileImageUrl, FilePath.PROFILE);
-            }
-            profileImageUrl = s3Util.uploadFile(multipartFile, FilePath.PROFILE);
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            profileImageUrl = updateProfileImage(multipartFile, profileImageUrl);
         }
 
-        user.updateProfile(req, profileImageUrl);
+        if (!user.getProfileImage().equals(profileImageUrl)) {
+            user.updateProfile(req, profileImageUrl);
+        }
 
         return new UserProfileEditRes();
     }
@@ -145,6 +138,21 @@ public class UserCommandService {
 
         if (req.getPrePassword().equals(req.getNewPassword())) {
             throw new GlobalException(SAME_OLD_PASSWORD);
+        }
+    }
+
+    private String updateProfileImage(MultipartFile multipartFile, String oldImageUrl) {
+        String newImageUrl = s3Util.uploadFile(multipartFile, FilePath.PROFILE);
+        if (newImageUrl != null && !newImageUrl.equals(oldImageUrl)) {
+            deleteProfileImage(oldImageUrl);
+            return newImageUrl;
+        }
+        return oldImageUrl;
+    }
+
+    private void deleteProfileImage(String imageUrl) {
+        if (!imageUrl.equals(defaultProfileImageUrl)) {
+            s3Util.deleteFile(imageUrl, FilePath.PROFILE);
         }
     }
 }
