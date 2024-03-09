@@ -13,11 +13,11 @@ import com.clover.youngchat.domain.chatroom.dto.response.PersonalChatRoomCreateR
 import com.clover.youngchat.domain.chatroom.service.command.ChatRoomCommandService;
 import com.clover.youngchat.domain.chatroom.service.query.ChatRoomQueryService;
 import com.clover.youngchat.global.response.RestResponse;
+import com.clover.youngchat.global.response.RestSlice;
 import com.clover.youngchat.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,11 +55,10 @@ public class ChatRoomController {
     }
 
     @GetMapping
-    public RestResponse<Slice<ChatRoomAndLastChatGetRes>> getChatRoomList(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestParam(required = false) Long cursorChatId) {
+    public RestResponse<RestSlice<ChatRoomAndLastChatGetRes>> getChatRoomList(
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return RestResponse.success(
-            chatRoomQueryService.getChatRoomList(userDetails.getUser(), cursorChatId));
+            chatRoomQueryService.getChatRoomList(userDetails.getUser()));
     }
 
     @GetMapping("/{chatRoomId}")

@@ -18,7 +18,6 @@ import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -54,21 +53,21 @@ public class ChatCommandService {
 
         Chat chat = chatRepository.save(Chat.builder()
             .message(req.getMessage())
-            .sender(chatRoomUser.getUser())
-            .chatRoom(chatRoom)
+            .senderId(chatRoomUser.getUser().getId())
+            .chatRoomId(chatRoom.getId())
             .build());
 
         rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
 
-        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
+//        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
 
         ChatAlertRes res = ChatAlertRes.to(chatRoomId, chatRoom.getTitle(), user.getUsername(),
             user.getProfileImage(), req.getMessage());
 
-        userIds.forEach(userId -> {
-            String routingKey = "users." + userId;
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, res);
-        });
+//        userIds.forEach(userId -> {
+//            String routingKey = "users." + userId;
+//            rabbitTemplate.convertAndSend(exchangeName, routingKey, res);
+//        });
 
         log.info("Message [{}] send by member: {} to chatting room: {}", req.getMessage(),
             user.getId(),
@@ -90,8 +89,8 @@ public class ChatCommandService {
             ChatRes.to(chat));
     }
 
-    private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
-        return chatRoomUserRepository.getOtherUsersInChatRoom(chatRoomId, userId)
-            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
-    }
+//    private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
+//        return chatRoomUserRepository.getOtherUsersInChatRoom(chatRoomId, userId)
+//            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
+//    }
 }
