@@ -1,12 +1,9 @@
 package com.clover.youngchat.domain.chatroom.service.query;
 
-import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_DETAIL_LIMIT_SIZE;
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_LIMIT_SIZE;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
-import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
 
-import com.clover.youngchat.domain.chat.dto.response.ChatRes;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
@@ -18,7 +15,6 @@ import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.response.RestSlice;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,25 +29,25 @@ public class ChatRoomQueryService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
 
-    public RestSlice<ChatRoomAndLastChatGetRes> getChatRoomList(User user, Long cursorChatId) {
-        userRepository.findById(user.getId());
+    public RestSlice<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
+        // 채팅방 아이디와 제목
         return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
-            cursorChatId, CHAT_ROOM_LIMIT_SIZE);
+            CHAT_ROOM_LIMIT_SIZE);
     }
 
     public ChatRoomDetailGetRes getDetailChatRoom(Long chatRoomId, User user) {
         isChatRoomMember(chatRoomId, user.getId());
         ChatRoom chatRoom = findById(chatRoomId);
 
-        List<ChatRes> chatList = chatRepository.findAllByChatRoom_Id(chatRoomId)
-            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT))
-            .stream()
-            .map(ChatRes::to)
-            .toList();
+//        List<ChatRes> chatList = chatRepository.findAllByChatRoom_Id(chatRoomId)
+//            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT))
+//            .stream()
+//            .map(ChatRes::to)
+//            .toList();
 
         return ChatRoomDetailGetRes.builder()
             .title(chatRoom.getTitle())
-            .chatResList(chatList)
+//            .chatResList(chatList)
             .build();
     }
 
@@ -61,13 +57,13 @@ public class ChatRoomQueryService {
         isChatRoomMember(chatRoomId, user.getId());
         ChatRoom chatRoom = findById(chatRoomId);
 
-        RestSlice<ChatRes> chatResList =
-            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId,
-                CHAT_ROOM_DETAIL_LIMIT_SIZE);
+//        RestSlice<ChatRes> chatResList =
+//            chatRepository.findChatsByChatRoomId(chatRoomId, lastChatId,
+//                CHAT_ROOM_DETAIL_LIMIT_SIZE);
 
         return ChatRoomPaginationDetailGetRes.builder()
             .title(chatRoom.getTitle())
-            .chatResList(chatResList)
+//            .chatResList(chatResList)
             .build();
     }
 

@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 public class ChatDeleteReq {
 
     private Long userId;
-    private Long chatId;
+    private String chatId;
 
     @Builder
-    private ChatDeleteReq(Long userId, Long chatId) {
+    private ChatDeleteReq(Long userId, String chatId) {
         this.userId = userId;
         this.chatId = chatId;
     }

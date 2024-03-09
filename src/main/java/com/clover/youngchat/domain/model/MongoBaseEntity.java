@@ -1,24 +1,22 @@
 package com.clover.youngchat.domain.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
+public abstract class MongoBaseEntity implements Serializable {
 
     @CreatedDate
-    @Column(updatable = false, name = "create_at")
+    @Field(name = "create_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "modified_at")
+    @Field(name = "modified_at")
     private LocalDateTime modifiedAt;
 }

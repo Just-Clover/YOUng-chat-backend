@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRes {
 
-    private Long chatId;
+    private String chatId;
     private Long userId;
     private String username;
     private String profileImage;
@@ -24,7 +24,7 @@ public class ChatRes {
     private LocalDateTime messageTime;
 
     @Builder
-    public ChatRes(Long chatId, Long userId, String username, String profileImage,
+    public ChatRes(String chatId, Long userId, String username, String profileImage,
         String message, Boolean isDeleted, LocalDateTime messageTime) {
         this.chatId = chatId;
         this.userId = userId;
@@ -39,9 +39,7 @@ public class ChatRes {
     public static ChatRes to(Chat chat) {
         return ChatRes.builder()
             .chatId(chat.getId())
-            .userId(chat.getSender().getId())
-            .username(chat.getSender().getUsername())
-            .profileImage(chat.getSender().getProfileImage())
+            .userId(chat.getSenderId())
             .message(chat.getMessage())
             .isDeleted(chat.isDeleted())
             .messageTime(chat.getCreatedAt())

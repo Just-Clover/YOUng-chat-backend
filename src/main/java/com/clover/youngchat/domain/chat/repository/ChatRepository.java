@@ -1,23 +1,19 @@
 package com.clover.youngchat.domain.chat.repository;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
-import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.RepositoryDefinition;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-@RepositoryDefinition(domainClass = Chat.class, idClass = Long.class)
-public interface ChatRepository extends ChatRepositoryCustom {
+public interface ChatRepository extends MongoRepository<Chat, String> {
 
-    Chat save(Chat chat);
+//    @Query("select c from Chat c where c.chatRoom.id = :chatRoomId order by c.createdAt desc limit 1")
+//    Optional<Chat> findLastChatByChatRoom_Id(@Param("chatRoomId") Long chatRoomId);
 
-    Optional<Chat> findById(Long chatId);
+    //    Optional<List<Chat>> findAllByChatRoom_Id(Long chatRoomId);
 
-    void delete(Chat chat);
+    Optional<List<Chat>> findByChatRoomId(Long chatRoomId);
 
-    @Query("select c from Chat c where c.chatRoom.id = :chatRoomId order by c.createdAt desc limit 1")
-    Optional<Chat> findLastChatByChatRoom_Id(@Param("chatRoomId") Long chatRoomId);
-
-    Optional<List<Chat>> findAllByChatRoom_Id(Long chatRoomId);
+    Optional<Chat> findFirstByChatRoomIdOrderByCreatedAtAsc(Long chatRoomId);
+    //List<1 2 3 4>
 }
