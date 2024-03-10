@@ -11,6 +11,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -19,31 +20,30 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepositoryCustom 
     private final JPAQueryFactory queryFactory;
     private final ChatRepository chatRepository;
 
-//    @Override
-//    public Optional<List<Long>> getOtherUsersInChatRoom(Long chatRoomId, Long userId) {
-//        QChatRoomUser chatRoomUser = QChatRoomUser.chatRoomUser;
-//
-//        return Optional.ofNullable(
-//            queryFactory.select(Projections.constructor(Long.class, chatRoomUser.user.id))
-//                .from(chatRoomUser)
-//                .where(chatRoomUser.chatRoom.id.in(chatRoomId))
-//                .groupBy(chatRoomUser.user.id)
-//                .having(chatRoomUser.user.id.notIn(userId))
-//                .fetch());
-//    }
+    @Override
+    public Optional<List<Long>> getOtherUsersInChatRoom(Long chatRoomId, Long userId) {
+        QChatRoomUser chatRoomUser = QChatRoomUser.chatRoomUser;
+
+        return Optional.ofNullable(
+            queryFactory.select(Projections.constructor(Long.class, chatRoomUser.user.id))
+                .from(chatRoomUser)
+                .where(chatRoomUser.chatRoom.id.in(chatRoomId))
+                .groupBy(chatRoomUser.user.id)
+                .having(chatRoomUser.user.id.notIn(userId))
+                .fetch());
+    }
 
     @Override
     public RestSlice<ChatRoomAndLastChatGetRes> findChatRoomsAndLastChatByUserId(Long userId,
         int limitSize) {
         List<ChatRoomIdAndTitleGetRes> resList = queryChatRooms(userId, limitSize);
-        // 문제 1. 채팅방 ID가 있지만 내가 하고 싶은 것은 최근 채팅 별로 정렬하고 싶음
         List<ChatRoomAndLastChatGetRes> list = new ArrayList<>();
         for (ChatRoomIdAndTitleGetRes res : resList) {
-            Chat chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtAsc(res.getChatRoomId())
-                .get();
+            Chat chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(
+                res.getChatRoomId());
             list.add(ChatRoomAndLastChatGetRes.to(res.getTitle(), chat));
         }
-
+        list.sort((o1, o2) -> o2.getLastChatTime().compareTo(o1.getLastChatTime()));
         return createSlice(list, limitSize);
     }
 

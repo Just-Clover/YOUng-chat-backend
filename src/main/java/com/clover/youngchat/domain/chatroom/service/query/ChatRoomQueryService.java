@@ -30,7 +30,6 @@ public class ChatRoomQueryService {
     private final UserRepository userRepository;
 
     public RestSlice<ChatRoomAndLastChatGetRes> getChatRoomList(User user) {
-        // 채팅방 아이디와 제목
         return chatRoomUserRepository.findChatRoomsAndLastChatByUserId(user.getId(),
             CHAT_ROOM_LIMIT_SIZE);
     }
