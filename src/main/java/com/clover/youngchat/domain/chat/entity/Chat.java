@@ -15,17 +15,17 @@ public class Chat extends MongoBaseEntity {
 
     @Id
     private String id;
-    private boolean isDeleted = false;
     private String message;
     private Long senderId;
     private Long chatRoomId;
+    private boolean isDeleted = false;
 
     @Builder
-    private Chat(boolean isDeleted, String message, Long senderId, Long chatRoomId) {
-        this.isDeleted = isDeleted;
+    private Chat(String message, Long senderId, Long chatRoomId, boolean isDeleted) {
         this.message = message;
         this.senderId = senderId;
         this.chatRoomId = chatRoomId;
+        this.isDeleted = isDeleted;
     }
 
     public void deleteChat() {
