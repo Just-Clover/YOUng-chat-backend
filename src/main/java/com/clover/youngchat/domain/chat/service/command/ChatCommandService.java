@@ -7,7 +7,7 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.dto.request.ChatDeleteReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatRes;
+import com.clover.youngchat.domain.chat.dto.response.ChatMessageRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatAlertRes;
@@ -58,7 +58,8 @@ public class ChatCommandService {
             .chatRoomId(chatRoom.getId())
             .build());
 
-        rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
+        rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId,
+            ChatMessageRes.to(chat));
 
         List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
 
@@ -87,7 +88,7 @@ public class ChatCommandService {
         chat.deleteChat();
 
         rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId,
-            ChatRes.to(chat));
+            ChatMessageRes.to(chat));
     }
 
     private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
