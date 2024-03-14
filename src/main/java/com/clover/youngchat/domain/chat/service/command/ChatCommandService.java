@@ -7,7 +7,7 @@ import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.dto.request.ChatDeleteReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatRes;
+import com.clover.youngchat.domain.chat.dto.response.ChatMessageRes;
 import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatAlertRes;
@@ -18,6 +18,7 @@ import com.clover.youngchat.domain.chatroom.repository.ChatRoomUserRepository;
 import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -57,17 +58,18 @@ public class ChatCommandService {
             .chatRoomId(chatRoom.getId())
             .build());
 
-        rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId, ChatRes.to(chat));
+        rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId,
+            ChatMessageRes.to(chat));
 
-//        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
+        List<Long> userIds = getUserIdListByChatRoomId(chatRoomId, user.getId());
 
         ChatAlertRes res = ChatAlertRes.to(chatRoomId, chatRoom.getTitle(), user.getUsername(),
             user.getProfileImage(), req.getMessage());
 
-//        userIds.forEach(userId -> {
-//            String routingKey = "users." + userId;
-//            rabbitTemplate.convertAndSend(exchangeName, routingKey, res);
-//        });
+        userIds.forEach(userId -> {
+            String routingKey = "users." + userId;
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, res);
+        });
 
         log.info("Message [{}] send by member: {} to chatting room: {}", req.getMessage(),
             user.getId(),
@@ -86,11 +88,11 @@ public class ChatCommandService {
         chat.deleteChat();
 
         rabbitTemplate.convertAndSend(exchangeName, "chat-rooms." + chatRoomId,
-            ChatRes.to(chat));
+            ChatMessageRes.to(chat));
     }
 
-//    private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
-//        return chatRoomUserRepository.getOtherUsersInChatRoom(chatRoomId, userId)
-//            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
-//    }
+    private List<Long> getUserIdListByChatRoomId(Long chatRoomId, Long userId) {
+        return chatRoomUserRepository.getOtherUsersInChatRoom(chatRoomId, userId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHATROOM));
+    }
 }

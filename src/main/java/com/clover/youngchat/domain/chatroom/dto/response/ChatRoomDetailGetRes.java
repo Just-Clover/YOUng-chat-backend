@@ -20,4 +20,11 @@ public class ChatRoomDetailGetRes {
         this.title = title;
         this.chatResList = chatResList;
     }
+
+    public static ChatRoomDetailGetRes to(String title, List<ChatRes> chatResList) {
+        return ChatRoomDetailGetRes.builder()
+            .title(title)
+            .chatResList(chatResList)
+            .build();
+    }
 }
