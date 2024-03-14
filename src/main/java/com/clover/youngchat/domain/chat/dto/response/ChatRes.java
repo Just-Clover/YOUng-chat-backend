@@ -1,6 +1,7 @@
 package com.clover.youngchat.domain.chat.dto.response;
 
 import com.clover.youngchat.domain.chat.entity.Chat;
+import com.clover.youngchat.domain.user.entity.User;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import java.time.LocalDateTime;
@@ -36,10 +37,12 @@ public class ChatRes {
     }
 
 
-    public static ChatRes to(Chat chat) {
+    public static ChatRes to(Chat chat, User user) {
         return ChatRes.builder()
             .chatId(chat.getId())
             .userId(chat.getSenderId())
+            .username(user.getUsername())
+            .profileImage(user.getProfileImage())
             .message(chat.getMessage())
             .isDeleted(chat.isDeleted())
             .messageTime(chat.getCreatedAt())
