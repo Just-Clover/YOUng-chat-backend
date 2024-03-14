@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 
 import com.clover.youngchat.domain.chat.dto.request.ChatCreateReq;
 import com.clover.youngchat.domain.chat.dto.request.ChatDeleteReq;
-import com.clover.youngchat.domain.chat.dto.response.ChatRes;
+import com.clover.youngchat.domain.chat.dto.response.ChatMessageRes;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chat.service.command.ChatCommandService;
 import com.clover.youngchat.domain.chatroom.repository.ChatRoomRepository;
@@ -112,7 +112,7 @@ class ChatServiceTest implements ChatTest {
             assertThat(TEST_CHAT.isDeleted()).isTrue();
             verify(rabbitTemplate).convertAndSend(eq(exchangeName),
                 eq("chat-rooms." + TEST_CHAT_ROOM_ID),
-                any(ChatRes.class));
+                any(ChatMessageRes.class));
 
         }
 
