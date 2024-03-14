@@ -2,8 +2,12 @@ package com.clover.youngchat.domain.chatroom.service.query;
 
 import static com.clover.youngchat.domain.chatroom.constant.ChatRoomConstant.CHAT_ROOM_LIMIT_SIZE;
 import static com.clover.youngchat.global.exception.ResultCode.ACCESS_DENY;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHAT;
 import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_CHATROOM;
+import static com.clover.youngchat.global.exception.ResultCode.NOT_FOUND_USER;
 
+import com.clover.youngchat.domain.chat.dto.response.ChatRes;
+import com.clover.youngchat.domain.chat.entity.Chat;
 import com.clover.youngchat.domain.chat.repository.ChatRepository;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomAndLastChatGetRes;
 import com.clover.youngchat.domain.chatroom.dto.response.ChatRoomDetailGetRes;
@@ -15,6 +19,8 @@ import com.clover.youngchat.domain.user.entity.User;
 import com.clover.youngchat.domain.user.repository.UserRepository;
 import com.clover.youngchat.global.exception.GlobalException;
 import com.clover.youngchat.global.response.RestSlice;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,16 +44,16 @@ public class ChatRoomQueryService {
         isChatRoomMember(chatRoomId, user.getId());
         ChatRoom chatRoom = findById(chatRoomId);
 
-//        List<ChatRes> chatList = chatRepository.findAllByChatRoom_Id(chatRoomId)
-//            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT))
-//            .stream()
-//            .map(ChatRes::to)
-//            .toList();
-
-        return ChatRoomDetailGetRes.builder()
-            .title(chatRoom.getTitle())
-//            .chatResList(chatList)
-            .build();
+        List<Chat> chatList = chatRepository.findAllByChatRoomId(chatRoomId)
+            .orElseThrow(() -> new GlobalException(NOT_FOUND_CHAT));
+        List<ChatRes> chatResList = new ArrayList<>();
+        for (Chat chat : chatList) {
+            User sender = userRepository.findById(chat.getSenderId())
+                .orElseThrow(() -> new GlobalException(NOT_FOUND_USER));
+            chatResList.add(ChatRes.to(chat, sender));
+        }
+        
+        return ChatRoomDetailGetRes.to(chatRoom.getTitle(), chatResList);
     }
 
     public ChatRoomPaginationDetailGetRes getPaginationDetailChatRoom(Long chatRoomId,

@@ -65,7 +65,6 @@ public class ChatRoomController {
     public RestResponse<ChatRoomDetailGetRes> getDetailChatRoom(@PathVariable Long chatRoomId,
         @AuthenticationPrincipal UserDetailsImpl
             userDetails) {
-        log.info("user: {}님이 채팅방 {} 에 들어갔습니다.", userDetails.getUser().getId(), chatRoomId);
         return RestResponse.success(
             chatRoomQueryService.getDetailChatRoom(chatRoomId, userDetails.getUser()));
     }
